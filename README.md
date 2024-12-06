@@ -1,2 +1,3 @@
-# NECS
-Nexus Entity Component System
+# MyECS
+
+My Entity Component System

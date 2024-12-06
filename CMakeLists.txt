@@ -46,17 +46,18 @@ FetchContent_MakeAvailable(MyGit)
 INIT_GIT()
 UPDATE_SUBMODULES()
 
-LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/external/MyCMake/cmake")
+LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/external/MyTemplate/external/MyCMake/cmake")
 INCLUDE (Tools)
 
 INCLUDE_DIRECTORIES(
-        "${CMAKE_SOURCE_DIR}/include"
+        "${PROJECT_SOURCE_DIR}/include"
+        "${PROJECT_SOURCE_DIR}/external/MyTemplate/include"
         # $ENV{*_INCLUDE_PATH}
         # ...
 )
 
 LINK_DIRECTORIES(
-        "${CMAKE_SOURCE_DIR}/lib"
+        "${PROJECT_SOURCE_DIR}/lib"
         # $ENV{*_LIBRARY_PATH}
         # ...
 )

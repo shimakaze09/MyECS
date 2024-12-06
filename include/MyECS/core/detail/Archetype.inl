@@ -1,0 +1,4 @@
+#ifndef ARCHETYPE_INL
+#define ARCHETYPE_INL
+
+#endif  // ARCHETYPE_INL

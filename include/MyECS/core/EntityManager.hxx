@@ -1,0 +1,4 @@
+#ifndef ENTITY_MANAGER_HXX
+#define ENTITY_MANAGER_HXX
+
+#endif  // ENTITY_MANAGER_HXX
