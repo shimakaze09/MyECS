@@ -1,0 +1,3 @@
+[submodule "external/MyTemplate"]
+	path = external/MyTemplate
+	url = https://github.com/shimakaze09/MyTemplate.git
