@@ -228,12 +228,12 @@ class Archetype {
  private:
   friend class Entity;
 
-  size_t m_num{0};
   ArchetypeManager* m_mgr;
   ID id;
   std::map<size_t, std::tuple<size_t, size_t>> h2so;  // hash to {size, offset}
   size_t m_chunkCapacity;
   std::vector<Chunk*> m_chunks;
+  size_t m_num{0};
 };
 }  // namespace My
 
