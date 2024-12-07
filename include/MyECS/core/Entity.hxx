@@ -1,32 +1,40 @@
 #ifndef ENTITY_HXX
 #define ENTITY_HXX
 
-#include "Archetype.hxx"
-#include "Component.hxx"
+#include "ArchetypeManager.hxx"
 
 namespace My {
 class World;
 
-class Entity {
+class Entity : private EntityData {
  public:
   template <typename Cmpt, typename... Args>
   inline void Init(Args... args) {
-    m_archetype->Init<Cmpt>(m_id, std::forward<Args>(args)...);
+    assert(IsAlive());
+    archetype->Init<Cmpt>(idx, std::forward<Args>(args)...);
   }
 
   template <typename Cmpt>
-  inline Cmpt& Get() {
-    return m_archetype->Get<Cmpt>(m_id);
+  inline Cmpt* Get() {
+    assert(IsAlive());
+    return archetype()->At<Cmpt>(idx());
   }
 
-  inline bool IsAlive() const noexcept { return m_isAlive; }
+  template <typename Cmpt, typename... Args>
+  inline Cmpt* Add(Args&&... args) {
+    assert(IsAlive());
+    return archetype()->m_mgr->EntityAdd<Cmpt>(this,
+                                              std::forward<Args>(args)...);
+  }
+
+  inline bool IsAlive() const noexcept { return archetype() != nullptr; }
 
  private:
   friend class World;
-  bool m_isAlive{false};
-  detail::Archetype* m_archetype;
-  size_t m_id;
 };
+
+static_assert(sizeof(Entity) == sizeof(EntityData) &&
+              std::is_base_of_v<EntityData, Entity>);
 }  // namespace My
 
 #endif  // ENTITY_HXX

@@ -18,12 +18,10 @@ struct Each;
 namespace My {
 class World {
  public:
-  World() : m_manager(this) {}
+  World() : m_manager(new ArchetypeManager(this)) {}
 
   template <typename... Cmpts>
   inline Entity* CreateEntityWith();
-
-  void Delete(Entity* entity);
 
   template <typename ArgList>
   friend struct detail::World_::Each;
@@ -35,10 +33,7 @@ class World {
   }
 
  private:
-  detail::ArchetypeManager m_manager;
-  Pool<Entity> m_entities;
-  std::map<Entity*, std::tuple<detail::Archetype*, size_t>> m_entityToAtid;
-  std::map<std::tuple<detail::Archetype*, size_t>, Entity*> m_atidToEntity;
+  ArchetypeManager* m_manager;
 };
 }  // namespace My
 

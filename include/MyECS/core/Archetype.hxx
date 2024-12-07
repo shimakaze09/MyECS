@@ -1,111 +1,240 @@
 #ifndef ARCHETYPE_HXX
 #define ARCHETYPE_HXX
 
+#include "Chunk.hxx"
+
 #include <MyTemplate/TypeID.hxx>
 
 #include <cassert>
 #include <map>
+#include <set>
+#include <tuple>
 #include <vector>
 
-namespace My::detail {
+namespace My {
+class ArchetypeManager;
+
 class Archetype {
- private:
-  using byte = std::uint8_t;
-
  public:
+  class ID : private std::set<size_t> {
+   public:
+    ID() = default;
+
+    template <typename... Cmpts>
+    ID(TypeList<Cmpts...>) noexcept {
+      Add<Cmpts...>();
+    }
+
+    template <typename... Cmpts>
+    void Add() noexcept {
+      (insert(TypeID<Cmpts>), ...);
+    }
+
+    template <typename... Cmpts>
+    bool IsContain() const noexcept {
+      return ((find(TypeID<Cmpts>) != end()) && ...);
+    }
+
+    template <typename... Cmpts>
+    bool Is() const noexcept {
+      return sizeof...(Cmpts) == size() && IsContain<Cmpts...>();
+    }
+
+    using std::set<size_t>::begin;
+    using std::set<size_t>::end;
+
+    bool operator<(const ID& id) const noexcept {
+      auto l = begin(), r = id.begin();
+      while (l != end() && r != id.end()) {
+        if (*l < *r)
+          return true;
+        if (*l > *r)
+          return false;
+        ++l;
+        ++r;
+      }
+      return l == end() && r != id.end();
+    }
+
+    bool operator==(const ID& id) const noexcept {
+      if (size() != id.size())
+        return false;
+      for (auto l = begin(), r = id.begin(); l != end(); ++l, ++r) {
+        if (*l != *r)
+          return false;
+      }
+      return true;
+    }
+  };
+
+  // argument is for type deduction
   template <typename... Cmpts>
-  void Init() {
-    m_map.clear();
-    m_size.clear();
-    m_n = 0;
-    if constexpr (sizeof...(Cmpts) == 0) {
-      m_map[My::TypeID<void>] = std::vector<byte>{};
-      m_size[My::TypeID<void>] = sizeof(byte);
-    } else {
-      ((m_map[My::TypeID<Cmpts>] = std::vector<byte>{}), ...);
-      ((m_size[My::TypeID<Cmpts>] = sizeof(Cmpts)), ...);
+  Archetype(ArchetypeManager* mgr, TypeList<Cmpts...>) : m_mgr(mgr) {
+    using CmptList = TypeList<Cmpts...>;
+
+    constexpr size_t N = sizeof...(Cmpts);
+
+    constexpr auto info = Chunk::StaticInfo<Cmpts...>();
+    m_chunkCapacity = info.capacity;
+    ((h2so[TypeID<Cmpts>] =
+          std::make_tuple(info.sizes[Find_v<CmptList, Cmpts>],
+                          info.offsets[Find_v<CmptList, Cmpts>])),
+     ...);
+    id.Add<Cmpts...>();
+  }
+
+  template <typename Cmpt>
+  Archetype(Archetype* srcArchetype, IType<Cmpt>) {
+    ArchetypeManager* mgr = srcArchetype->m_mgr;
+    id = srcArchetype->id;
+    id.Add<Cmpt>();
+    std::map<size_t, size_t> s2h;  // size to hash
+    for (auto h : id) {
+      if (h == TypeID<Cmpt>)
+        s2h[sizeof(Cmpt)] = h;
+      else
+        s2h[std::get<0>(srcArchetype->h2so[h])] = h;
+    }
+    std::vector<size_t> sizes;
+    for (auto p : s2h)
+      sizes.push_back(p.first);  // sorted
+    auto co = Chunk::CO(sizes);
+    m_chunkCapacity = std::get<0>(co);
+    size_t i = 0;
+    for (auto h : id) {
+      h2so[h] = std::make_tuple(sizes[i], std::get<1>(co)[i]);
+      i++;
     }
   }
 
-  template <typename... Cmpts>
-  size_t CreateEntity() {
-    if constexpr (sizeof...(Cmpts) == 0)
-      assert(m_map.size() == 1 && m_map.find(My::TypeID<void>) != m_map.end());
-    else
-      assert(!(sizeof...(Cmpts) != m_map.size()) ||
-             !((m_map.find(My::TypeID<Cmpts>) != m_map.end()) && ...));
-
-    (push_back<Cmpts>(), ...);
-
-    return m_n++;
+  ~Archetype() {
+    for (auto c : m_chunks)
+      delete c;
   }
 
+  template <typename... Cmpts>
+  const std::tuple<std::vector<Cmpts*>...> Locate() {
+    return {LocateOne<Cmpts>()...};
+  }
+
+  std::tuple<void*, size_t> At(size_t cmptHash, size_t idx) {
+    auto target = h2so.find(cmptHash);
+    assert(target != h2so.end());
+    size_t size = std::get<0>(target->second);
+    size_t offset = std::get<1>(target->second);
+    size_t idxInChunk = idx % m_chunkCapacity;
+    byte* buffer = m_chunks[idx / m_chunkCapacity]->Data();
+    return {buffer + offset + size * idxInChunk, size};
+  }
+
+  template <typename Cmpt>
+  Cmpt* At(size_t idx) {
+    auto target = h2so.find(TypeID<Cmpt>);
+    if (target == h2so.end())
+      return nullptr;
+    assert(sizeof(Cmpt) == std::get<0>(target->second));
+    size_t offset = std::get<1>(target->second);
+    size_t idxInChunk = idx % m_chunkCapacity;
+    byte* buffer = m_chunks[idx / m_chunkCapacity]->Data();
+    return reinterpret_cast<Cmpt*>(buffer + offset + sizeof(Cmpt) * idxInChunk);
+  }
+
+  // no init
   size_t CreateEntity() {
-    assert(m_size.size() > 0);
-    for (auto& p : m_size) {
-      auto& arr = m_map[p.first];
-      for (size_t i = 0; i < p.second; i++)
-        arr.emplace_back();
-    }
-    return m_n++;
+    if (m_num % m_chunkCapacity == 0)
+      m_chunks.push_back(new Chunk);
+    return m_num++;
+  }
+
+  // init all cmpts
+  template <typename... Cmpts>
+  size_t CreateEntity() {
+    assert(id.Is<Cmpts...>());
+
+    using CmptList = TypeList<Cmpts...>;
+    size_t idx = CreateEntity();
+    size_t idxInChunk = idx % m_chunkCapacity;
+    byte* buffer = m_chunks[idx / m_chunkCapacity]->Data();
+    std::array<std::tuple<size_t, size_t>, sizeof...(Cmpts)> soArr{
+        h2so[TypeID<Cmpts>]...};
+    (new (buffer + std::get<1>(soArr[Find_v<CmptList, Cmpts>]) +
+          idxInChunk * std::get<0>(soArr[Find_v<CmptList, Cmpts>])) Cmpts(),
+     ...);
+
+    return idx;
+  }
+
+  // erase idx-th entity
+  // if idx != num-1, back entity will put at idx, return num-1
+  // else return static_cast<size_t>(-1)
+  size_t Erase(size_t idx) {
+    assert(idx < m_num);
+    size_t movedIdx;
+    if (idx != m_num - 1) {
+      size_t idxInChunk = idx % m_chunkCapacity;
+      byte* buffer = m_chunks[idx / m_chunkCapacity]->Data();
+      for (auto p : h2so) {
+        size_t size = std::get<0>(p.second);
+        size_t offset = std::get<1>(p.second);
+        byte* dst = buffer + offset + size * idxInChunk;
+        byte* src = buffer + offset + (m_num - 1) * idxInChunk;
+        memcpy(dst, src, size);
+      }
+      movedIdx = m_num - 1;
+    } else
+      movedIdx = static_cast<size_t>(-1);
+
+    m_num--;
+
+    return movedIdx;
+  }
+
+  inline size_t Size() const noexcept { return m_num; }
+
+  inline size_t ChunkNum() const noexcept { return m_chunks.size(); }
+
+  inline size_t ChunkCapacity() const noexcept { return m_chunkCapacity; }
+
+  inline const ID& GetID() const noexcept { return id; }
+
+  inline ArchetypeManager* GetArchetypeManager() const noexcept {
+    return m_mgr;
+  }
+
+  template <typename... Cmpts>
+  bool IsContain() const noexcept {
+    return id.IsContain<Cmpts...>();
   }
 
   template <typename Cmpt, typename... Args>
-  void Init(size_t ID, Args&&... args) {
-    void* addr = &Get<Cmpt>(ID);
-    new (addr) Cmpt{std::forward<Args>(args)...};
+  Cmpt* Init(size_t idx, Args&&... args) noexcept {
+    Cmpt* cmpt = reinterpret_cast<Cmpt*>(At<Cmpt>(idx));
+    new (cmpt) Cmpt(std::forward<Args>(args)...);
+    return cmpt;
   }
-
-  template <typename Cmpt>
-  Cmpt& Get(size_t ID) {
-    auto target = m_map.find(My::TypeID<Cmpt>);
-    assert(target != m_map.end() &&
-           target->second.size() >= sizeof(Cmpt) * (ID + 1));
-    return reinterpret_cast<Cmpt&>(target->second[sizeof(Cmpt) * ID]);
-  }
-
-  template <typename Cmpt>
-  Cmpt* Get() const noexcept {
-    auto target = m_map.find(My::TypeID<Cmpt>);
-    assert(target != m_map.end());
-    return reinterpret_cast<Cmpt*>(const_cast<byte*>(target->second.data()));
-  }
-
-  template <typename... Cmpts>
-  bool IsContain() const {
-    return ((m_map.find(My::TypeID<Cmpts>) != m_map.end()) && ...);
-  }
-
-  size_t Delete(size_t ID) {
-    assert(m_n > ID);
-    if (ID != m_n - 1) {
-      for (auto& p : m_map) {
-        size_t s = m_size[p.first];
-        auto& arr = p.second;
-        auto dst = &arr[ID * s];
-        auto src = &arr[(m_n - 1) * s];
-        memcpy(dst, src, s);
-        for (size_t i = 0; i < s; i++)
-          arr.pop_back();
-      }
-    }
-    return --m_n;
-  }
-
-  inline size_t Size() const noexcept { return m_n; }
 
  private:
   template <typename Cmpt>
-  void push_back() {
-    auto target = m_map.find(My::TypeID<Cmpt>);
-    for (size_t i = 0; i < sizeof(Cmpt); i++)
-      target->second.emplace_back();
+  const std::vector<Cmpt*> LocateOne() {
+    auto target = h2so.find(TypeID<Cmpt>);
+    assert(target != h2so.end());
+    const size_t offset = std::get<1>(target->second);
+    std::vector<Cmpt*> rst;
+    for (auto c : m_chunks)
+      rst.push_back(reinterpret_cast<Cmpt*>(c->Data() + offset));
+    return rst;
   }
 
-  size_t m_n{0};
-  std::map<size_t, size_t> m_size;
-  std::map<size_t, std::vector<byte>> m_map;
+ private:
+  friend class Entity;
+
+  size_t m_num{0};
+  ArchetypeManager* m_mgr;
+  ID id;
+  std::map<size_t, std::tuple<size_t, size_t>> h2so;  // hash to {size, offset}
+  size_t m_chunkCapacity;
+  std::vector<Chunk*> m_chunks;
 };
-}  // namespace My::detail
+}  // namespace My
 
 #endif  // ARCHETYPE_HXX

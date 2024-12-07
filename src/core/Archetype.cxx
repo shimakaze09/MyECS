@@ -1,0 +1,1 @@
+#include "MyECS/core/Archetype.hxx"
