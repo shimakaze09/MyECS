@@ -32,11 +32,6 @@ class Pool {
     std::unordered_set<T*> freeAddressSet(m_freeAddresses.begin(),
                                           m_freeAddresses.end());
     for (auto block : m_blocks) {
-      for (size_t i = 0; i < BLOCK_SIZE; ++i) {
-        T* address = block->data() + i;
-        if (freeAddressSet.find(address) == freeAddressSet.end())
-          address->~T();
-      }
       free(block);
     }
     m_blocks.clear();
@@ -52,7 +47,7 @@ class Pool {
   }
 
  private:
-  static constexpr size_t BLOCK_SIZE = 64;
+  static constexpr size_t BLOCK_SIZE = 1024;
   using Block = std::array<T, BLOCK_SIZE>;
 
   std::vector<Block*> m_blocks;

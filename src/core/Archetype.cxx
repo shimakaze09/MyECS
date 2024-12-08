@@ -3,6 +3,8 @@
 using namespace My;
 using namespace std;
 
+Pool<Chunk> Archetype::m_chunkPools;
+
 bool Archetype::ID::operator<(const ID& id) const noexcept {
   auto l = begin(), r = id.begin();
   while (l != end() && r != id.end()) {
@@ -56,6 +58,11 @@ size_t Archetype::Erase(size_t idx) {
     movedIdx = static_cast<size_t>(-1);
 
   m_num--;
+
+  if (m_chunks.size() * m_chunkCapacity - m_num >= m_chunkCapacity) {
+    Chunk* back = m_chunks.back();
+    m_chunkPools.Recycle(back);
+  }
 
   return movedIdx;
 }

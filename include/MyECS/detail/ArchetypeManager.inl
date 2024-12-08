@@ -38,21 +38,21 @@ const std::vector<Archetype*> ArchetypeManager::GetArchetypeWith() {
   return rst;
 }
 
-template <typename Cmpt, typename... Args>
-Cmpt* ArchetypeManager::EntityAttach(EntityData* e, Args&&... args) {
-  assert(!e->archetype()->id.IsContain<Cmpt>());
+template <typename... Cmpts>
+std::tuple<Cmpts*...> ArchetypeManager::EntityAttach(EntityData* e) {
+  assert(!e->archetype()->id.IsContain<Cmpts...>());
 
   Archetype* srcArchetype = e->archetype();
   size_t srcIdx = e->idx();
 
   auto& srcID = srcArchetype->GetID();
   auto dstID = srcID;
-  dstID.Add<Cmpt>();
+  dstID.Add<Cmpts...>();
 
   Archetype* dstArchetype;
   auto target = m_idToArchetype.find(dstID);
   if (target == m_idToArchetype.end()) {
-    dstArchetype = Archetype::Add<Cmpt>::From(srcArchetype);
+    dstArchetype = Archetype::Add<Cmpts...>::From(srcArchetype);
     assert(dstID == dstArchetype->GetID());
     m_idToArchetype[dstID] = dstArchetype;
     m_ids.insert(dstID);
@@ -60,7 +60,6 @@ Cmpt* ArchetypeManager::EntityAttach(EntityData* e, Args&&... args) {
     dstArchetype = target->second;
 
   size_t dstIdx = dstArchetype->CreateEntity();
-  Cmpt* cmpt = dstArchetype->Init<Cmpt>(dstIdx, std::forward<Args>(args)...);
   for (auto cmptHash : srcID) {
     auto srcCmpt = srcArchetype->At(cmptHash, srcIdx);
     auto dstCmpt = dstArchetype->At(cmptHash, dstIdx);
@@ -84,24 +83,30 @@ Cmpt* ArchetypeManager::EntityAttach(EntityData* e, Args&&... args) {
   e->archetype() = dstArchetype;
   e->idx() = dstIdx;
 
-  return cmpt;
+  if (srcArchetype->Size() == 0 && srcArchetype->CmptNum() != 0) {
+    m_ids.erase(srcArchetype->id);
+    m_idToArchetype.erase(srcArchetype->id);
+    delete srcArchetype;
+  }
+
+  return {dstArchetype->At<Cmpts>(dstIdx)...};
 }
 
-template <typename Cmpt>
+template <typename... Cmpts>
 void ArchetypeManager::EntityDetach(EntityData* e) {
-  assert(e->archetype()->id.IsContain<Cmpt>());
+  assert(e->archetype()->id.IsContain<Cmpts...>());
 
   Archetype* srcArchetype = e->archetype();
   size_t srcIdx = e->idx();
 
   auto& srcID = srcArchetype->GetID();
   auto dstID = srcID;
-  dstID.Remove<Cmpt>();
+  dstID.Remove<Cmpts...>();
 
   Archetype* dstArchetype;
   auto target = m_idToArchetype.find(dstID);
   if (target == m_idToArchetype.end()) {
-    dstArchetype = Archetype::Remove<Cmpt>::From(srcArchetype);
+    dstArchetype = Archetype::Remove<Cmpts...>::From(srcArchetype);
     assert(dstID == dstArchetype->GetID());
     m_idToArchetype[dstID] = dstArchetype;
     m_ids.insert(dstID);
@@ -131,6 +136,12 @@ void ArchetypeManager::EntityDetach(EntityData* e) {
 
   e->archetype() = dstArchetype;
   e->idx() = dstIdx;
+
+  if (srcArchetype->Size() == 0) {
+    m_ids.erase(srcArchetype->id);
+    m_idToArchetype.erase(srcArchetype->id);
+    delete srcArchetype;
+  }
 }
 
 }  // namespace My

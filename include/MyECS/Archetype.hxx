@@ -2,6 +2,7 @@
 #define ARCHETYPE_HXX
 
 #include "Chunk.hxx"
+#include "Pool.hxx"
 
 #include <MyTemplate/TypeID.hxx>
 
@@ -39,6 +40,10 @@ class Archetype {
       return ((find(TypeID<Cmpts>) != end()) && ...);
     }
 
+    bool IsContain(size_t cmptHash) const noexcept {
+      return find(cmptHash) != end();
+    }
+
     template <typename... Cmpts>
     bool Is() const noexcept {
       return sizeof...(Cmpts) == size() && IsContain<Cmpts...>();
@@ -58,21 +63,23 @@ class Archetype {
   template <typename... Cmpts>
   Archetype(ArchetypeManager* mgr, TypeList<Cmpts...>) noexcept;
 
-  template <typename Cmpt>
+  template <typename... Cmpts>
   struct Add {
     static Archetype* From(Archetype* srcArchetype) noexcept;
   };
 
-  template <typename Cmpt>
+  template <typename... Cmpts>
   struct Remove {
     static Archetype* From(Archetype* srcArchetype) noexcept;
   };
-  template <typename Cmpt>
+  template <typename... Cmpts>
   friend struct Add;
+  template <typename... Cmpts>
+  friend struct Remove;
 
   inline ~Archetype() {
     for (auto c : m_chunks)
-      delete c;
+      m_chunkPools.Recycle(c);
   }
 
   template <typename... Cmpts>
@@ -88,7 +95,7 @@ class Archetype {
   // no init
   inline size_t CreateEntity() {
     if (m_num == m_chunks.size() * m_chunkCapacity)
-      m_chunks.push_back(new Chunk);
+      m_chunks.push_back(m_chunkPools.Request());
     return m_num++;
   }
 
@@ -141,6 +148,8 @@ class Archetype {
   size_t m_chunkCapacity;
   std::vector<Chunk*> m_chunks;
   size_t m_num{0};
+
+  static Pool<Chunk> m_chunkPools;  // TODO: lock
 };
 }  // namespace My
 
