@@ -1,4 +1,0 @@
-#ifndef COMPONENT_HXX
-#define COMPONENT_HXX
-
-#endif  // COMPONENT_HXX
