@@ -1,4 +1,4 @@
-#include "MyECS/core/Archetype.hxx"
+#include "MyECS/Archetype.hxx"
 
 using namespace My;
 using namespace std;

@@ -1,4 +1,4 @@
-#include "MyECS/core/Chunk.hxx"
+#include "MyECS/Chunk.hxx"
 
 using namespace My;
 using namespace std;

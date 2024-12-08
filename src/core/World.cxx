@@ -1,3 +1,3 @@
-#include "MyECS/core/World.hxx"
+#include "MyECS/World.hxx"
 
 using namespace My;

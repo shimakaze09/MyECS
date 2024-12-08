@@ -1,4 +1,4 @@
-#include "MyECS/core/World.hxx"
+#include "MyECS/World.hxx"
 
 #include <iostream>
 #include <set>
