@@ -49,6 +49,8 @@ class Archetype {
 
     bool operator<(const ID& id) const noexcept;
     bool operator==(const ID& id) const noexcept;
+
+    friend class Archetype;
   };
 
   Archetype() = default;
@@ -111,6 +113,8 @@ class Archetype {
     return m_mgr;
   }
 
+  inline size_t CmptNum() const noexcept { return id.size(); }
+
   template <typename... Cmpts>
   inline bool IsContain() const noexcept {
     return id.IsContain<Cmpts...>();
@@ -129,6 +133,7 @@ class Archetype {
 
  private:
   friend class Entity;
+  friend class ArchetypeManager;
 
   ArchetypeManager* m_mgr;
   ID id;

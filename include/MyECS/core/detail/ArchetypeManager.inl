@@ -29,7 +29,7 @@ EntityData* ArchetypeManager::CreateEntity() {
 }
 
 template <typename... Cmpts>
-const std::vector<Archetype*> ArchetypeManager::LocateArchetypeWith() {
+const std::vector<Archetype*> ArchetypeManager::GetArchetypeWith() {
   std::vector<Archetype*> rst;
   for (auto& p : m_idToArchetype) {
     if (p.second->IsContain<Cmpts...>())
@@ -40,6 +40,8 @@ const std::vector<Archetype*> ArchetypeManager::LocateArchetypeWith() {
 
 template <typename Cmpt, typename... Args>
 Cmpt* ArchetypeManager::EntityAttach(EntityData* e, Args&&... args) {
+  assert(!e->archetype()->id.IsContain<Cmpt>());
+
   Archetype* srcArchetype = e->archetype();
   size_t srcIdx = e->idx();
 
@@ -87,6 +89,8 @@ Cmpt* ArchetypeManager::EntityAttach(EntityData* e, Args&&... args) {
 
 template <typename Cmpt>
 void ArchetypeManager::EntityDetach(EntityData* e) {
+  assert(e->archetype()->id.IsContain<Cmpt>());
+
   Archetype* srcArchetype = e->archetype();
   size_t srcIdx = e->idx();
 
