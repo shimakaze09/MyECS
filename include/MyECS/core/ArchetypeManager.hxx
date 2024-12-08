@@ -37,7 +37,10 @@ class ArchetypeManager {
   EntityData* CreateEntity();
 
   template <typename Cmpt, typename... Args>
-  Cmpt* EntityAdd(EntityData* e, Args&&... args);
+  Cmpt* EntityAttach(EntityData* e, Args&&... args);
+
+  template <typename Cmpt>
+  void EntityDetach(EntityData* e);
 
   void Release(EntityData* e);
 

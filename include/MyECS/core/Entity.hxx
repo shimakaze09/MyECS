@@ -21,10 +21,16 @@ class Entity : private EntityData {
   }
 
   template <typename Cmpt, typename... Args>
-  inline Cmpt* Add(Args&&... args) {
+  inline Cmpt* Attach(Args&&... args) {
     assert(IsAlive());
-    return archetype()->m_mgr->EntityAdd<Cmpt>(this,
-                                              std::forward<Args>(args)...);
+    return archetype()->m_mgr->EntityAttach<Cmpt>(this,
+                                                  std::forward<Args>(args)...);
+  }
+
+  template <typename Cmpt>
+  inline void Detach() {
+    assert(IsAlive());
+    return archetype()->m_mgr->EntityDetach<Cmpt>(this);
   }
 
   inline bool IsAlive() const noexcept { return archetype() != nullptr; }
