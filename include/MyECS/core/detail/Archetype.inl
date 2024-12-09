@@ -123,6 +123,11 @@ Cmpt* Archetype::New(void* addr, EntityData* e) {
   e->RegisterCmptRelease(cmpt);
   return cmpt;
 }
+
+template <typename Cmpt>
+Cmpt* Archetype::New(size_t idx, EntityData* e) {
+  return New<Cmpt>(At<Cmpt>(idx), e);
+}
 }  // namespace My
 
 #endif  // ARCHETYPE_INL
