@@ -6,7 +6,11 @@
 namespace My {
 template <typename... Cmpts>
 std::tuple<Entity*, Cmpts*...> World::CreateEntity() {
-  static_assert(IsSet_v<TypeList<Cmpts...>>, "Componnents must be different");
+  static_assert(sizeof...(Cmpts) > 0);
+  static_assert(IsSet_v<TypeList<Cmpts...>>, "Components must be different");
+  static_assert(((std::is_constructible_v<Cmpts> ||
+                  std::is_constructible_v<Cmpts, Entity*>) &&
+                 ...));
   auto rst = m_manager->CreateEntity<Cmpts...>();
   return {reinterpret_cast<Entity*>(std::get<0>(rst)),
           std::get<1 + Find_v<TypeList<Cmpts...>, Cmpts>>(rst)...};

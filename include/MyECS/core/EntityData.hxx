@@ -31,6 +31,7 @@ struct EntityData : std::tuple<Archetype*, size_t> {
 
  private:
   friend class ArchetypeManager;
+  friend class Archetype;
 
   template <typename Cmpt>
   void RegisterCmptRelease(Cmpt* cmpt) {

@@ -1,16 +1,17 @@
 #ifndef NODE_HXX
 #define NODE_HXX
 
+#include "../core/Entity.hxx"
+
 #include <set>
 
 namespace My::Cmpt {
 struct Node {
-  Entity* entity{nullptr};
+  Entity* entity;
   Node* parent{nullptr};
   std::set<Node*> children;
 
-  Node(Entity* entity = nullptr, Node* parent = nullptr)
-      : entity(entity), parent(parent) {}
+  Node(Entity* entity) : entity(entity) {}
 
   ~Node() {
     for (auto child : children)
@@ -50,8 +51,8 @@ struct Node {
     return parent->IsDescendantOf(node);
   }
 
-  Node(const Node& tree) = delete;
-  Node& operator=(const Node& tree) = delete;
+  Node(const Node& node) = delete;
+  Node& operator=(const Node& node) = delete;
 };
 }  // namespace My::Cmpt
 

@@ -2,6 +2,7 @@
 #define ARCHETYPE_HXX
 
 #include "Chunk.hxx"
+#include "EntityData.hxx"
 #include "Pool.hxx"
 
 #include <MyTemplate/TypeID.hxx>
@@ -14,6 +15,7 @@
 
 namespace My {
 class ArchetypeManager;
+class Entity;
 
 class Archetype {
  public:
@@ -99,9 +101,9 @@ class Archetype {
     return m_num++;
   }
 
-  // init all cmpts
+  // init cmpts (with e if std::is_constructible_v<Cmpt, Entity*>)
   template <typename... Cmpts>
-  size_t CreateEntity();
+  const std::pair<size_t, std::tuple<Cmpts*...>> CreateEntity(EntityData* e);
 
   // erase idx-th entity
   // if idx != num-1, back entity will put at idx, return num-1
@@ -128,16 +130,18 @@ class Archetype {
     return id.IsContain<Cmpts...>();
   }
 
-  template <typename Cmpt, typename... Args>
-  inline Cmpt* Init(size_t idx, Args&&... args) noexcept {
-    Cmpt* cmpt = reinterpret_cast<Cmpt*>(At<Cmpt>(idx));
-    new (cmpt) Cmpt(std::forward<Args>(args)...);
-    return cmpt;
-  }
+  // template <typename Cmpt, typename... Args>
+  // inline Cmpt* Init(size_t idx, Args&&... args) noexcept {
+  //   Cmpt* cmpt = reinterpret_cast<Cmpt*>(At<Cmpt>(idx));
+  //   new (cmpt) Cmpt(std::forward<Args>(args)...);
+  //   return cmpt;
+  // }
 
  private:
   template <typename Cmpt>
   const std::vector<Cmpt*> LocateOne();
+  template <typename Cmpt>
+  static Cmpt* New(void* addr, EntityData* e);
 
  private:
   friend class Entity;
