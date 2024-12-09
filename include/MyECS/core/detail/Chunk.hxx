@@ -44,6 +44,6 @@ struct Chunk {
 static_assert(sizeof(Chunk) == Chunk::size);
 }  // namespace My
 
-#include "detail/Chunk.inl"
+#include "Chunk.inl"
 
 #endif  // CHUNK_HXX

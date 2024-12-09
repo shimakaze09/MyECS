@@ -1,9 +1,25 @@
 #ifndef WORLD_INL
 #define WORLD_INL
 
-#include <thread>
-
 namespace My {
+World::World() : m_manager(new ArchetypeManager(this)) {}
+
+World::~World() {
+  delete m_manager;
+}
+
+template <typename Sys>
+inline void World::Each(Sys&& s) {
+  detail::World_::Each<typename FuncTraits<Sys>::ArgList>::Run(
+      this, std::forward<Sys>(s));
+}
+
+template <typename Sys>
+inline void World::ParallelEach(Sys&& s) {
+  detail::World_::ParallelEach<typename FuncTraits<Sys>::ArgList>::run(
+      this, std::forward<Sys>(s));
+}
+
 template <typename... Cmpts>
 std::tuple<Entity*, Cmpts*...> World::CreateEntity() {
   // static_assert(sizeof...(Cmpts) > 0);
@@ -36,7 +52,7 @@ struct Each<TypeList<Cmpts*...>> {
         auto cmptsTuple = std::make_tuple(
             std::get<Find_v<CmptList, Cmpts>>(cmptsVecTuple)[i]...);
         size_t J = std::min(chunkCapacity, num - (i * chunkCapacity));
-        for (size_t j = 0; j < J; ++j)
+        for (size_t j = 0; j < J; j++)
           s((std::get<Find_v<CmptList, Cmpts>>(cmptsTuple) + j)...);
       }
     }
@@ -47,7 +63,7 @@ template <typename... Cmpts>
 struct ParallelEach<TypeList<Cmpts*...>> {
   static_assert(sizeof...(Cmpts) > 0);
   using CmptList = TypeList<Cmpts...>;
-  static_assert(IsSet_v<CmptList>, "Components must be different");
+  static_assert(IsSet_v<CmptList>, "Componnents must be different");
 
   template <typename Sys>
   static void run(World* w, Sys&& s) {

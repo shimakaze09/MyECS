@@ -1,4 +1,4 @@
-#include "MyECS/core/ArchetypeManager.hxx"
+#include "MyECS/core/detail/ArchetypeManager.hxx"
 
 using namespace My;
 

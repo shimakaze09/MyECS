@@ -1,14 +1,12 @@
 #ifndef WORLD_HXX
 #define WORLD_HXX
 
-#include "Archetype.hxx"
-#include "ArchetypeManager.hxx"
+
 #include "Entity.hxx"
-#include "Pool.hxx"
 
 #include <MyTemplate/FuncTraits.hxx>
 
-#include <tuple>
+#include <thread>
 
 namespace My::detail::World_ {
 template <typename Arg>
@@ -20,34 +18,26 @@ struct ParallelEach;
 namespace My {
 class World {
  public:
-  World() : m_manager(new ArchetypeManager(this)) {}
-
-  ~World() { delete m_manager; }
+  World();
+  ~World();
 
   template <typename... Cmpts>
   inline std::tuple<Entity*, Cmpts*...> CreateEntity();
 
   // s must be a callable object, and it's argument-list isn't empty
-  template <typename ArgList>
-  friend struct detail::World_::Each;
-
   template <typename Sys>
-  inline void Each(Sys&& s) {
-    detail::World_::Each<typename FuncTraits<Sys>::ArgList>::Run(
-        this, std::forward<Sys>(s));
-  }
+  inline void Each(Sys&& s);
 
   // s must be a callable object, and it's argument-list isn't empty
+  template <typename Sys>
+  inline void ParallelEach(Sys&& s);
+
+ private:
+  template <typename ArgList>
+  friend struct detail::World_::Each;
   template <typename ArgList>
   friend struct detail::World_::ParallelEach;
 
-  template <typename Sys>
-  inline void ParallelEach(Sys&& s) {
-    detail::World_::ParallelEach<typename FuncTraits<Sys>::ArgList>::run(
-        this, std::forward<Sys>(s));
-  }
-
- private:
   ArchetypeManager* m_manager;
 };
 }  // namespace My

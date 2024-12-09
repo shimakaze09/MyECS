@@ -7,11 +7,8 @@
 
 #include <MyTemplate/TypeID.hxx>
 
-#include <cassert>
 #include <map>
 #include <set>
-#include <tuple>
-#include <vector>
 
 namespace My {
 class ArchetypeManager;
@@ -151,7 +148,8 @@ class Archetype {
 
   ArchetypeManager* m_manager;
   ID m_id;
-  std::map<size_t, std::pair<size_t, size_t>> m_hashToSO;  // hash to (size, offset)
+  std::map<size_t, std::pair<size_t, size_t>>
+      m_hashToSO;  // hash to (size, offset)
   size_t m_chunkCapacity;
   std::vector<Chunk*> m_chunks;
   size_t m_num{0};
@@ -160,6 +158,6 @@ class Archetype {
 };
 }  // namespace My
 
-#include "detail/Archetype.inl"
+#include "Archetype.inl"
 
 #endif  // ARCHETYPE_HXX

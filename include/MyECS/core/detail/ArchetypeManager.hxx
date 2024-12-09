@@ -54,6 +54,6 @@ class ArchetypeManager {
 };
 }  // namespace My
 
-#include "detail/ArchetypeManager.inl"
+#include "ArchetypeManager.inl"
 
 #endif  // ARCHETYPE_MANAGER_HXX

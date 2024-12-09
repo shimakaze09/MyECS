@@ -3,8 +3,6 @@
 
 #include "../core/Entity.hxx"
 
-#include <set>
-
 namespace My::Cmpt {
 class Node {
  public:
@@ -16,7 +14,6 @@ class Node {
 
   inline const My::Entity* Entity() const noexcept { return entity; }
 
-  // don't call it in parallel
   void AddChild(Node* child);
   void DelChild(Node* child);
 
