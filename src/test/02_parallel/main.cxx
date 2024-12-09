@@ -9,23 +9,25 @@ using namespace My;
 
 struct velocity {
   float v{0.f};
-  float pad[31];
+  float pad[31]{};
 };
 
 struct position {
   float x{0.f};
-  float pad[31];
+  float pad[31]{};
 };
 
 int main() {
   constexpr size_t N = 1 << 22;
   constexpr size_t M = 100;
+
   World w;
   vector<velocity*> vs;
   vector<position*> ps;
   vector<pair<size_t, size_t>> table;
   vs.reserve(N);
   ps.reserve(N);
+  table.reserve(N);
 
   default_random_engine engine;
   uniform_real_distribution uni_f(0.f, 1.f);
@@ -65,6 +67,7 @@ int main() {
     for (size_t i = 0; i < M; i++)
       pX += vX * 0.01f;
   }
+
   auto t1 = chrono::steady_clock::now();
   w.Each(sys);
   auto t2 = chrono::steady_clock::now();
@@ -75,7 +78,8 @@ int main() {
       chrono::duration_cast<chrono::duration<double>>(t1 - t0);
   chrono::duration<double> t12 =
       chrono::duration_cast<chrono::duration<double>>(t2 - t1);
-  chrono::duration<double> t32 = chrono::duration_cast<chrono::duration<double>>(t3 - t2);
+  chrono::duration<double> t32 =
+      chrono::duration_cast<chrono::duration<double>>(t3 - t2);
 
   cout << "core: " << thread::hardware_concurrency() << endl;
   cout << "[   Native   ] consume: " << t01.count() << "s" << endl;
