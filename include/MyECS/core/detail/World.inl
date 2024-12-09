@@ -6,6 +6,7 @@
 namespace My {
 template <typename... Cmpts>
 std::tuple<Entity*, Cmpts*...> World::CreateEntity() {
+  static_assert(IsSet_v<TypeList<Cmpts...>>, "Componnents must be different");
   auto rst = m_manager->CreateEntity<Cmpts...>();
   return {reinterpret_cast<Entity*>(std::get<0>(rst)),
           std::get<1 + Find_v<TypeList<Cmpts...>, Cmpts>>(rst)...};
@@ -17,6 +18,7 @@ template <typename... Cmpts>
 struct Each<TypeList<Cmpts*...>> {
   static_assert(sizeof...(Cmpts) > 0);
   using CmptList = TypeList<Cmpts...>;
+  static_assert(IsSet_v<CmptList>, "Components must be different");
 
   template <typename Sys>
   static void Run(World* w, Sys&& s) {
@@ -41,6 +43,7 @@ template <typename... Cmpts>
 struct ParallelEach<TypeList<Cmpts*...>> {
   static_assert(sizeof...(Cmpts) > 0);
   using CmptList = TypeList<Cmpts...>;
+  static_assert(IsSet_v<CmptList>, "Components must be different");
 
   template <typename Sys>
   static void run(World* w, Sys&& s) {

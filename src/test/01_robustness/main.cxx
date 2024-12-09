@@ -38,5 +38,15 @@ int main() {
     entities.erase(entities.begin());
   }
 
+  // [invalid]
+  // size_t i = 0;
+  // w.Each([&i]() {
+  //   cout << "i: " << i << endl;
+  //   i++;
+  // });
+
+  // [ invalid ]
+  // w.CreateEntity<velocity, velocity>();
+
   return 0;
 }
