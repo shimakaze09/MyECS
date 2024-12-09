@@ -2,7 +2,7 @@
 #define ARCHETYPE_HXX
 
 #include "Chunk.hxx"
-#include "EntityData.hxx"
+#include "EntityBase.hxx"
 #include "Pool.hxx"
 
 #include <MyTemplate/TypeID.hxx>
@@ -103,7 +103,7 @@ class Archetype {
 
   // init cmpts (with e if std::is_constructible_v<Cmpt, Entity*>)
   template <typename... Cmpts>
-  const std::pair<size_t, std::tuple<Cmpts*...>> CreateEntity(EntityData* e);
+  const std::pair<size_t, std::tuple<Cmpts*...>> CreateEntity(EntityBase* e);
 
   // erase idx-th entity
   // if idx != num-1, back entity will put at idx, return num-1
@@ -117,17 +117,17 @@ class Archetype {
 
   inline size_t ChunkCapacity() const noexcept { return m_chunkCapacity; }
 
-  inline const ID& GetID() const noexcept { return id; }
+  inline const ID& GetID() const noexcept { return m_id; }
 
   inline ArchetypeManager* GetArchetypeManager() const noexcept {
-    return m_mgr;
+    return m_manager;
   }
 
-  inline size_t CmptNum() const noexcept { return id.size(); }
+  inline size_t CmptNum() const noexcept { return m_id.size(); }
 
   template <typename... Cmpts>
   inline bool IsContain() const noexcept {
-    return id.IsContain<Cmpts...>();
+    return m_id.IsContain<Cmpts...>();
   }
 
   // template <typename Cmpt, typename... Args>
@@ -141,17 +141,17 @@ class Archetype {
   template <typename Cmpt>
   const std::vector<Cmpt*> LocateOne();
   template <typename Cmpt>
-  Cmpt* New(size_t idx, EntityData* e);
+  Cmpt* New(size_t idx, EntityBase* e);
   template <typename Cmpt>
-  static Cmpt* New(void* addr, EntityData* e);
+  static Cmpt* New(void* addr, EntityBase* e);
 
  private:
   friend class Entity;
   friend class ArchetypeManager;
 
-  ArchetypeManager* m_mgr;
-  ID id;
-  std::map<size_t, std::pair<size_t, size_t>> h2so;  // hash to (size, offset)
+  ArchetypeManager* m_manager;
+  ID m_id;
+  std::map<size_t, std::pair<size_t, size_t>> m_hashToSO;  // hash to (size, offset)
   size_t m_chunkCapacity;
   std::vector<Chunk*> m_chunks;
   size_t m_num{0};

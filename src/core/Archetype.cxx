@@ -29,8 +29,8 @@ bool Archetype::ID::operator==(const ID& id) const noexcept {
 }
 
 pair<void*, size_t> Archetype::At(size_t cmptHash, size_t idx) {
-  auto target = h2so.find(cmptHash);
-  if (target == h2so.end())
+  auto target = m_hashToSO.find(cmptHash);
+  if (target == m_hashToSO.end())
     return {nullptr, static_cast<size_t>(-1)};
 
   size_t size = target->second.first;
@@ -47,7 +47,7 @@ pair<size_t, vector<pair<void*, void*>>> Archetype::Erase(size_t idx) {
   if (idx != m_num - 1) {
     size_t idxInChunk = idx % m_chunkCapacity;
     byte* buffer = m_chunks[idx / m_chunkCapacity]->Data();
-    for (auto p : h2so) {
+    for (auto p : m_hashToSO) {
       size_t size = p.second.first;
       size_t offset = p.second.second;
       byte* dst = buffer + offset + size * idxInChunk;

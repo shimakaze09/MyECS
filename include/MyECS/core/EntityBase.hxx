@@ -3,31 +3,26 @@
 
 #include <functional>
 #include <map>
-#include <tuple>
 
 namespace My {
 class Archetype;
 
-struct EntityData : std::tuple<Archetype*, size_t> {
-  EntityData(Archetype* archetype = nullptr,
-             size_t idx = static_cast<size_t>(-1))
-      : std::tuple<Archetype*, size_t>{archetype, idx} {}
+struct EntityBase {
+  Archetype* archetype{nullptr};
+  size_t idx{static_cast<size_t>(-1)};
 
-  ~EntityData() {
+  ~EntityBase() {
     for (auto p : m_releases)
       p.second(p.first);
     m_releases.clear();
+
+    archetype = nullptr;
+    idx = static_cast<size_t>(-1);
   }
 
-  inline Archetype*& archetype() noexcept { return std::get<0>(*this); }
-
-  inline const Archetype* archetype() const noexcept {
-    return std::get<0>(*this);
+  bool operator<(const EntityBase& e) const noexcept {
+    return archetype < e.archetype || (archetype == e.archetype && idx < e.idx);
   }
-
-  inline size_t& idx() noexcept { return std::get<1>(*this); }
-
-  inline size_t idx() const noexcept { return std::get<1>(*this); }
 
  private:
   friend class ArchetypeManager;

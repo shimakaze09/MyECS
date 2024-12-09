@@ -2,7 +2,7 @@
 #define ARCHETYPE_MANAGER_HXX
 
 #include "Archetype.hxx"
-#include "EntityData.hxx"
+#include "EntityBase.hxx"
 #include "Pool.hxx"
 
 #include <MyTemplate/TypeList.hxx>
@@ -34,19 +34,20 @@ class ArchetypeManager {
   const std::vector<Archetype*> GetArchetypeWith();
 
   template <typename... Cmpts>
-  const std::tuple<EntityData*, Cmpts*...> CreateEntity();
+  const std::tuple<EntityBase*, Cmpts*...> CreateEntity();
 
   template <typename... Cmpts>
-  const std::tuple<Cmpts*...> EntityAttach(EntityData* e);
+  const std::tuple<Cmpts*...> EntityAttach(EntityBase* e);
 
   template <typename... Cmpts>
-  void EntityDetach(EntityData* e);
+  void EntityDetach(EntityBase* e);
 
-  void Release(EntityData* e);
+  void Release(EntityBase* e);
 
  private:
-  Pool<EntityData> m_entityPool;
-  std::map<EntityData, EntityData*> m_dataToPointer;
+  Pool<EntityBase> m_entityPool;
+  std::map<std::pair<Archetype*, size_t>, EntityBase*>
+      m_aiToEntity;  // (archetype, idx) -> entity
   std::set<Archetype::ID> m_ids;
   My::World* m_world;
   std::map<Archetype::ID, Archetype*> m_idToArchetype;  // id to archetype

@@ -16,15 +16,15 @@ inline Archetype* ArchetypeManager::GetOrCreateArchetypeOf() {
 }
 
 template <typename... Cmpts>
-const std::tuple<EntityData*, Cmpts*...> ArchetypeManager::CreateEntity() {
+const std::tuple<EntityBase*, Cmpts*...> ArchetypeManager::CreateEntity() {
   auto entity = m_entityPool.Request();
 
   Archetype* archetype = GetOrCreateArchetypeOf<Cmpts...>();
   auto [idx, cmpts] = archetype->CreateEntity<Cmpts...>(entity);
 
-  entity->archetype() = archetype;
-  entity->idx() = idx;
-  m_dataToPointer[*entity] = entity;
+  entity->archetype = archetype;
+  entity->idx = idx;
+  m_aiToEntity[{archetype, idx}] = entity;
 
   using CmptList = TypeList<Cmpts...>;
   return {entity, std::get<Find_v<CmptList, Cmpts>>(cmpts)...};
@@ -41,11 +41,11 @@ const std::vector<Archetype*> ArchetypeManager::GetArchetypeWith() {
 }
 
 template <typename... Cmpts>
-const std::tuple<Cmpts*...> ArchetypeManager::EntityAttach(EntityData* e) {
-  assert(!e->archetype()->id.IsContain<Cmpts...>());
+const std::tuple<Cmpts*...> ArchetypeManager::EntityAttach(EntityBase* e) {
+  assert(!e->archetype->m_id.IsContain<Cmpts...>());
 
-  Archetype* srcArchetype = e->archetype();
-  size_t srcIdx = e->idx();
+  Archetype* srcArchetype = e->archetype;
+  size_t srcIdx = e->idx;
 
   auto& srcID = srcArchetype->GetID();
   auto dstID = srcID;
@@ -77,24 +77,23 @@ const std::tuple<Cmpts*...> ArchetypeManager::EntityAttach(EntityData* e) {
   // erase
   auto [srcMovedIdx, pairs] = srcArchetype->Erase(srcIdx);
   if (srcMovedIdx != static_cast<size_t>(-1)) {
-    auto srcMovedEntityTarget =
-        m_dataToPointer.find({srcArchetype, srcMovedIdx});
+    auto srcMovedEntityTarget = m_aiToEntity.find({srcArchetype, srcMovedIdx});
     auto srcMovedEntity = srcMovedEntityTarget->second;
     for (auto p : pairs)
       srcMovedEntity->MoveCmpt(p.first, p.second);
-    m_dataToPointer.erase(srcMovedEntityTarget);
-    m_dataToPointer[{srcArchetype, srcIdx}] = srcMovedEntity;
-    srcMovedEntity->idx() = srcMovedIdx;
+    m_aiToEntity.erase(srcMovedEntityTarget);
+    m_aiToEntity[{srcArchetype, srcIdx}] = srcMovedEntity;
+    srcMovedEntity->idx = srcMovedIdx;
   }
 
-  m_dataToPointer[{dstArchetype, dstIdx}] = e;
+  m_aiToEntity[{dstArchetype, dstIdx}] = e;
 
-  e->archetype() = dstArchetype;
-  e->idx() = dstIdx;
+  e->archetype = dstArchetype;
+  e->idx = dstIdx;
 
   if (srcArchetype->Size() == 0 && srcArchetype->CmptNum() != 0) {
-    m_ids.erase(srcArchetype->id);
-    m_idToArchetype.erase(srcArchetype->id);
+    m_ids.erase(srcArchetype->m_id);
+    m_idToArchetype.erase(srcArchetype->m_id);
     delete srcArchetype;
   }
 
@@ -102,11 +101,11 @@ const std::tuple<Cmpts*...> ArchetypeManager::EntityAttach(EntityData* e) {
 }
 
 template <typename... Cmpts>
-void ArchetypeManager::EntityDetach(EntityData* e) {
-  assert(e->archetype()->id.IsContain<Cmpts...>());
+void ArchetypeManager::EntityDetach(EntityBase* e) {
+  assert(e->archetype->m_id.IsContain<Cmpts...>());
 
-  Archetype* srcArchetype = e->archetype();
-  size_t srcIdx = e->idx();
+  Archetype* srcArchetype = e->archetype;
+  size_t srcIdx = e->idx;
 
   auto& srcID = srcArchetype->GetID();
   auto dstID = srcID;
@@ -139,24 +138,23 @@ void ArchetypeManager::EntityDetach(EntityData* e) {
   // erase
   auto [srcMovedIdx, pairs] = srcArchetype->Erase(srcIdx);
   if (srcMovedIdx != static_cast<size_t>(-1)) {
-    auto srcMovedEntityTarget =
-        m_dataToPointer.find({srcArchetype, srcMovedIdx});
+    auto srcMovedEntityTarget = m_aiToEntity.find({srcArchetype, srcMovedIdx});
     auto srcMovedEntity = srcMovedEntityTarget->second;
     for (auto p : pairs)
       srcMovedEntity->MoveCmpt(p.first, p.second);
-    m_dataToPointer.erase(srcMovedEntityTarget);
-    m_dataToPointer[{srcArchetype, srcIdx}] = srcMovedEntity;
-    srcMovedEntity->idx() = srcMovedIdx;
+    m_aiToEntity.erase(srcMovedEntityTarget);
+    m_aiToEntity[{srcArchetype, srcIdx}] = srcMovedEntity;
+    srcMovedEntity->idx = srcMovedIdx;
   }
 
-  m_dataToPointer[{dstArchetype, dstIdx}] = e;
+  m_aiToEntity[{dstArchetype, dstIdx}] = e;
 
-  e->archetype() = dstArchetype;
-  e->idx() = dstIdx;
+  e->archetype = dstArchetype;
+  e->idx = dstIdx;
 
   if (srcArchetype->Size() == 0) {
-    m_ids.erase(srcArchetype->id);
-    m_idToArchetype.erase(srcArchetype->id);
+    m_ids.erase(srcArchetype->m_id);
+    m_idToArchetype.erase(srcArchetype->m_id);
     delete srcArchetype;
   }
 }

@@ -4,14 +4,14 @@
 namespace My {
 template <typename... Cmpts>
 Archetype::Archetype(ArchetypeManager* mgr, TypeList<Cmpts...>) noexcept
-    : m_mgr(mgr), id(TypeList<Cmpts...>{}) {
+    : m_manager(mgr), m_id(TypeList<Cmpts...>{}) {
   using CmptList = TypeList<Cmpts...>;
 
   constexpr size_t N = sizeof...(Cmpts);
 
   constexpr auto info = Chunk::StaticInfo<Cmpts...>();
   m_chunkCapacity = info.capacity;
-  ((h2so[TypeID<Cmpts>] =
+  ((m_hashToSO[TypeID<Cmpts>] =
         std::make_pair(info.sizes[Find_v<CmptList, Cmpts>],
                        info.offsets[Find_v<CmptList, Cmpts>])),
    ...);
@@ -20,60 +20,60 @@ Archetype::Archetype(ArchetypeManager* mgr, TypeList<Cmpts...>) noexcept
 template <typename... Cmpts>
 Archetype* Archetype::Add<Cmpts...>::From(Archetype* srcArchetype) noexcept {
   using CmptList = TypeList<Cmpts...>;
-  assert(((!srcArchetype->id.IsContain<Cmpts>()) && ...));
+  assert(((!srcArchetype->m_id.IsContain<Cmpts>()) && ...));
   Archetype* rst = new Archetype;
-  rst->m_mgr = srcArchetype->m_mgr;
+  rst->m_manager = srcArchetype->m_manager;
 
-  rst->id = srcArchetype->id;
-  rst->id.Add<Cmpts...>();
+  rst->m_id = srcArchetype->m_id;
+  rst->m_id.Add<Cmpts...>();
 
   std::vector<size_t> h;
   std::vector<size_t> s;
   ((h.push_back(TypeID<Cmpts>), s.push_back(sizeof(Cmpts))), ...);
-  for (auto p : srcArchetype->h2so) {
+  for (auto p : srcArchetype->m_hashToSO) {
     h.push_back(p.first);
     s.push_back(std::get<0>(p.second));
   }
   auto co = Chunk::CO(s);
   rst->m_chunkCapacity = std::get<0>(co);
-  ((rst->h2so[TypeID<Cmpts>] = std::make_pair(
+  ((rst->m_hashToSO[TypeID<Cmpts>] = std::make_pair(
         s[Find_v<CmptList, Cmpts>], std::get<1>(co)[Find_v<CmptList, Cmpts>])),
    ...);
-  for (size_t i = sizeof...(Cmpts); i < rst->id.size(); i++)
-    rst->h2so[h[i]] = std::make_pair(s[i], std::get<1>(co)[i]);
+  for (size_t i = sizeof...(Cmpts); i < rst->m_id.size(); i++)
+    rst->m_hashToSO[h[i]] = std::make_pair(s[i], std::get<1>(co)[i]);
   return rst;
 }
 
 template <typename... Cmpts>
 Archetype* Archetype::Remove<Cmpts...>::From(Archetype* srcArchetype) noexcept {
   using CmptList = TypeList<Cmpts...>;
-  assert((srcArchetype->id.IsContain<Cmpts>() && ...));
+  assert((srcArchetype->m_id.IsContain<Cmpts>() && ...));
 
   Archetype* rst = new Archetype;
-  rst->m_mgr = srcArchetype->m_mgr;
+  rst->m_manager = srcArchetype->m_manager;
 
-  rst->id = srcArchetype->id;
-  rst->id.Remove<Cmpts...>();
+  rst->m_id = srcArchetype->m_id;
+  rst->m_id.Remove<Cmpts...>();
 
   std::vector<size_t> h;
   std::vector<size_t> s;
-  for (auto p : rst->h2so) {
-    if (rst->id.IsContain(p.first))
+  for (auto p : rst->m_hashToSO) {
+    if (rst->m_id.IsContain(p.first))
       continue;
     h.push_back(p.first);
     s.push_back(std::get<0>(p.second));
   }
   auto co = Chunk::CO(s);
   rst->m_chunkCapacity = std::get<0>(co);
-  for (size_t i = 0; i < rst->id.size(); i++)
-    rst->h2so[h[i]] = std::make_pair(s[i], std::get<1>(co)[i]);
+  for (size_t i = 0; i < rst->m_id.size(); i++)
+    rst->m_hashToSO[h[i]] = std::make_pair(s[i], std::get<1>(co)[i]);
   return rst;
 }
 
 template <typename Cmpt>
 Cmpt* Archetype::At(size_t idx) {
-  auto target = h2so.find(TypeID<Cmpt>);
-  if (target == h2so.end())
+  auto target = m_hashToSO.find(TypeID<Cmpt>);
+  if (target == m_hashToSO.end())
     return nullptr;
   assert(sizeof(Cmpt) == target->second.first);
   size_t offset = target->second.second;
@@ -84,15 +84,15 @@ Cmpt* Archetype::At(size_t idx) {
 
 template <typename... Cmpts>
 const std::pair<size_t, std::tuple<Cmpts*...>> Archetype::CreateEntity(
-    EntityData* e) {
-  assert(id.Is<Cmpts...>());
+    EntityBase* e) {
+  assert(m_id.Is<Cmpts...>());
 
   using CmptList = TypeList<Cmpts...>;
   size_t idx = CreateEntity();
   size_t idxInChunk = idx % m_chunkCapacity;
   byte* buffer = m_chunks[idx / m_chunkCapacity]->Data();
   std::array<std::pair<size_t, size_t>, sizeof...(Cmpts)> soArr{
-      h2so[TypeID<Cmpts>]...};
+      m_hashToSO[TypeID<Cmpts>]...};
   std::tuple<Cmpts*...> cmpts = {
       New<Cmpts>(buffer + soArr[Find_v<CmptList, Cmpts>].second +
                      idxInChunk * soArr[Find_v<CmptList, Cmpts>].first,
@@ -103,8 +103,8 @@ const std::pair<size_t, std::tuple<Cmpts*...>> Archetype::CreateEntity(
 
 template <typename Cmpt>
 const std::vector<Cmpt*> Archetype::LocateOne() {
-  auto target = h2so.find(TypeID<Cmpt>);
-  assert(target != h2so.end());
+  auto target = m_hashToSO.find(TypeID<Cmpt>);
+  assert(target != m_hashToSO.end());
   assert(sizeof(Cmpt) == target->second.first);
   const size_t offset = target->second.second;
   std::vector<Cmpt*> rst;
@@ -114,7 +114,7 @@ const std::vector<Cmpt*> Archetype::LocateOne() {
 }
 
 template <typename Cmpt>
-Cmpt* Archetype::New(void* addr, EntityData* e) {
+Cmpt* Archetype::New(void* addr, EntityBase* e) {
   Cmpt* cmpt;
   if constexpr (std::is_constructible_v<Cmpt, Entity*>)
     cmpt = new (addr) Cmpt(reinterpret_cast<Entity*>(e));
@@ -125,7 +125,7 @@ Cmpt* Archetype::New(void* addr, EntityData* e) {
 }
 
 template <typename Cmpt>
-Cmpt* Archetype::New(size_t idx, EntityData* e) {
+Cmpt* Archetype::New(size_t idx, EntityBase* e) {
   return New<Cmpt>(At<Cmpt>(idx), e);
 }
 }  // namespace My
