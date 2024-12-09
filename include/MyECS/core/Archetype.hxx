@@ -79,7 +79,7 @@ class Archetype {
 
   inline ~Archetype() {
     for (auto c : m_chunks)
-      m_chunkPools.Recycle(c);
+      m_chunkPool.Recycle(c);
   }
 
   template <typename... Cmpts>
@@ -87,7 +87,7 @@ class Archetype {
     return {LocateOne<Cmpts>()...};
   }
 
-  std::tuple<void*, size_t> At(size_t cmptHash, size_t idx);
+  std::pair<void*, size_t> At(size_t cmptHash, size_t idx);
 
   template <typename Cmpt>
   Cmpt* At(size_t idx);
@@ -95,7 +95,7 @@ class Archetype {
   // no init
   inline size_t CreateEntity() {
     if (m_num == m_chunks.size() * m_chunkCapacity)
-      m_chunks.push_back(m_chunkPools.Request());
+      m_chunks.push_back(m_chunkPool.Request());
     return m_num++;
   }
 
@@ -106,7 +106,8 @@ class Archetype {
   // erase idx-th entity
   // if idx != num-1, back entity will put at idx, return num-1
   // else return static_cast<size_t>(-1)
-  size_t Erase(size_t idx);
+  // return: (movedIdx, [(src, dst)...])
+  std::pair<size_t, std::vector<std::pair<void*, void*>>> Erase(size_t idx);
 
   inline size_t Size() const noexcept { return m_num; }
 
@@ -144,12 +145,12 @@ class Archetype {
 
   ArchetypeManager* m_mgr;
   ID id;
-  std::map<size_t, std::tuple<size_t, size_t>> h2so;  // hash to {size, offset}
+  std::map<size_t, std::pair<size_t, size_t>> h2so;  // hash to (size, offset)
   size_t m_chunkCapacity;
   std::vector<Chunk*> m_chunks;
   size_t m_num{0};
 
-  static Pool<Chunk> m_chunkPools;  // TODO: lock
+  static Pool<Chunk> m_chunkPool;  // TODO: lock
 };
 }  // namespace My
 

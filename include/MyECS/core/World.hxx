@@ -22,6 +22,8 @@ class World {
  public:
   World() : m_manager(new ArchetypeManager(this)) {}
 
+  ~World() { delete m_manager; }
+
   template <typename... Cmpts>
   inline std::tuple<Entity*, Cmpts*...> CreateEntity();
 

@@ -3,16 +3,21 @@
 using namespace My;
 
 void ArchetypeManager::Release(EntityData* e) {
-  Archetype* archetype = e->archetype();
-  size_t movedEntityIdx = archetype->Erase(e->idx());
+  auto archetype = e->archetype();
+  auto idx = e->idx();
+  m_entityPool.Recycle(e);
 
-  auto target = m_dataToPointer.find({archetype, movedEntityIdx});
+  auto [movedEntityIdx, pairs] = archetype->Erase(idx);
+
   if (movedEntityIdx != static_cast<size_t>(-1)) {
+    auto target = m_dataToPointer.find({archetype, movedEntityIdx});
     EntityData* movedEntity = target->second;
-    movedEntity->idx() = e->idx();
+    for (auto p : pairs)
+      movedEntity->MoveCmpt(p.first, p.second);
+    movedEntity->idx() = idx;
     m_dataToPointer[*e] = movedEntity;
+    m_dataToPointer.erase(target);
   }
-  m_dataToPointer.erase(target);
 
   if (archetype->Size() == 0 && archetype->CmptNum() != 0) {
     m_ids.erase(archetype->id);
@@ -20,8 +25,6 @@ void ArchetypeManager::Release(EntityData* e) {
     delete archetype;
   }
 
-  e->archetype() = nullptr;
-  e->idx() = static_cast<size_t>(-1);
-
-  m_entityPool.Recycle(e);
+  archetype = nullptr;
+  idx = static_cast<size_t>(-1);
 }

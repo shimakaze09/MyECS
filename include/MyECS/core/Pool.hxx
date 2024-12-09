@@ -16,11 +16,15 @@ class Pool {
     if (m_freeAddresses.empty())
       NewBlock();
     T* freeAddress = m_freeAddresses.back();
+    new (freeAddress) T;
     m_freeAddresses.pop_back();
     return freeAddress;
   }
 
-  void Recycle(T* object) { m_freeAddresses.push_back(object); }
+  void Recycle(T* object) {
+    object->~T();
+    m_freeAddresses.push_back(object);
+  }
 
   void Reserve(size_t n) {
     size_t blockNum = n / BLOCK_SIZE + (n % BLOCK_SIZE > 0 ? 1 : 0);
@@ -32,6 +36,11 @@ class Pool {
     std::unordered_set<T*> freeAddressSet(m_freeAddresses.begin(),
                                           m_freeAddresses.end());
     for (auto block : m_blocks) {
+      for (size_t i = 0; i < BLOCK_SIZE; i++) {
+        T* adress = block->data() + i;
+        if (freeAddressSet.find(adress) == freeAddressSet.end())
+          adress->~T();
+      }
       free(block);
     }
     m_blocks.clear();

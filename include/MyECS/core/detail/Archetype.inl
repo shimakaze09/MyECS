@@ -12,8 +12,8 @@ Archetype::Archetype(ArchetypeManager* mgr, TypeList<Cmpts...>) noexcept
   constexpr auto info = Chunk::StaticInfo<Cmpts...>();
   m_chunkCapacity = info.capacity;
   ((h2so[TypeID<Cmpts>] =
-        std::make_tuple(info.sizes[Find_v<CmptList, Cmpts>],
-                        info.offsets[Find_v<CmptList, Cmpts>])),
+        std::make_pair(info.sizes[Find_v<CmptList, Cmpts>],
+                       info.offsets[Find_v<CmptList, Cmpts>])),
    ...);
 }
 
@@ -36,11 +36,11 @@ Archetype* Archetype::Add<Cmpts...>::From(Archetype* srcArchetype) noexcept {
   }
   auto co = Chunk::CO(s);
   rst->m_chunkCapacity = std::get<0>(co);
-  ((rst->h2so[TypeID<Cmpts>] = std::make_tuple(
+  ((rst->h2so[TypeID<Cmpts>] = std::make_pair(
         s[Find_v<CmptList, Cmpts>], std::get<1>(co)[Find_v<CmptList, Cmpts>])),
    ...);
   for (size_t i = sizeof...(Cmpts); i < rst->id.size(); i++)
-    rst->h2so[h[i]] = std::make_tuple(s[i], std::get<1>(co)[i]);
+    rst->h2so[h[i]] = std::make_pair(s[i], std::get<1>(co)[i]);
   return rst;
 }
 
@@ -66,7 +66,7 @@ Archetype* Archetype::Remove<Cmpts...>::From(Archetype* srcArchetype) noexcept {
   auto co = Chunk::CO(s);
   rst->m_chunkCapacity = std::get<0>(co);
   for (size_t i = 0; i < rst->id.size(); i++)
-    rst->h2so[h[i]] = std::make_tuple(s[i], std::get<1>(co)[i]);
+    rst->h2so[h[i]] = std::make_pair(s[i], std::get<1>(co)[i]);
   return rst;
 }
 
@@ -75,8 +75,8 @@ Cmpt* Archetype::At(size_t idx) {
   auto target = h2so.find(TypeID<Cmpt>);
   if (target == h2so.end())
     return nullptr;
-  assert(sizeof(Cmpt) == std::get<0>(target->second));
-  size_t offset = std::get<1>(target->second);
+  assert(sizeof(Cmpt) == target->second.first);
+  size_t offset = target->second.second;
   size_t idxInChunk = idx % m_chunkCapacity;
   byte* buffer = m_chunks[idx / m_chunkCapacity]->Data();
   return reinterpret_cast<Cmpt*>(buffer + offset + sizeof(Cmpt) * idxInChunk);
@@ -90,10 +90,10 @@ size_t Archetype::CreateEntity() {
   size_t idx = CreateEntity();
   size_t idxInChunk = idx % m_chunkCapacity;
   byte* buffer = m_chunks[idx / m_chunkCapacity]->Data();
-  std::array<std::tuple<size_t, size_t>, sizeof...(Cmpts)> soArr{
+  std::array<std::pair<size_t, size_t>, sizeof...(Cmpts)> soArr{
       h2so[TypeID<Cmpts>]...};
-  (new (buffer + std::get<1>(soArr[Find_v<CmptList, Cmpts>]) +
-        idxInChunk * std::get<0>(soArr[Find_v<CmptList, Cmpts>])) Cmpts(),
+  (new (buffer + soArr[Find_v<CmptList, Cmpts>].second +
+        idxInChunk * soArr[Find_v<CmptList, Cmpts>].first) Cmpts,
    ...);
 
   return idx;
@@ -103,7 +103,8 @@ template <typename Cmpt>
 const std::vector<Cmpt*> Archetype::LocateOne() {
   auto target = h2so.find(TypeID<Cmpt>);
   assert(target != h2so.end());
-  const size_t offset = std::get<1>(target->second);
+  assert(sizeof(Cmpt) == target->second.first);
+  const size_t offset = target->second.second;
   std::vector<Cmpt*> rst;
   for (auto c : m_chunks)
     rst.push_back(reinterpret_cast<Cmpt*>(c->Data() + offset));
