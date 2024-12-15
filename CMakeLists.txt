@@ -2,13 +2,8 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.20 FATAL_ERROR)
 
 # Project settings
-PROJECT(MyECS VERSION 0.1 LANGUAGES CXX)
+PROJECT(MyECS VERSION 0.1.0 LANGUAGES CXX)
 MESSAGE(STATUS "Project: ${PROJECT_NAME} ${PROJECT_VERSION}")
-
-# Set the default install path prefix
-IF (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-    SET(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}" CACHE PATH "INSTALL PREFIX" FORCE)
-ENDIF ()
 
 # Add 'd' to the end of the lib and dll names in debug mode
 SET(CMAKE_DEBUG_POSTFIX d)
@@ -36,32 +31,24 @@ SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/build/lib")
 SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
 
 INCLUDE(FETCHCONTENT)
-FETCHCONTENT_DECLARE(
-        MyGit
-        GIT_REPOSITORY https://github.com/shimakaze09/MyGit
-        GIT_TAG main
-)
-FetchContent_MakeAvailable(MyGit)
+FIND_PACKAGE(MyCMake 0.3.4 EXACT QUIET)
+IF (${MyCMake_FOUND})
+    MESSAGE(STATUS "MyCMake found")
+ELSE ()
+    MESSAGE(STATUS "MyCMake not found")
+    FETCHCONTENT_DECLARE(
+            MyCMake
+            GIT_REPOSITORY https://github.com/shimakaze09/MyCMake.git
+            GIT_TAG "v0.3.4"
+    )
+    FETCHCONTENT_MAKEAVAILABLE(MyCMake)
+    MESSAGE(STATUS "MyCMake fetched")
+ENDIF ()
 
-INIT_GIT()
-UPDATE_SUBMODULES()
+INIT_INSTALL_PREFIX()
 
-LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/external/MyCMake/cmake")
-INCLUDE(Tools)
-
-INCLUDE_DIRECTORIES(
-        "${PROJECT_SOURCE_DIR}/include"
-        "${PROJECT_SOURCE_DIR}/external/MyTemplate/include"
-        # $ENV{*_INCLUDE_PATH}
-        # ...
-)
-
-LINK_DIRECTORIES(
-        "${PROJECT_SOURCE_DIR}/lib"
-        # $ENV{*_LIBRARY_PATH}
-        # ...
-)
+ADD_DEP(MyTemplate 0.1)
 
 ADD_SUB_DIRS_REC(src)
 
-EXPORT_TARGETS()
+MY_EXPORT()
