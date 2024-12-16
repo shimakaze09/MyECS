@@ -1,7 +1,7 @@
 #ifndef ENTITY_HXX
 #define ENTITY_HXX
 
-#include "core/detail/ArchetypeManager.hxx"
+#include "detail/ArchetypeManager.hxx"
 
 namespace My {
 class World;
@@ -36,6 +36,6 @@ static_assert(sizeof(Entity) == sizeof(EntityBase) &&
               std::is_base_of_v<EntityBase, Entity>);
 }  // namespace My
 
-#include "core/detail/Entity.inl"
+#include "detail/Entity.inl"
 
 #endif  // ENTITY_HXX

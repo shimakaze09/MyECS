@@ -8,7 +8,7 @@
 #include <thread>
 
 namespace My::detail::World_ {
-template <typename Arg>
+template <typename Args>
 struct Each;
 template <typename Args>
 struct ParallelEach;
@@ -37,10 +37,10 @@ class World {
   template <typename ArgList>
   friend struct detail::World_::ParallelEach;
 
-  ArchetypeManager* m_manager;
+  ArchetypeMngr* mngr;
 };
 }  // namespace My
 
-#include "core/detail/World.inl"
+#include "detail/World.inl"
 
 #endif  // WORLD_HXX

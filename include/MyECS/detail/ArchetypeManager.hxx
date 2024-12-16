@@ -46,7 +46,7 @@ class ArchetypeMngr {
   std::map<std::tuple<Archetype*, size_t>, EntityBase*>
       ai2e;  // (archetype, idx) -> entity
   std::set<Archetype::ID> ids;
-  Ubpa::World* w;
+  My::World* w;
   std::map<Archetype::ID, Archetype*> id2a;  // id to archetype
 };
 }  // namespace My
