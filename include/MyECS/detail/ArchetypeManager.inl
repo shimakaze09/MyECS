@@ -3,37 +3,39 @@
 
 namespace My {
 template <typename... Cmpts>
-inline Archetype* ArchetypeManager::GetOrCreateArchetypeOf() {
+inline Archetype* ArchetypeMngr::GetOrCreateArchetypeOf() {
   auto id = Archetype::ID(TypeList<Cmpts...>{});
-  auto target = m_idToArchetype.find(id);
-  if (target == m_idToArchetype.end()) {
+  auto target = id2a.find(id);
+  if (target == id2a.end()) {
     auto archetype = new Archetype(this, TypeList<Cmpts...>{});
-    m_idToArchetype[id] = archetype;
-    m_ids.insert(archetype->GetID());
+    id2a[id] = archetype;
+    ids.insert(archetype->GetID());
     return archetype;
   } else
     return target->second;
 }
 
 template <typename... Cmpts>
-const std::tuple<EntityBase*, Cmpts*...> ArchetypeManager::CreateEntity() {
-  auto entity = m_entityPool.Request();
+const std::tuple<EntityBase*, Cmpts*...> ArchetypeMngr::CreateEntity() {
+  auto entity = entityPool.request();
 
   Archetype* archetype = GetOrCreateArchetypeOf<Cmpts...>();
   auto [idx, cmpts] = archetype->CreateEntity<Cmpts...>(entity);
 
   entity->archetype = archetype;
   entity->idx = idx;
-  m_aiToEntity[{archetype, idx}] = entity;
+  ai2e[{archetype, idx}] = entity;
+
+  // ((entity->RegistCmptFuncs(std::get<Find_v<CmptList, Cmpts>>(cmpts))),...);
 
   using CmptList = TypeList<Cmpts...>;
   return {entity, std::get<Find_v<CmptList, Cmpts>>(cmpts)...};
 }
 
 template <typename... Cmpts>
-const std::vector<Archetype*> ArchetypeManager::GetArchetypeWith() {
+const std::vector<Archetype*> ArchetypeMngr::GetArchetypeWith() {
   std::vector<Archetype*> rst;
-  for (auto& p : m_idToArchetype) {
+  for (auto& p : id2a) {
     if (p.second->IsContain<Cmpts...>())
       rst.push_back(p.second);
   }
@@ -41,8 +43,8 @@ const std::vector<Archetype*> ArchetypeManager::GetArchetypeWith() {
 }
 
 template <typename... Cmpts>
-const std::tuple<Cmpts*...> ArchetypeManager::EntityAttach(EntityBase* e) {
-  assert(!e->archetype->m_id.IsContain<Cmpts...>());
+const std::tuple<Cmpts*...> ArchetypeMngr::EntityAttach(EntityBase* e) {
+  assert(!e->archetype->id.IsContain<Cmpts...>());
 
   Archetype* srcArchetype = e->archetype;
   size_t srcIdx = e->idx;
@@ -53,12 +55,12 @@ const std::tuple<Cmpts*...> ArchetypeManager::EntityAttach(EntityBase* e) {
 
   // get dstArchetype
   Archetype* dstArchetype;
-  auto target = m_idToArchetype.find(dstID);
-  if (target == m_idToArchetype.end()) {
+  auto target = id2a.find(dstID);
+  if (target == id2a.end()) {
     dstArchetype = Archetype::Add<Cmpts...>::From(srcArchetype);
     assert(dstID == dstArchetype->GetID());
-    m_idToArchetype[dstID] = dstArchetype;
-    m_ids.insert(dstID);
+    id2a[dstID] = dstArchetype;
+    ids.insert(dstID);
   } else
     dstArchetype = target->second;
 
@@ -77,23 +79,23 @@ const std::tuple<Cmpts*...> ArchetypeManager::EntityAttach(EntityBase* e) {
   // erase
   auto [srcMovedIdx, pairs] = srcArchetype->Erase(srcIdx);
   if (srcMovedIdx != static_cast<size_t>(-1)) {
-    auto srcMovedEntityTarget = m_aiToEntity.find({srcArchetype, srcMovedIdx});
+    auto srcMovedEntityTarget = ai2e.find({srcArchetype, srcMovedIdx});
     auto srcMovedEntity = srcMovedEntityTarget->second;
-    for (auto p : pairs)
-      srcMovedEntity->MoveCmpt(p.first, p.second);
-    m_aiToEntity.erase(srcMovedEntityTarget);
-    m_aiToEntity[{srcArchetype, srcIdx}] = srcMovedEntity;
+    for (auto [src, dst] : pairs)
+      srcMovedEntity->MoveCmpt(src, dst);
+    ai2e.erase(srcMovedEntityTarget);
+    ai2e[{srcArchetype, srcIdx}] = srcMovedEntity;
     srcMovedEntity->idx = srcMovedIdx;
   }
 
-  m_aiToEntity[{dstArchetype, dstIdx}] = e;
+  ai2e[{dstArchetype, dstIdx}] = e;
 
   e->archetype = dstArchetype;
   e->idx = dstIdx;
 
   if (srcArchetype->Size() == 0 && srcArchetype->CmptNum() != 0) {
-    m_ids.erase(srcArchetype->m_id);
-    m_idToArchetype.erase(srcArchetype->m_id);
+    ids.erase(srcArchetype->id);
+    id2a.erase(srcArchetype->id);
     delete srcArchetype;
   }
 
@@ -101,8 +103,8 @@ const std::tuple<Cmpts*...> ArchetypeManager::EntityAttach(EntityBase* e) {
 }
 
 template <typename... Cmpts>
-void ArchetypeManager::EntityDetach(EntityBase* e) {
-  assert(e->archetype->m_id.IsContain<Cmpts...>());
+void ArchetypeMngr::EntityDetach(EntityBase* e) {
+  assert(e->archetype->id.IsContain<Cmpts...>());
 
   Archetype* srcArchetype = e->archetype;
   size_t srcIdx = e->idx;
@@ -113,12 +115,12 @@ void ArchetypeManager::EntityDetach(EntityBase* e) {
 
   // get dstArchetype
   Archetype* dstArchetype;
-  auto target = m_idToArchetype.find(dstID);
-  if (target == m_idToArchetype.end()) {
+  auto target = id2a.find(dstID);
+  if (target == id2a.end()) {
     dstArchetype = Archetype::Remove<Cmpts...>::From(srcArchetype);
     assert(dstID == dstArchetype->GetID());
-    m_idToArchetype[dstID] = dstArchetype;
-    m_ids.insert(dstID);
+    id2a[dstID] = dstArchetype;
+    ids.insert(dstID);
   } else
     dstArchetype = target->second;
 
@@ -138,23 +140,23 @@ void ArchetypeManager::EntityDetach(EntityBase* e) {
   // erase
   auto [srcMovedIdx, pairs] = srcArchetype->Erase(srcIdx);
   if (srcMovedIdx != static_cast<size_t>(-1)) {
-    auto srcMovedEntityTarget = m_aiToEntity.find({srcArchetype, srcMovedIdx});
+    auto srcMovedEntityTarget = ai2e.find({srcArchetype, srcMovedIdx});
     auto srcMovedEntity = srcMovedEntityTarget->second;
-    for (auto p : pairs)
-      srcMovedEntity->MoveCmpt(p.first, p.second);
-    m_aiToEntity.erase(srcMovedEntityTarget);
-    m_aiToEntity[{srcArchetype, srcIdx}] = srcMovedEntity;
+    for (auto [src, dst] : pairs)
+      srcMovedEntity->MoveCmpt(src, dst);
+    ai2e.erase(srcMovedEntityTarget);
+    ai2e[{srcArchetype, srcIdx}] = srcMovedEntity;
     srcMovedEntity->idx = srcMovedIdx;
   }
 
-  m_aiToEntity[{dstArchetype, dstIdx}] = e;
+  ai2e[{dstArchetype, dstIdx}] = e;
 
   e->archetype = dstArchetype;
   e->idx = dstIdx;
 
   if (srcArchetype->Size() == 0) {
-    m_ids.erase(srcArchetype->m_id);
-    m_idToArchetype.erase(srcArchetype->m_id);
+    ids.erase(srcArchetype->id);
+    id2a.erase(srcArchetype->id);
     delete srcArchetype;
   }
 }

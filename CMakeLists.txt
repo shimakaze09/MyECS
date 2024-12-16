@@ -2,7 +2,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.20 FATAL_ERROR)
 
 # Project settings
-PROJECT(MyECS VERSION 0.1.0 LANGUAGES CXX)
+PROJECT(MyECS VERSION 0.3.2 LANGUAGES CXX)
 MESSAGE(STATUS "Project: ${PROJECT_NAME} ${PROJECT_VERSION}")
 
 # Add 'd' to the end of the lib and dll names in debug mode
@@ -10,7 +10,7 @@ SET(CMAKE_DEBUG_POSTFIX d)
 
 # Check C++ version
 SET(CMAKE_CXX_STANDARD 17)
-SET(CMAKE_CXX_STANDARD_REQUIRED ON)
+SET(CMAKE_CXX_STANDARD_REQUIRED True)
 
 IF (MSVC)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /permissive-")
@@ -31,24 +31,27 @@ SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/build/lib")
 SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
 
 INCLUDE(FETCHCONTENT)
-FIND_PACKAGE(MyCMake 0.3.4 EXACT QUIET)
+MESSAGE(STATUS "Finding MyCMake")
+FIND_PACKAGE(MyCMake 0.3.5 QUIET)
 IF (${MyCMake_FOUND})
     MESSAGE(STATUS "MyCMake found")
 ELSE ()
-    MESSAGE(STATUS "MyCMake not found")
+    SET(ADDRESS "https://github.com/shimakaze09/MyCMake.git")
+    MESSAGE(STATUS "MyCMake not found, fetching...")
     FETCHCONTENT_DECLARE(
             MyCMake
-            GIT_REPOSITORY https://github.com/shimakaze09/MyCMake.git
-            GIT_TAG "v0.3.4"
+            GIT_REPOSITORY ${ADDRESS}
+            GIT_TAG "v0.3.5"
     )
+    MESSAGE(STATUS "Fetched MyCMake")
     FETCHCONTENT_MAKEAVAILABLE(MyCMake)
-    MESSAGE(STATUS "MyCMake fetched")
+    MESSAGE(STATUS "MyCMake built")
 ENDIF ()
 
 INIT_INSTALL_PREFIX()
 
-ADD_DEP(MyTemplate 0.1)
+ADD_DEP(MyTemplate 0.2.1)
 
 ADD_SUB_DIRS_REC(src)
 
-MY_EXPORT()
+EXPORT_TARGETS(DIRECTORIES "include")

@@ -9,22 +9,22 @@ namespace My {
 template <typename T>
 class Pool {
  public:
-  ~Pool() { Clear(); }
+  ~Pool() { clear(); }
 
-  T* const Request();
-  void Recycle(T* object);
-  void Reserve(size_t n);
-  void Clear();
+  T* const request();
+  void recycle(T* object);
+  void reserve(size_t n);
+  void clear();
 
  private:
   void NewBlock();
 
  private:
-  static constexpr size_t BLOCK_SIZE = 1024;
+  static const size_t BLOCK_SIZE = 1024;
   using Block = std::array<T, BLOCK_SIZE>;
 
-  std::vector<Block*> m_blocks;
-  std::vector<T*> m_freeAddresses;
+  std::vector<Block*> blocks;
+  std::vector<T*> freeAdresses;
 };
 }  // namespace My
 

@@ -1,4 +1,6 @@
-#include "MyECS/core/World.hxx"
+#include "MyECS/World.hxx"
+
+#include <functional>
 
 #include <iostream>
 #include <set>
@@ -19,6 +21,12 @@ struct position {
   ~position() { cout << "position release " << this << endl; }
 
   float x{0.f};
+  position() = default;
+
+  position(position&& p) noexcept {
+    this->x = p.x;
+    cout << "aha" << endl;
+  }
 };
 
 int main() {
@@ -27,28 +35,38 @@ int main() {
 
   auto [e] = w.CreateEntity<>();
   e->Attach<velocity>();
+  e->Attach<position>();
   e->Detach<velocity>();
+  e->Detach<position>();
   e->Attach<position, velocity>();
   e->Detach<position, velocity>();
-  for (size_t i = 0; i < 10; ++i)
+  for (size_t i = 0; i < 10; i++)
     w.CreateEntity<>();
 
-  for (size_t i = 0; i < 100000; i++) {
-    auto [e] = w.CreateEntity<>();
+  for (size_t i = 0; i < 100; i++) {
+    auto [e, p] = w.CreateEntity<position>();
+    //e->Release();
     entities.insert(e);
   }
 
-  for (size_t i = 0; i < 100000; i++) {
-    (*entities.begin())->Release();
-    entities.erase(entities.begin());
+  while (!entities.empty()) {
+    auto iter = entities.begin();
+    (*iter)->Release();
+    entities.erase(iter);
   }
 
-  // [invalid]
-  // size_t i = 0;
-  // w.Each([&i]() {
-  //   cout << "i: " << i << endl;
-  //   i++;
-  // });
+  //for (size_t i = 0; i < 100000; i++)
+  //{
+  //	(*entities.begin())->Release();
+  //	entities.erase(entities.begin());
+  //}
+
+  // [ invalid ]
+  //size_t i = 0;
+  //w.Each([&i]() {
+  //	cout << "i: " << i << endl;
+  //	i++;
+  //	});
 
   // [ invalid ]
   // w.CreateEntity<velocity, velocity>();

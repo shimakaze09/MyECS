@@ -1,7 +1,7 @@
 #ifndef ENTITY_HXX
 #define ENTITY_HXX
 
-#include "detail/ArchetypeManager.hxx"
+#include "core/detail/ArchetypeManager.hxx"
 
 namespace My {
 class World;
@@ -10,6 +10,13 @@ class Entity final : private EntityBase {
  public:
   template <typename Cmpt>
   inline Cmpt* Get();
+
+  template <typename Cmpt>
+  inline const Cmpt* Get() const {
+    return const_cast<Entity*>(this)->Get();
+  }
+
+  inline const std::vector<std::tuple<void*, size_t>> Components() const;
 
   template <typename... Cmpts>
   inline std::tuple<Cmpts*...> Attach();
@@ -29,6 +36,6 @@ static_assert(sizeof(Entity) == sizeof(EntityBase) &&
               std::is_base_of_v<EntityBase, Entity>);
 }  // namespace My
 
-#include "detail/Entity.inl"
+#include "core/detail/Entity.inl"
 
 #endif  // ENTITY_HXX

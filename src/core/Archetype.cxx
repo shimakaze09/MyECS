@@ -1,9 +1,14 @@
-#include "MyECS/core/detail/Archetype.hxx"
+#include "MyECS/detail/Archetype.hxx"
 
 using namespace My;
 using namespace std;
 
-Pool<Chunk> Archetype::m_chunkPool;
+Pool<Chunk> Archetype::chunkPool;
+
+Archetype::~Archetype() {
+  for (auto c : chunks)
+    chunkPool.recycle(c);
+}
 
 bool Archetype::ID::operator<(const ID& id) const noexcept {
   auto l = begin(), r = id.begin();
@@ -28,43 +33,54 @@ bool Archetype::ID::operator==(const ID& id) const noexcept {
   return true;
 }
 
-pair<void*, size_t> Archetype::At(size_t cmptHash, size_t idx) {
-  auto target = m_hashToSO.find(cmptHash);
-  if (target == m_hashToSO.end())
+tuple<void*, size_t> Archetype::At(size_t cmptHash, size_t idx) {
+  auto target = h2so.find(cmptHash);
+  if (target == h2so.end())
     return {nullptr, static_cast<size_t>(-1)};
 
-  size_t size = target->second.first;
-  size_t offset = target->second.second;
-  size_t idxInChunk = idx % m_chunkCapacity;
-  byte* buffer = m_chunks[idx / m_chunkCapacity]->Data();
-  return {buffer + offset + size * idxInChunk, size};
+  auto [size, offset] = target->second;
+  size_t idxInChunk = idx % chunkCapacity;
+  byte* buffer = chunks[idx / chunkCapacity]->Data();
+  return {buffer + offset + idxInChunk * size, size};
 }
 
-pair<size_t, vector<pair<void*, void*>>> Archetype::Erase(size_t idx) {
-  assert(idx < m_num);
-  pair<size_t, vector<pair<void*, void*>>> rst;
+tuple<size_t, vector<tuple<void*, void*>>> Archetype::Erase(size_t idx) {
+  assert(idx < num);
 
-  if (idx != m_num - 1) {
-    size_t idxInChunk = idx % m_chunkCapacity;
-    byte* buffer = m_chunks[idx / m_chunkCapacity]->Data();
-    for (auto p : m_hashToSO) {
-      size_t size = p.second.first;
-      size_t offset = p.second.second;
-      byte* dst = buffer + offset + size * idxInChunk;
-      byte* src = buffer + offset + (m_num - 1) * idxInChunk;
-      rst.second.emplace_back(dst, src);
+  size_t movedIdx;
+  vector<tuple<void*, void*>> src_dst;
+
+  if (idx != num - 1) {
+    movedIdx = num - 1;
+    size_t dstIdxInChunk = idx % chunkCapacity;
+    byte* dstBuffer = chunks[idx / chunkCapacity]->Data();
+    size_t srcIdxInChunk = movedIdx % chunkCapacity;
+    byte* srcBuffer = chunks[movedIdx / chunkCapacity]->Data();
+    for (auto p : h2so) {
+      auto [size, offset] = p.second;
+      byte* dst = dstBuffer + offset + dstIdxInChunk * size;
+      byte* src = srcBuffer + offset + srcIdxInChunk * size;
+      src_dst.emplace_back(src, dst);
       memcpy(dst, src, size);
     }
-    rst.first = m_num - 1;
   } else
-    rst.first = static_cast<size_t>(-1);
+    movedIdx = static_cast<size_t>(-1);
 
-  m_num--;
+  num--;
 
-  if (m_chunks.size() * m_chunkCapacity - m_num >= m_chunkCapacity) {
-    Chunk* back = m_chunks.back();
-    m_chunkPool.Recycle(back);
+  if (chunks.size() * chunkCapacity - num >= chunkCapacity) {
+    Chunk* back = chunks.back();
+    chunkPool.recycle(back);
   }
+
+  return {movedIdx, src_dst};
+}
+
+vector<tuple<void*, size_t>> Archetype::Components(size_t idx) {
+  vector<tuple<void*, size_t>> rst;
+
+  for (const auto& [h, so] : h2so)
+    rst.push_back(At(h, idx));
 
   return rst;
 }

@@ -1,27 +1,32 @@
-#include "MyECS/core/detail/ArchetypeManager.hxx"
+#include "MyECS/detail/ArchetypeManager.hxx"
 
 using namespace My;
 
-void ArchetypeManager::Release(EntityBase* e) {
+ArchetypeMngr::~ArchetypeMngr() {
+  for (auto p : id2a)
+    delete p.second;
+}
+
+void ArchetypeMngr::Release(EntityBase* e) {
   auto archetype = e->archetype;
   auto idx = e->idx;
-  m_entityPool.Recycle(e);
+  entityPool.recycle(e);
 
   auto [movedEntityIdx, pairs] = archetype->Erase(idx);
 
   if (movedEntityIdx != static_cast<size_t>(-1)) {
-    auto target = m_aiToEntity.find({archetype, movedEntityIdx});
+    auto target = ai2e.find({archetype, movedEntityIdx});
     EntityBase* movedEntity = target->second;
-    for (auto p : pairs)
-      movedEntity->MoveCmpt(p.first, p.second);
+    ai2e.erase(target);
+    for (auto [src, dst] : pairs)
+      movedEntity->MoveCmpt(src, dst);
     movedEntity->idx = idx;
-    m_aiToEntity[{archetype, idx}] = movedEntity;
-    m_aiToEntity.erase(target);
+    ai2e[{archetype, idx}] = movedEntity;
   }
 
   if (archetype->Size() == 0 && archetype->CmptNum() != 0) {
-    m_ids.erase(archetype->m_id);
-    m_idToArchetype.erase(archetype->m_id);
+    ids.erase(archetype->id);
+    id2a.erase(archetype->id);
     delete archetype;
   }
 

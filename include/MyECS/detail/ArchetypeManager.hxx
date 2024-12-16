@@ -10,20 +10,17 @@
 namespace My {
 class World;
 
-class ArchetypeManager {
+class ArchetypeMngr {
  public:
-  ArchetypeManager(World* world) : m_world(world) {}
+  ArchetypeMngr(World* w) : w(w) {}
 
-  ~ArchetypeManager() {
-    for (auto p : m_idToArchetype)
-      delete p.second;
-  }
+  ~ArchetypeMngr();
 
-  inline World* World() const noexcept { return m_world; }
+  inline World* World() const noexcept { return w; }
 
   inline Archetype* GetArchetypeOf(const Archetype::ID& archetypeID) {
-    auto target = m_idToArchetype.find(archetypeID);
-    assert(target != m_idToArchetype.end());
+    auto target = id2a.find(archetypeID);
+    assert(target != id2a.end());
     return target->second;
   }
 
@@ -45,12 +42,12 @@ class ArchetypeManager {
   void Release(EntityBase* e);
 
  private:
-  Pool<EntityBase> m_entityPool;
-  std::map<std::pair<Archetype*, size_t>, EntityBase*>
-      m_aiToEntity;  // (archetype, idx) -> entity
-  std::set<Archetype::ID> m_ids;
-  My::World* m_world;
-  std::map<Archetype::ID, Archetype*> m_idToArchetype;  // id to archetype
+  Pool<EntityBase> entityPool;
+  std::map<std::tuple<Archetype*, size_t>, EntityBase*>
+      ai2e;  // (archetype, idx) -> entity
+  std::set<Archetype::ID> ids;
+  Ubpa::World* w;
+  std::map<Archetype::ID, Archetype*> id2a;  // id to archetype
 };
 }  // namespace My
 

@@ -2,15 +2,15 @@
 #define WORLD_INL
 
 namespace My {
-World::World() : m_manager(new ArchetypeManager(this)) {}
+World::World() : mngr(new ArchetypeMngr(this)) {}
 
 World::~World() {
-  delete m_manager;
+  delete mngr;
 }
 
 template <typename Sys>
 inline void World::Each(Sys&& s) {
-  detail::World_::Each<typename FuncTraits<Sys>::ArgList>::Run(
+  detail::World_::Each<typename FuncTraits<Sys>::ArgList>::run(
       this, std::forward<Sys>(s));
 }
 
@@ -23,11 +23,11 @@ inline void World::ParallelEach(Sys&& s) {
 template <typename... Cmpts>
 std::tuple<Entity*, Cmpts*...> World::CreateEntity() {
   // static_assert(sizeof...(Cmpts) > 0);
-  static_assert(IsSet_v<TypeList<Cmpts...>>, "Components must be different");
+  static_assert(IsSet_v<TypeList<Cmpts...>>, "Componnents must be different");
   static_assert(((std::is_constructible_v<Cmpts> ||
                   std::is_constructible_v<Cmpts, Entity*>) &&
                  ...));
-  auto rst = m_manager->CreateEntity<Cmpts...>();
+  auto rst = mngr->CreateEntity<Cmpts...>();
   return {reinterpret_cast<Entity*>(std::get<0>(rst)),
           std::get<1 + Find_v<TypeList<Cmpts...>, Cmpts>>(rst)...};
 }
@@ -38,11 +38,11 @@ template <typename... Cmpts>
 struct Each<TypeList<Cmpts*...>> {
   static_assert(sizeof...(Cmpts) > 0);
   using CmptList = TypeList<Cmpts...>;
-  static_assert(IsSet_v<CmptList>, "Components must be different");
+  static_assert(IsSet_v<CmptList>, "Componnents must be different");
 
   template <typename Sys>
-  static void Run(World* w, Sys&& s) {
-    for (auto archetype : w->m_manager->GetArchetypeWith<Cmpts...>()) {
+  static void run(World* w, Sys&& s) {
+    for (auto archetype : w->mngr->GetArchetypeWith<Cmpts...>()) {
       auto cmptsVecTuple = archetype->Locate<Cmpts...>();
       size_t num = archetype->Size();
       size_t chunkNum = archetype->ChunkNum();
@@ -67,7 +67,7 @@ struct ParallelEach<TypeList<Cmpts*...>> {
 
   template <typename Sys>
   static void run(World* w, Sys&& s) {
-    for (auto archetype : w->m_manager->GetArchetypeWith<Cmpts...>()) {
+    for (auto archetype : w->mngr->GetArchetypeWith<Cmpts...>()) {
       auto cmptsVecTuple = archetype->Locate<Cmpts...>();
       size_t num = archetype->Size();
       size_t chunkNum = archetype->ChunkNum();

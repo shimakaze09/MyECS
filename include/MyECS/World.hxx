@@ -1,7 +1,6 @@
 #ifndef WORLD_HXX
 #define WORLD_HXX
 
-
 #include "Entity.hxx"
 
 #include <MyTemplate/Func.hxx>
@@ -18,8 +17,8 @@ struct ParallelEach;
 namespace My {
 class World {
  public:
-  World();
-  ~World();
+  inline World();
+  inline ~World();
 
   template <typename... Cmpts>
   inline std::tuple<Entity*, Cmpts*...> CreateEntity();
@@ -42,6 +41,6 @@ class World {
 };
 }  // namespace My
 
-#include "detail/World.inl"
+#include "core/detail/World.inl"
 
 #endif  // WORLD_HXX

@@ -35,10 +35,10 @@ struct Chunk {
   static const std::tuple<size_t, std::vector<size_t>> CO(
       const std::vector<size_t>& sizes) noexcept;
 
-  constexpr byte* Data() noexcept { return m_buffer.data(); }
+  constexpr byte* Data() noexcept { return buffer.data(); }
 
  private:
-  std::array<byte, size> m_buffer;
+  std::array<byte, size> buffer;
 };
 
 static_assert(sizeof(Chunk) == Chunk::size);
