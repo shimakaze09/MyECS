@@ -2,7 +2,7 @@
 #define WORLD_INL
 
 namespace My {
-World::World() : mngr(new ArchetypeMngr(this)) {}
+World::World() : mngr(new ArchetypeManager(this)) {}
 
 World::~World() {
   delete mngr;

@@ -3,7 +3,7 @@
 
 namespace My {
 template <typename... Cmpts>
-inline Archetype* ArchetypeMngr::GetOrCreateArchetypeOf() {
+inline Archetype* ArchetypeManager::GetOrCreateArchetypeOf() {
   auto id = Archetype::ID(TypeList<Cmpts...>{});
   auto target = id2a.find(id);
   if (target == id2a.end()) {
@@ -15,8 +15,15 @@ inline Archetype* ArchetypeMngr::GetOrCreateArchetypeOf() {
     return target->second;
 }
 
+inline Archetype* ArchetypeManager::GetArchetypeOf(
+    const Archetype::ID& archetypeID) {
+  auto target = id2a.find(archetypeID);
+  assert(target != id2a.end());
+  return target->second;
+}
+
 template <typename... Cmpts>
-const std::tuple<EntityBase*, Cmpts*...> ArchetypeMngr::CreateEntity() {
+const std::tuple<EntityBase*, Cmpts*...> ArchetypeManager::CreateEntity() {
   auto entity = entityPool.request();
 
   Archetype* archetype = GetOrCreateArchetypeOf<Cmpts...>();
@@ -33,7 +40,7 @@ const std::tuple<EntityBase*, Cmpts*...> ArchetypeMngr::CreateEntity() {
 }
 
 template <typename... Cmpts>
-const std::vector<Archetype*> ArchetypeMngr::GetArchetypeWith() {
+const std::vector<Archetype*> ArchetypeManager::GetArchetypeWith() {
   std::vector<Archetype*> rst;
   for (auto& p : id2a) {
     if (p.second->IsContain<Cmpts...>())
@@ -43,7 +50,7 @@ const std::vector<Archetype*> ArchetypeMngr::GetArchetypeWith() {
 }
 
 template <typename... Cmpts>
-const std::tuple<Cmpts*...> ArchetypeMngr::EntityAttach(EntityBase* e) {
+const std::tuple<Cmpts*...> ArchetypeManager::EntityAttach(EntityBase* e) {
   assert(!e->archetype->id.IsContain<Cmpts...>());
 
   Archetype* srcArchetype = e->archetype;
@@ -100,7 +107,7 @@ const std::tuple<Cmpts*...> ArchetypeMngr::EntityAttach(EntityBase* e) {
 }
 
 template <typename... Cmpts>
-void ArchetypeMngr::EntityDetach(EntityBase* e) {
+void ArchetypeManager::EntityDetach(EntityBase* e) {
   assert(e->archetype->id.IsContain<Cmpts...>());
 
   Archetype* srcArchetype = e->archetype;

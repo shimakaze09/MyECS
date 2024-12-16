@@ -2,12 +2,12 @@
 
 using namespace My;
 
-ArchetypeMngr::~ArchetypeMngr() {
+ArchetypeManager::~ArchetypeManager() {
   for (auto p : id2a)
     delete p.second;
 }
 
-void ArchetypeMngr::Release(EntityBase* e) {
+void ArchetypeManager::Release(EntityBase* e) {
   auto archetype = e->archetype;
   auto idx = e->idx;
   entityPool.recycle(e);

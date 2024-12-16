@@ -3,7 +3,7 @@
 
 namespace My {
 template <typename... Cmpts>
-Archetype::Archetype(ArchetypeMngr* mngr, TypeList<Cmpts...>) noexcept
+Archetype::Archetype(ArchetypeManager* mngr, TypeList<Cmpts...>) noexcept
     : mngr(mngr), id(TypeList<Cmpts...>{}) {
   using CmptList = TypeList<Cmpts...>;
 

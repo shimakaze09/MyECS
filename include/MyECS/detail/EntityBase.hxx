@@ -16,7 +16,7 @@ struct EntityBase {
   }
 
  private:
-  friend class ArchetypeMngr;
+  friend class ArchetypeManager;
   friend class Archetype;
 };
 }  // namespace My

@@ -37,7 +37,7 @@ class World {
   template <typename ArgList>
   friend struct detail::World_::ParallelEach;
 
-  ArchetypeMngr* mngr;
+  ArchetypeManager* mngr;
 };
 }  // namespace My
 
