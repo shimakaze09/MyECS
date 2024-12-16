@@ -24,7 +24,7 @@ class Pool {
   using Block = std::array<T, BLOCK_SIZE>;
 
   std::vector<Block*> blocks;
-  std::vector<T*> freeAdresses;
+  std::vector<T*> freeAddresses;
 };
 }  // namespace My
 
