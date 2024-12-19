@@ -3,8 +3,9 @@
 
 namespace My {
 template <typename... Cmpts>
-Archetype::Archetype(ArchetypeManager* mngr, TypeList<Cmpts...>) noexcept
-    : mngr(mngr), id(TypeList<Cmpts...>{}) {
+Archetype::Archetype(SystemManager* sysmngr, ArchetypeManager* mngr,
+                     TypeList<Cmpts...>) noexcept
+    : sysmngr(sysmngr), mngr(mngr), id(TypeList<Cmpts...>{}) {
   using CmptList = TypeList<Cmpts...>;
 
   constexpr size_t N = sizeof...(Cmpts);

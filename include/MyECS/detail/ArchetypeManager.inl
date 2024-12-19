@@ -1,5 +1,11 @@
-#ifndef ARCHETYPE_MANAGER_INL
-#define ARCHETYPE_MANAGER_INL
+#pragma once
+
+#include <MyTemplate/Func.hxx>
+
+namespace My::detail::ArchetypeManager_ {
+template <typename ArgList>
+struct GenTaskflow;
+}
 
 namespace My {
 template <typename... Cmpts>
@@ -7,7 +13,7 @@ inline Archetype* ArchetypeManager::GetOrCreateArchetypeOf() {
   auto id = Archetype::ID(TypeList<Cmpts...>{});
   auto target = id2a.find(id);
   if (target == id2a.end()) {
-    auto archetype = new Archetype(this, TypeList<Cmpts...>{});
+    auto archetype = new Archetype(sysmngr, this, TypeList<Cmpts...>{});
     id2a[id] = archetype;
     ids.insert(archetype->GetID());
     return archetype;
@@ -161,6 +167,41 @@ void ArchetypeManager::EntityDetach(EntityBase* e) {
     delete srcArchetype;
   }
 }
-}  // namespace My
 
-#endif  // ARCHETYPE_MANAGER_INL
+template <typename Sys>
+void ArchetypeManager::GenTaskflow(tf::Taskflow& taskflow, Sys&& sys) {
+  return detail::ArchetypeManager_::GenTaskflow<FuncTraits_ArgList<Sys>>::run(
+      taskflow, this, std::forward<Sys>(sys));
+}
+
+namespace My::detail::ArchetypeManager_ {
+template <typename... Cmpts>
+struct GenTaskflow<TypeList<Cmpts*...>> {
+  static_assert(sizeof...(Cmpts) > 0);
+  using CmptList = TypeList<Cmpts...>;
+  static_assert(IsSet_v<CmptList>, "Components must be different");
+
+  template <typename Sys>
+  static void run(tf::Taskflow& taskflow, ArchetypeMngr* mngr, Sys&& s) {
+    taskflow.clear();
+    for (auto archetype :
+         mngr->GetArchetypeWith<std::remove_const_t<Cmpts>...>()) {
+      auto cmptsVecTuple = archetype->Locate<std::remove_const_t<Cmpts>...>();
+      size_t num = archetype->Size();
+      size_t chunkNum = archetype->ChunkNum();
+      size_t chunkCapacity = archetype->ChunkCapacity();
+
+      for (size_t i = 0; i < chunkNum; i++) {
+        auto cmptsTuple = std::make_tuple(
+            std::get<Find_v<CmptList, Cmpts>>(cmptsVecTuple)[i]...);
+        size_t J = std::min(chunkCapacity, num - (i * chunkCapacity));
+        taskflow.emplace([s, cmptsTuple, J]() {
+          for (size_t j = 0; j < J; j++)
+            s((std::get<Find_v<CmptList, Cmpts>>(cmptsTuple) + j)...);
+        });
+      }
+    }
+  }
+};
+}  // namespace My::detail::ArchetypeManager_
+}  // namespace My

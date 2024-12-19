@@ -2,12 +2,6 @@
 #define WORLD_INL
 
 namespace My {
-World::World() : mngr(new ArchetypeManager(this)) {}
-
-World::~World() {
-  delete mngr;
-}
-
 template <typename Sys>
 inline void World::Each(Sys&& s) {
   detail::World_::Each<typename FuncTraits<Sys>::ArgList>::run(
@@ -24,7 +18,8 @@ template <typename... Cmpts>
 std::tuple<Entity*, Cmpts*...> World::CreateEntity() {
   static_assert(IsSet_v<TypeList<Cmpts...>>, "Components must be different");
   (ComponentManager::Instance().Regist<Cmpts>(), ...);
-  auto rst = mngr->CreateEntity<Cmpts...>();
+  auto rst = mngr.CreateEntity<Cmpts...>();
+  (sysMngr.Regist<Cmpts>(&mngr), ...);
   return {reinterpret_cast<Entity*>(std::get<0>(rst)),
           std::get<1 + Find_v<TypeList<Cmpts...>, Cmpts>>(rst)...};
 }
@@ -39,7 +34,7 @@ struct Each<TypeList<Cmpts*...>> {
 
   template <typename Sys>
   static void run(World* w, Sys&& s) {
-    for (auto archetype : w->mngr->GetArchetypeWith<Cmpts...>()) {
+    for (auto archetype : w->mngr.GetArchetypeWith<Cmpts...>()) {
       auto cmptsVecTuple = archetype->Locate<Cmpts...>();
       size_t num = archetype->Size();
       size_t chunkNum = archetype->ChunkNum();
@@ -64,11 +59,19 @@ struct ParallelEach<TypeList<Cmpts*...>> {
 
   template <typename Sys>
   static void run(World* w, Sys&& s) {
-    for (auto archetype : w->mngr->GetArchetypeWith<Cmpts...>()) {
+    for (auto archetype : w->mngr.GetArchetypeWith<Cmpts...>()) {
       auto cmptsVecTuple = archetype->Locate<Cmpts...>();
       size_t num = archetype->Size();
       size_t chunkNum = archetype->ChunkNum();
       size_t chunkCapacity = archetype->ChunkCapacity();
+
+      if (chunkNum == 1) {
+        auto cmptsTuple = std::make_tuple(
+            std::get<Find_v<CmptList, Cmpts>>(cmptsVecTuple)[0]...);
+        for (size_t j = 0; j < num; j++)
+          s((std::get<Find_v<CmptList, Cmpts>>(cmptsTuple) + j)...);
+        return;
+      }
 
       size_t coreNum = std::thread::hardware_concurrency();
       assert(coreNum > 0);
@@ -84,7 +87,7 @@ struct ParallelEach<TypeList<Cmpts*...>> {
       };
 
       std::vector<std::thread> workers;
-      for (size_t i = 0; i < coreNum; i++)
+      for (size_t i = 0; i < std::min(chunkNum, coreNum); i++)
         workers.emplace_back(job, i);
 
       for (auto& worker : workers)

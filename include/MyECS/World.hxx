@@ -2,6 +2,7 @@
 #define WORLD_HXX
 
 #include "Entity.hxx"
+#include "detail/SystemManager.hxx"
 
 #include <MyTemplate/Func.hxx>
 
@@ -17,11 +18,12 @@ struct ParallelEach;
 namespace My {
 class World {
  public:
-  inline World();
-  inline ~World();
+  World();
 
   template <typename... Cmpts>
   inline std::tuple<Entity*, Cmpts*...> CreateEntity();
+
+  void Update(bool dump = false);
 
   // s must be a callable object, and it's argument-list isn't empty
   template <typename Sys>
@@ -37,7 +39,9 @@ class World {
   template <typename ArgList>
   friend struct detail::World_::ParallelEach;
 
-  ArchetypeManager* mngr;
+  SystemManager sysMngr;
+  tf::Executor executor;
+  ArchetypeManager mngr;
 };
 }  // namespace My
 

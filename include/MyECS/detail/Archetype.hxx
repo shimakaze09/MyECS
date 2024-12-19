@@ -11,9 +11,12 @@
 #include <map>
 #include <set>
 
+#include "ArchetypeManager.hxx"
+
 namespace My {
 class ArchetypeManager;
 class Entity;
+class SystemManager;
 
 // TODO: clear up
 class Archetype {
@@ -63,7 +66,7 @@ class Archetype {
   Archetype() = default;
   // argument is for type deduction
   template <typename... Cmpts>
-  Archetype(ArchetypeManager* mngr, TypeList<Cmpts...>) noexcept;
+  Archetype(SystemManager* sysmngr, ArchetypeManager* mngr, TypeList<Cmpts...>) noexcept;
 
   // TODO: simplify
   template <typename... Cmpts>
@@ -134,6 +137,7 @@ class Archetype {
   friend class ArchetypeManager;
 
   ArchetypeManager* mngr;
+  SystemManager* sysmngr;
   ID id;
   std::map<size_t, std::tuple<size_t, size_t>> h2so;  // hash to (size, offset)
   size_t chunkCapacity;
