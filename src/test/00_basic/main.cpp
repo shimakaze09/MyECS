@@ -63,4 +63,6 @@ int main() {
       e->Attach<velocity>();
     }
   }
+
+  return 0;
 }

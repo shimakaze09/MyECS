@@ -35,11 +35,11 @@ class Pool {
     std::unordered_set<T*> freeAdressesSet(freeAdresses.begin(),
                                            freeAdresses.end());
     for (auto block : blocks) {
-      for (size_t i = 0; i < BLOCK_SIZE; i++) {
-        T* adress = block->data() + i;
-        if (freeAdressesSet.find(adress) == freeAdressesSet.end())
-          adress->~T();
-      }
+      // for (size_t i = 0; i < BLOCK_SIZE; i++) {
+      //   T* adress = block->data() + i;
+      //   if (freeAdressesSet.find(adress) == freeAdressesSet.end())
+      //     adress->~T();
+      // }
       free(block);
     }
     blocks.clear();
@@ -55,7 +55,7 @@ class Pool {
   }
 
  private:
-  static const size_t BLOCK_SIZE = 64;
+  static const size_t BLOCK_SIZE = 1024;
   using Block = std::array<T, BLOCK_SIZE>;
 
   std::vector<Block*> blocks;

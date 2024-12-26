@@ -27,8 +27,20 @@ int main() {
   auto e = w.CreateEntity<>();
   e->Attach<velocity>();
   e->Detach<velocity>();
+  e->Attach<position, velocity>();
+  e->Detach<position, velocity>();
   for (size_t i = 0; i < 10; i++)
     w.CreateEntity<>();
+
+  for (size_t i = 0; i < 100000; i++) {
+    auto e = w.CreateEntity<>();
+    entities.insert(e);
+  }
+
+  for (size_t i = 0; i < 100000; i++) {
+    (*entities.begin())->Release();
+    entities.erase(entities.begin());
+  }
 
   // [ invalid ]
   // size_t i = 0;
@@ -36,4 +48,6 @@ int main() {
   //   cout << "i: " << i << endl;
   //   i++;
   // });
+
+  return 0;
 }
