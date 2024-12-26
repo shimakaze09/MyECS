@@ -25,7 +25,7 @@ class Entity final : private EntityData {
 
   template <typename... Cmpts>
   inline std::tuple<Cmpts*...> Attach() {
-    // TODO: static_assert(Different_v<TypeList<Cmpts...>>);
+    static_assert(IsSet_v<TypeList<Cmpts...>>);
     static_assert(sizeof...(Cmpts) > 0);
     assert(IsAlive());
     return archetype()->mngr->EntityAttach<Cmpts...>(this);
@@ -33,6 +33,7 @@ class Entity final : private EntityData {
 
   template <typename... Cmpts>
   inline void Detach() {
+    static_assert(IsSet_v<TypeList<Cmpts...>>, "Componnents must be different");
     // TODO: static_assert(Different_v<TypeList<Cmpts...>>);
     static_assert(sizeof...(Cmpts) > 0);
     assert(IsAlive());

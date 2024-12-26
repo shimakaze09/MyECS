@@ -49,5 +49,8 @@ int main() {
   //   i++;
   // });
 
+  // [ invalid ]
+  // w.CreateEntity<velocity, velocity>();
+
   return 0;
 }
