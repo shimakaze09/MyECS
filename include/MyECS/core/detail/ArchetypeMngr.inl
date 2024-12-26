@@ -20,18 +20,18 @@ inline Archetype* ArchetypeMngr::GetOrCreateArchetypeOf() {
 
 template <typename... Cmpts>
 const std::tuple<EntityData*, Cmpts*...> ArchetypeMngr::CreateEntity() {
-  using CmptList = TypeList<Cmpts...>;
-  Archetype* archetype = GetOrCreateArchetypeOf<Cmpts...>();
-  size_t idx = archetype->CreateEntity<Cmpts...>();
-
   auto entity = entityPool.request();
+
+  Archetype* archetype = GetOrCreateArchetypeOf<Cmpts...>();
+  auto [idx, cmpts] = archetype->CreateEntity<Cmpts...>(entity);
+
   entity->archetype() = archetype;
   entity->idx() = idx;
   d2p[*entity] = entity;
 
-  std::tuple<Cmpts*...> cmpts = {archetype->At<Cmpts>(idx)...};
-  ((entity->RegistCmptRelease(std::get<Find_v<CmptList, Cmpts>>(cmpts))), ...);
+  // ((entity->RegistCmptRelease(std::get<Find_v<CmptList, Cmpts>>(cmpts))),...);
 
+  using CmptList = TypeList<Cmpts...>;
   return {entity, std::get<Find_v<CmptList, Cmpts>>(cmpts)...};
 }
 
@@ -69,6 +69,7 @@ const std::tuple<Cmpts*...> ArchetypeMngr::EntityAttach(EntityData* e) {
 
   // move src to dst
   size_t dstIdx = dstArchetype->CreateEntity();
+
   ((e->RegistCmptRelease<Cmpts>(dstArchetype->At<Cmpts>(dstIdx))), ...);
   for (auto cmptHash : srcID) {
     auto [srcCmpt, srcSize] = srcArchetype->At(cmptHash, srcIdx);

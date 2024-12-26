@@ -40,6 +40,7 @@ struct EntityData : std::tuple<Archetype*, size_t> {
 
  private:
   friend class ArchetypeMngr;
+  friend class Archetype;
 
   template <typename Cmpt>
   void RegistCmptRelease(Cmpt* cmpt) {

@@ -87,7 +87,8 @@ Cmpt* Archetype::At(size_t idx) {
 }
 
 template <typename... Cmpts>
-size_t Archetype::CreateEntity() {
+const std::pair<size_t, std::tuple<Cmpts*...>> Archetype::CreateEntity(
+    EntityData* e) {
   assert(id.Is<Cmpts...>());
 
   using CmptList = TypeList<Cmpts...>;
@@ -96,11 +97,12 @@ size_t Archetype::CreateEntity() {
   byte* buffer = chunks[idx / chunkCapacity]->Data();
   std::array<std::pair<size_t, size_t>, sizeof...(Cmpts)> soArr{
       h2so[TypeID<Cmpts>]...};
-  (new (buffer + soArr[Find_v<CmptList, Cmpts>].second +
-        idxInChunk * soArr[Find_v<CmptList, Cmpts>].first) Cmpts,
-   ...);
+  std::tuple<Cmpts*...> cmpts = {
+      New<Cmpts>(buffer + soArr[Find_v<CmptList, Cmpts>].second +
+                     idxInChunk * soArr[Find_v<CmptList, Cmpts>].first,
+                 e)...};
 
-  return idx;
+  return {idx, cmpts};
 }
 
 template <typename Cmpt>
@@ -113,5 +115,16 @@ const std::vector<Cmpt*> Archetype::LocateOne() {
   for (auto c : chunks)
     rst.push_back(reinterpret_cast<Cmpt*>(c->Data() + offset));
   return rst;
+}
+
+template <typename Cmpt>
+Cmpt* Archetype::New(void* addr, EntityData* e) {
+  Cmpt* cmpt;
+  if constexpr (std::is_constructible_v<Cmpt, Entity*>)
+    cmpt = new (addr) Cmpt(reinterpret_cast<Entity*>(e));
+  else
+    cmpt = new (addr) Cmpt;
+  e->RegistCmptRelease(cmpt);
+  return cmpt;
 }
 }  // namespace My
