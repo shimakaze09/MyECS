@@ -7,7 +7,7 @@
 namespace My {
 template <typename... Cmpts>
 Archetype::Archetype(ArchetypeMngr* mngr, TypeList<Cmpts...>) noexcept
-    : mngr(mngr) {
+    : mngr(mngr), id(TypeList<Cmpts...>{}) {
   using CmptList = TypeList<Cmpts...>;
 
   constexpr size_t N = sizeof...(Cmpts);
@@ -18,7 +18,6 @@ Archetype::Archetype(ArchetypeMngr* mngr, TypeList<Cmpts...>) noexcept
         std::make_tuple(info.sizes[Find_v<CmptList, Cmpts>],
                         info.offsets[Find_v<CmptList, Cmpts>])),
    ...);
-  id.Add<Cmpts...>();
 }
 
 template <typename Cmpt>

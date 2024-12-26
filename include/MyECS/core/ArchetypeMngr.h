@@ -34,7 +34,7 @@ class ArchetypeMngr {
   inline Archetype* GetOrCreateArchetypeOf();
 
   template <typename... Cmpts>
-  const std::vector<Archetype*> LocateArchetypeWith();
+  const std::vector<Archetype*> GetArchetypeWith();
 
   template <typename... Cmpts>
   EntityData* CreateEntity();

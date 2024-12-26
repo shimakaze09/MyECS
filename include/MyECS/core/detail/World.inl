@@ -4,6 +4,13 @@
 
 #pragma once
 
+namespace My {
+template <typename... Cmpts>
+Entity* World::CreateEntity() {
+  return reinterpret_cast<Entity*>(mngr->CreateEntity<Cmpts...>());
+}
+}  // namespace My
+
 namespace My::detail::World_ {
 template <typename... Cmpts>
 struct Each<TypeList<Cmpts*...>> {
@@ -12,7 +19,7 @@ struct Each<TypeList<Cmpts*...>> {
 
   template <typename Sys>
   static void run(World* w, Sys&& s) {
-    for (auto archetype : w->mngr->LocateArchetypeWith<Cmpts...>()) {
+    for (auto archetype : w->mngr->GetArchetypeWith<Cmpts...>()) {
       auto cmptsVecTuple = archetype->Locate<Cmpts...>();
       size_t num = archetype->Size();
       size_t chunkNum = archetype->ChunkNum();
@@ -31,10 +38,3 @@ struct Each<TypeList<Cmpts*...>> {
   }
 };
 }  // namespace My::detail::World_
-
-namespace My {
-template <typename... Cmpts>
-Entity* World::CreateEntityWith() {
-  return reinterpret_cast<Entity*>(mngr->CreateEntity<Cmpts...>());
-}
-}  // namespace My

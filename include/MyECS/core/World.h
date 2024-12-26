@@ -15,7 +15,7 @@
 namespace My::detail::World_ {
 template <typename Args>
 struct Each;
-}
+}  // namespace My::detail::World_
 
 namespace My {
 class World {
@@ -23,8 +23,9 @@ class World {
   World() : mngr(new ArchetypeMngr(this)) {}
 
   template <typename... Cmpts>
-  inline Entity* CreateEntityWith();
+  inline Entity* CreateEntity();
 
+  // s must be a callable object and it's argument-list isn't empty
   template <typename ArgList>
   friend struct detail::World_::Each;
 
