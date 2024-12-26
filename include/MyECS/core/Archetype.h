@@ -232,11 +232,11 @@ class Archetype {
  private:
   friend class Entity;
 
-  size_t num{0};
   ArchetypeMngr* mngr;
   ID id;
   std::map<size_t, std::tuple<size_t, size_t>> h2so;  // hash to {size, offset}
   size_t chunkCapacity;
   std::vector<Chunk*> chunks;
+  size_t num{0};
 };
 }  // namespace My
