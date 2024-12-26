@@ -6,7 +6,7 @@
 
 #include "Chunk.h"
 
-#include <Mytemplate/TypeID.h>
+#include <MyTemplate/TypeID.h>
 
 #include <cassert>
 #include <map>
@@ -33,6 +33,11 @@ class Archetype {
     }
 
     template <typename... Cmpts>
+    void Remove() noexcept {
+      (erase(TypeID<Cmpts>), ...);
+    }
+
+    template <typename... Cmpts>
     bool IsContain() const noexcept {
       return ((find(TypeID<Cmpts>) != end()) && ...);
     }
@@ -49,12 +54,22 @@ class Archetype {
     bool operator==(const ID& id) const noexcept;
   };
 
+  Archetype() = default;
   // argument is for type deduction
   template <typename... Cmpts>
   Archetype(ArchetypeMngr* mngr, TypeList<Cmpts...>) noexcept;
 
   template <typename Cmpt>
-  Archetype(Archetype* srcArchetype, IType<Cmpt>) noexcept;
+  struct Add {
+    static Archetype* From(Archetype* srcArchetype) noexcept;
+  };
+
+  template <typename Cmpt>
+  struct Remove {
+    static Archetype* From(Archetype* srcArchetype) noexcept;
+  };
+  template <typename Cmpt>
+  friend struct Add;
 
   inline ~Archetype() {
     for (auto c : chunks)
@@ -73,7 +88,7 @@ class Archetype {
 
   // no init
   inline size_t CreateEntity() {
-    if (num % chunkCapacity == 0)
+    if (num == chunks.size() * chunkCapacity)
       chunks.push_back(new Chunk);
     return num++;
   }
