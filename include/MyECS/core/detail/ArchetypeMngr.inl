@@ -20,6 +20,7 @@ inline Archetype* ArchetypeMngr::GetOrCreateArchetypeOf() {
 
 template <typename... Cmpts>
 const std::tuple<EntityData*, Cmpts*...> ArchetypeMngr::CreateEntity() {
+  using CmptList = TypeList<Cmpts...>;
   Archetype* archetype = GetOrCreateArchetypeOf<Cmpts...>();
   size_t idx = archetype->CreateEntity<Cmpts...>();
 
@@ -28,7 +29,10 @@ const std::tuple<EntityData*, Cmpts*...> ArchetypeMngr::CreateEntity() {
   entity->idx() = idx;
   d2p[*entity] = entity;
 
-  return {entity, archetype->At<Cmpts>(idx)...};
+  std::tuple<Cmpts*...> cmpts = {archetype->At<Cmpts>(idx)...};
+  ((entity->RegistCmptRelease(std::get<Find_v<CmptList, Cmpts>>(cmpts))), ...);
+
+  return {entity, std::get<Find_v<CmptList, Cmpts>>(cmpts)...};
 }
 
 template <typename... Cmpts>
@@ -52,6 +56,7 @@ const std::tuple<Cmpts*...> ArchetypeMngr::EntityAttach(EntityData* e) {
   auto dstID = srcID;
   dstID.Add<Cmpts...>();
 
+  // get dstArchetype
   Archetype* dstArchetype;
   auto target = id2a.find(dstID);
   if (target == id2a.end()) {
@@ -62,19 +67,24 @@ const std::tuple<Cmpts*...> ArchetypeMngr::EntityAttach(EntityData* e) {
   } else
     dstArchetype = target->second;
 
+  // move src to dst
   size_t dstIdx = dstArchetype->CreateEntity();
+  ((e->RegistCmptRelease<Cmpts>(dstArchetype->At<Cmpts>(dstIdx))), ...);
   for (auto cmptHash : srcID) {
-    auto srcCmpt = srcArchetype->At(cmptHash, srcIdx);
-    auto dstCmpt = dstArchetype->At(cmptHash, dstIdx);
-    size_t size = std::get<1>(srcCmpt);
-    assert(size == std::get<1>(dstCmpt));
-    memcpy(std::get<0>(dstCmpt), std::get<0>(srcCmpt), size);
+    auto [srcCmpt, srcSize] = srcArchetype->At(cmptHash, srcIdx);
+    auto [dstCmpt, dstSize] = dstArchetype->At(cmptHash, dstIdx);
+    e->MoveCmpt(srcCmpt, dstCmpt);
+    assert(srcSize == dstSize);
+    memcpy(dstCmpt, srcCmpt, srcSize);
   }
 
-  size_t srcMovedIdx = srcArchetype->Erase(srcIdx);
+  // erase
+  auto [srcMovedIdx, pairs] = srcArchetype->Erase(srcIdx);
   if (srcMovedIdx != static_cast<size_t>(-1)) {
     auto srcMovedEntityTarget = d2p.find({srcArchetype, srcMovedIdx});
     auto srcMovedEntity = srcMovedEntityTarget->second;
+    for (auto p : pairs)
+      srcMovedEntity->MoveCmpt(p.first, p.second);
     d2p.erase(srcMovedEntityTarget);
     d2p[{srcArchetype, srcIdx}] = srcMovedEntity;
     srcMovedEntity->idx() = srcMovedIdx;
@@ -105,6 +115,7 @@ void ArchetypeMngr::EntityDetach(EntityData* e) {
   auto dstID = srcID;
   dstID.Remove<Cmpts...>();
 
+  // get dstArchetype
   Archetype* dstArchetype;
   auto target = id2a.find(dstID);
   if (target == id2a.end()) {
@@ -115,19 +126,26 @@ void ArchetypeMngr::EntityDetach(EntityData* e) {
   } else
     dstArchetype = target->second;
 
+  // move src to dst
   size_t dstIdx = dstArchetype->CreateEntity();
-  for (auto cmptHash : dstID) {
-    auto srcCmpt = srcArchetype->At(cmptHash, srcIdx);
-    auto dstCmpt = dstArchetype->At(cmptHash, dstIdx);
-    size_t size = std::get<1>(srcCmpt);
-    assert(size == std::get<1>(dstCmpt));
-    memcpy(std::get<0>(dstCmpt), std::get<0>(srcCmpt), size);
+  for (auto cmptHash : srcID) {
+    auto [srcCmpt, srcSize] = srcArchetype->At(cmptHash, srcIdx);
+    if (dstID.IsContain(cmptHash)) {
+      auto [dstCmpt, dstSize] = dstArchetype->At(cmptHash, dstIdx);
+      e->MoveCmpt(srcCmpt, dstCmpt);
+      assert(srcSize == dstSize);
+      memcpy(dstCmpt, srcCmpt, srcSize);
+    } else
+      e->ReleaseCmpt(srcCmpt);
   }
 
-  size_t srcMovedIdx = srcArchetype->Erase(srcIdx);
+  // erase
+  auto [srcMovedIdx, pairs] = srcArchetype->Erase(srcIdx);
   if (srcMovedIdx != static_cast<size_t>(-1)) {
     auto srcMovedEntityTarget = d2p.find({srcArchetype, srcMovedIdx});
     auto srcMovedEntity = srcMovedEntityTarget->second;
+    for (auto p : pairs)
+      srcMovedEntity->MoveCmpt(p.first, p.second);
     d2p.erase(srcMovedEntityTarget);
     d2p[{srcArchetype, srcIdx}] = srcMovedEntity;
     srcMovedEntity->idx() = srcMovedIdx;

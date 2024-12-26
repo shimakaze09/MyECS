@@ -8,23 +8,27 @@
 #include <unordered_set>
 #include <vector>
 
-// no release
+// have new and release
 namespace My {
 template <typename T>
-class Pool {
+class pool {
  public:
-  ~Pool() { clear(); }
+  ~pool() { clear(); }
 
  public:
   T* const request() {
     if (freeAdresses.empty())
       NewBlock();
     T* freeAdress = freeAdresses.back();
+    new (freeAdress) T;
     freeAdresses.pop_back();
     return freeAdress;
   }
 
-  void recycle(T* object) { freeAdresses.push_back(object); }
+  void recycle(T* object) {
+    object->~T();
+    freeAdresses.push_back(object);
+  }
 
   void reserve(size_t n) {
     size_t blockNum = n / BLOCK_SIZE + (n % BLOCK_SIZE > 0 ? 1 : 0);
@@ -36,11 +40,11 @@ class Pool {
     std::unordered_set<T*> freeAdressesSet(freeAdresses.begin(),
                                            freeAdresses.end());
     for (auto block : blocks) {
-      // for (size_t i = 0; i < BLOCK_SIZE; i++) {
-      //   T* adress = block->data() + i;
-      //   if (freeAdressesSet.find(adress) == freeAdressesSet.end())
-      //     adress->~T();
-      // }
+      for (size_t i = 0; i < BLOCK_SIZE; i++) {
+        T* adress = block->data() + i;
+        if (freeAdressesSet.find(adress) == freeAdressesSet.end())
+          adress->~T();
+      }
       free(block);
     }
     blocks.clear();

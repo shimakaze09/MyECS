@@ -7,13 +7,25 @@
 #include <set>
 
 namespace My::Cmpt {
+// auto delete children
 struct Node {
-  Entity* entity{ nullptr };
-  Node* parent{ nullptr };
+  Entity* entity{nullptr};
+  Node* parent{nullptr};
   std::set<Node*> children;
 
   Node(Entity* entity = nullptr, Node* parent = nullptr)
-      : entity(entity), parent(parent) { }
+      : entity(entity), parent(parent) {}
+
+  ~Node() {
+    for (auto child : children)
+      child->entity->Release();
+    children.clear();
+    if (parent) {
+      parent->children.erase(this);
+      parent = nullptr;
+    }
+    entity = nullptr;
+  }
 
   void AddChild(Node* child) {
     if (child->parent != nullptr)
@@ -45,4 +57,4 @@ struct Node {
   Node(const Node& tree) = delete;
   Node& operator=(const Node& tree) = delete;
 };
-}
+}  // namespace My::Cmpt

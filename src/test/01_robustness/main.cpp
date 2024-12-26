@@ -12,11 +12,16 @@ using namespace My;
 
 struct velocity {
   velocity() = default;
+
+  ~velocity() { cout << "velocity release " << this << endl; }
+
   velocity(float v) : v(v) {};
   float v{0.f};
 };
 
 struct position {
+  ~position() { cout << "position release " << this << endl; }
+
   float x{0.f};
 };
 

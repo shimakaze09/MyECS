@@ -6,7 +6,7 @@
 
 #include "Archetype.h"
 #include "EntityData.h"
-#include "Pool.h"
+#include "pool.h"
 
 #include <MyTemplate/TypeList.h>
 
@@ -48,7 +48,7 @@ class ArchetypeMngr {
   void Release(EntityData* e);
 
  private:
-  Pool<EntityData> entityPool;
+  pool<EntityData> entityPool;
   std::map<EntityData, EntityData*> d2p;
   std::set<Archetype::ID> ids;
   My::World* w;

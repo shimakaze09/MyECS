@@ -11,11 +11,11 @@ class World;
 
 class Entity final : private EntityData {
  public:
-  template <typename Cmpt, typename... Args>
-  inline void Init(Args&&... args) {
-    assert(IsAlive());
-    archetype->Init<Cmpt>(idx, std::forward<Args>(args)...);
-  }
+  // template <typename Cmpt, typename... Args>
+  // inline void Init(Args&&... args) {
+  //   assert(IsAlive());
+  //   archetype->Init<Cmpt>(idx, std::forward<Args>(args)...);
+  // }
 
   template <typename Cmpt>
   inline Cmpt* Get() {
@@ -33,8 +33,7 @@ class Entity final : private EntityData {
 
   template <typename... Cmpts>
   inline void Detach() {
-    static_assert(IsSet_v<TypeList<Cmpts...>>, "Componnents must be different");
-    // TODO: static_assert(Different_v<TypeList<Cmpts...>>);
+    static_assert(IsSet_v<TypeList<Cmpts...>>, "Components must be different");
     static_assert(sizeof...(Cmpts) > 0);
     assert(IsAlive());
     return archetype()->mngr->EntityDetach<Cmpts...>(this);
