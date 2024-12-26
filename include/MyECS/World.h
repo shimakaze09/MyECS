@@ -8,7 +8,7 @@
 #include "Entity.h"
 #include "Pool.h"
 
-#include <../../external/MyTemplate/include/MyTemplate/FuncTraits.h>
+#include <MyTemplate/FuncTraits.h>
 
 #include <tuple>
 

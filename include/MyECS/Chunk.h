@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <../../external/MyTemplate/include/MyTemplate/TypeList.h>
+#include <MyTemplate/TypeList.h>
 
 #include <array>
 #include <cassert>
