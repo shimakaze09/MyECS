@@ -12,7 +12,7 @@ class World;
 class Entity final : private EntityData {
  public:
   template <typename Cmpt, typename... Args>
-  inline void Init(Args... args) {
+  inline void Init(Args&&... args) {
     assert(IsAlive());
     archetype->Init<Cmpt>(idx, std::forward<Args>(args)...);
   }

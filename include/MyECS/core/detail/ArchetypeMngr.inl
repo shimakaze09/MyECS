@@ -19,7 +19,7 @@ inline Archetype* ArchetypeMngr::GetOrCreateArchetypeOf() {
 }
 
 template <typename... Cmpts>
-EntityData* ArchetypeMngr::CreateEntity() {
+const std::tuple<EntityData*, Cmpts*...> ArchetypeMngr::CreateEntity() {
   Archetype* archetype = GetOrCreateArchetypeOf<Cmpts...>();
   size_t idx = archetype->CreateEntity<Cmpts...>();
 
@@ -28,7 +28,7 @@ EntityData* ArchetypeMngr::CreateEntity() {
   entity->idx() = idx;
   d2p[*entity] = entity;
 
-  return entity;
+  return {entity, archetype->At<Cmpts>(idx)...};
 }
 
 template <typename... Cmpts>
@@ -42,7 +42,7 @@ const std::vector<Archetype*> ArchetypeMngr::GetArchetypeWith() {
 }
 
 template <typename... Cmpts>
-std::tuple<Cmpts*...> ArchetypeMngr::EntityAttach(EntityData* e) {
+const std::tuple<Cmpts*...> ArchetypeMngr::EntityAttach(EntityData* e) {
   assert(!e->archetype()->id.IsContain<Cmpts...>());
 
   Archetype* srcArchetype = e->archetype();

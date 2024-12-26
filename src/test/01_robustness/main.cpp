@@ -24,7 +24,7 @@ int main() {
   World w;
   set<Entity*> entities;
 
-  auto e = w.CreateEntity<>();
+  auto [e] = w.CreateEntity<>();
   e->Attach<velocity>();
   e->Detach<velocity>();
   e->Attach<position, velocity>();
@@ -33,7 +33,7 @@ int main() {
     w.CreateEntity<>();
 
   for (size_t i = 0; i < 100000; i++) {
-    auto e = w.CreateEntity<>();
+    auto [e] = w.CreateEntity<>();
     entities.insert(e);
   }
 

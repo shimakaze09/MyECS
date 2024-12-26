@@ -2,8 +2,8 @@
 // Created by Admin on 27/12/2024.
 //
 
-#include <MyECS/core/World.h>
 #include <MyECS/cmpt/Node.h>
+#include <MyECS/core/World.h>
 
 #include <iostream>
 
@@ -12,15 +12,10 @@ using namespace My;
 
 int main() {
   World w;
-  auto e0 = w.CreateEntity<Cmpt::Node>();
-  auto e1 = w.CreateEntity<Cmpt::Node>();
-  auto e2 = w.CreateEntity<Cmpt::Node>();
-  auto e3 = w.CreateEntity<Cmpt::Node>();
-
-  auto n0 = e0->Get<Cmpt::Node>();
-  auto n1 = e1->Get<Cmpt::Node>();
-  auto n2 = e2->Get<Cmpt::Node>();
-  auto n3 = e3->Get<Cmpt::Node>();
+  auto [e0, n0] = w.CreateEntity<Cmpt::Node>();
+  auto [e1, n1] = w.CreateEntity<Cmpt::Node>();
+  auto [e2, n2] = w.CreateEntity<Cmpt::Node>();
+  auto [e3, n3] = w.CreateEntity<Cmpt::Node>();
 
   n0->entity = e0;
   n1->entity = e1;

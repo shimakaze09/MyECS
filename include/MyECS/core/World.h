@@ -26,7 +26,7 @@ class World {
   World() : mngr(new ArchetypeMngr(this)) {}
 
   template <typename... Cmpts>
-  inline Entity* CreateEntity();
+  inline std::tuple<Entity*, Cmpts*...> CreateEntity();
 
   // s must be a callable object and it's argument-list isn't empty
   template <typename ArgList>
