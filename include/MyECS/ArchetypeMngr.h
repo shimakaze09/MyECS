@@ -8,7 +8,7 @@
 #include "EntityData.h"
 #include "Pool.h"
 
-#include <MyTemplate/TypeList.h>
+#include <../../external/MyTemplate/include/MyTemplate/TypeList.h>
 
 namespace My {
 class World;

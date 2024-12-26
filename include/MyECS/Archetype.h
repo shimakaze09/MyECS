@@ -6,7 +6,7 @@
 
 #include "Chunk.h"
 
-#include <MyTemplate/TypeID.h>
+#include <../../external/MyTemplate/include/MyTemplate/TypeID.h>
 
 #include <cassert>
 #include <map>

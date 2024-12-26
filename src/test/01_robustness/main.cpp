@@ -2,7 +2,7 @@
 // Created by Admin on 27/12/2024.
 //
 
-#include <MyECS/core/World.h>
+#include <MyECS/World.h>
 
 #include <iostream>
 #include <set>
