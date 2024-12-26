@@ -20,12 +20,10 @@ struct Each;
 namespace My {
 class World {
  public:
-  World() : mngr(this) {}
+  World() : mngr(new ArchetypeMngr(this)) {}
 
   template <typename... Cmpts>
   inline Entity* CreateEntityWith();
-
-  void Delete(Entity* entity);
 
   template <typename ArgList>
   friend struct detail::World_::Each;
@@ -37,10 +35,7 @@ class World {
   }
 
  private:
-  detail::ArcheTypeMngr mngr;
-  Pool<Entity> entities;
-  std::map<Entity*, std::tuple<detail::ArcheType*, size_t>> e2atid;
-  std::map<std::tuple<detail::ArcheType*, size_t>, Entity*> atid2e;
+  ArchetypeMngr* mngr;
 };
 }  // namespace My
 
