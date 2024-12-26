@@ -8,6 +8,7 @@
 #include <unordered_set>
 #include <vector>
 
+// no release
 namespace My {
 template <typename T>
 class Pool {

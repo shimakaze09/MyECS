@@ -2,7 +2,7 @@
 // Created by Admin on 26/12/2024.
 //
 
-#include <MyECS/Archetype.h>
+#include <MyECS/core/Archetype.h>
 
 using namespace std;
 using namespace My;

@@ -53,6 +53,7 @@ struct ParallelEach<TypeList<Cmpts*...>> {
 
       size_t coreNum = std::thread::hardware_concurrency();
       assert(coreNum > 0);
+
       auto job = [=](size_t ID) {
         for (size_t i = ID; i < chunkNum; i += coreNum) {
           auto cmptsTuple = std::make_tuple(
@@ -62,6 +63,7 @@ struct ParallelEach<TypeList<Cmpts*...>> {
             s((std::get<Find_v<CmptList, Cmpts>>(cmptsTuple) + j)...);
         }
       };
+
       std::vector<std::thread> workers;
       for (size_t i = 0; i < coreNum; i++)
         workers.emplace_back(job, i);
