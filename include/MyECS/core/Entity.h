@@ -9,7 +9,7 @@
 namespace My {
 class World;
 
-class Entity final : private EntityData {
+class Entity final : private EntityBase {
  public:
   // template <typename Cmpt, typename... Args>
   // inline void Init(Args&&... args) {
@@ -20,7 +20,7 @@ class Entity final : private EntityData {
   template <typename Cmpt>
   inline Cmpt* Get() {
     assert(IsAlive());
-    return archetype()->At<Cmpt>(idx());
+    return archetype->At<Cmpt>(idx);
   }
 
   template <typename... Cmpts>
@@ -31,7 +31,16 @@ class Entity final : private EntityData {
                     std::is_constructible_v<Cmpts, Entity*>) &&
                    ...));
     assert(IsAlive());
-    return archetype()->mngr->EntityAttach<Cmpts...>(this);
+    return archetype->mngr->EntityAttach<Cmpts...>(this);
+  }
+
+  template <typename Cmpt>
+  inline Cmpt* GetOrAttach() {
+    assert(IsAlive());
+    Cmpt* cmpt = archetype->At<Cmpt>(idx);
+    if (!cmpt)
+      std::tie(cmpt) = Attach<Cmpt>();
+    return cmpt;
   }
 
   template <typename... Cmpts>
@@ -39,20 +48,20 @@ class Entity final : private EntityData {
     static_assert(sizeof...(Cmpts) > 0);
     static_assert(IsSet_v<TypeList<Cmpts...>>, "Components must be different");
     assert(IsAlive());
-    return archetype()->mngr->EntityDetach<Cmpts...>(this);
+    return archetype->mngr->EntityDetach<Cmpts...>(this);
   }
 
-  inline bool IsAlive() const noexcept { return archetype() != nullptr; }
+  inline bool IsAlive() const noexcept { return archetype != nullptr; }
 
   void Release() noexcept {
     assert(IsAlive());
-    archetype()->mngr->Release(this);
+    archetype->mngr->Release(this);
   }
 
  private:
   friend class World;
 };
 
-static_assert(sizeof(Entity) == sizeof(EntityData) &&
-              std::is_base_of_v<EntityData, Entity>);
+static_assert(sizeof(Entity) == sizeof(EntityBase) &&
+              std::is_base_of_v<EntityBase, Entity>);
 }  // namespace My

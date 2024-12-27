@@ -10,52 +10,28 @@
 
 namespace My::Cmpt {
 // auto delete children
-struct Node {
-  Entity* entity;
-  Node* parent{nullptr};
-  std::set<Node*> children;
+class Node {
+ public:
+  Node(My::Entity* entity) : entity(entity) {}
 
-  Node(Entity* entity) : entity(entity) {}
+  ~Node();
 
-  ~Node() {
-    for (auto child : children)
-      child->entity->Release();
-    children.clear();
-    if (parent) {
-      parent->children.erase(this);
-      parent = nullptr;
-    }
-    entity = nullptr;
-  }
+  inline My::Entity* Entity() noexcept { return entity; }
 
-  void AddChild(Node* child) {
-    if (child->parent != nullptr)
-      child->parent->DelChild(child);
+  inline const My::Entity* Entity() const noexcept { return entity; }
 
-    child->parent = this;
-    children.insert(child);
-  }
+  // don't call it in parallel
+  void AddChild(Node* child);
+  void DelChild(Node* child);
 
-  void DelChild(Node* child) {
-    assert(child == this);
-    if (child->parent != this)
-      return;
+  bool IsDescendantOf(Node* e) const;
 
-    children.erase(child);
-    child->parent = nullptr;
-  }
-
-  bool IsDescendantOf(Node* node) const {
-    if (this == node)
-      return true;
-
-    if (parent == nullptr)
-      return false;
-
-    return parent->IsDescendantOf(node);
-  }
-
+ private:
   Node(const Node& node) = delete;
   Node& operator=(const Node& node) = delete;
+
+  My::Entity* entity;
+  Node* parent{nullptr};
+  std::set<Node*> children;
 };
 }  // namespace My::Cmpt

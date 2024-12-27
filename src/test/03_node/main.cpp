@@ -19,6 +19,7 @@ int main() {
   auto [e3] = w.CreateEntity<>();
   auto [n3] = e3->Attach<Cmpt::Node>();
 
+  // CreateEntity and Attach will auto-bind entity
   // n0->entity = e0;
   // n1->entity = e1;
   // n2->entity = e2;

@@ -88,7 +88,7 @@ Cmpt* Archetype::At(size_t idx) {
 
 template <typename... Cmpts>
 const std::pair<size_t, std::tuple<Cmpts*...>> Archetype::CreateEntity(
-    EntityData* e) {
+    EntityBase* e) {
   assert(id.Is<Cmpts...>());
 
   using CmptList = TypeList<Cmpts...>;
@@ -118,7 +118,7 @@ const std::vector<Cmpt*> Archetype::LocateOne() {
 }
 
 template <typename Cmpt>
-Cmpt* Archetype::New(void* addr, EntityData* e) {
+Cmpt* Archetype::New(void* addr, EntityBase* e) {
   Cmpt* cmpt;
   if constexpr (std::is_constructible_v<Cmpt, Entity*>)
     cmpt = new (addr) Cmpt(reinterpret_cast<Entity*>(e));
@@ -129,7 +129,7 @@ Cmpt* Archetype::New(void* addr, EntityData* e) {
 }
 
 template <typename Cmpt>
-Cmpt* Archetype::New(size_t idx, EntityData* e) {
+Cmpt* Archetype::New(size_t idx, EntityBase* e) {
   return New<Cmpt>(At<Cmpt>(idx), e);
 }
 }  // namespace My
