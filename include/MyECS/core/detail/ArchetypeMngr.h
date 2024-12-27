@@ -6,9 +6,9 @@
 
 #include "Archetype.h"
 #include "EntityBase.h"
-#include "pool.h"
+#include "Pool.h"
 
-#include <MyTemplate/TypeList.h>
+#include <MyTemplate/Typelist.h>
 
 namespace My {
 class World;
@@ -48,7 +48,7 @@ class ArchetypeMngr {
   void Release(EntityBase* e);
 
  private:
-  pool<EntityBase> entityPool;
+  Pool<EntityBase> entityPool;
   std::map<std::pair<Archetype*, size_t>, EntityBase*>
       ai2e;  // (archetype, idx) -> entity
   std::set<Archetype::ID> ids;
@@ -57,4 +57,4 @@ class ArchetypeMngr {
 };
 }  // namespace My
 
-#include "detail/ArchetypeMngr.inl"
+#include "ArchetypeMngr.inl"

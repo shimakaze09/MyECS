@@ -2,12 +2,12 @@
 // Created by Admin on 26/12/2024.
 //
 
-#include <MyECS/core/Archetype.h>
+#include <MyECS/core/detail/Archetype.h>
 
 using namespace std;
 using namespace My;
 
-pool<Chunk> Archetype::chunkPool;
+Pool<Chunk> Archetype::chunkPool;
 
 bool Archetype::ID::operator<(const ID& id) const noexcept {
   auto l = begin(), r = id.begin();

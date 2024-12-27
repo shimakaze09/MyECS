@@ -4,13 +4,29 @@
 
 #pragma once
 
-#include <thread>
-
 namespace My {
+World::World() : mngr(new ArchetypeMngr(this)) {}
+
+World::~World() {
+  delete mngr;
+}
+
+template <typename Sys>
+inline void World::Each(Sys&& s) {
+  detail::World_::Each<typename FuncTraits<Sys>::ArgList>::run(
+      this, std::forward<Sys>(s));
+}
+
+template <typename Sys>
+inline void World::ParallelEach(Sys&& s) {
+  detail::World_::ParallelEach<typename FuncTraits<Sys>::ArgList>::run(
+      this, std::forward<Sys>(s));
+}
+
 template <typename... Cmpts>
 std::tuple<Entity*, Cmpts*...> World::CreateEntity() {
   // static_assert(sizeof...(Cmpts) > 0);
-  static_assert(IsSet_v<TypeList<Cmpts...>>, "Components must be different");
+  static_assert(IsSet_v<TypeList<Cmpts...>>, "Componnents must be different");
   static_assert(((std::is_constructible_v<Cmpts> ||
                   std::is_constructible_v<Cmpts, Entity*>) &&
                  ...));
@@ -25,7 +41,7 @@ template <typename... Cmpts>
 struct Each<TypeList<Cmpts*...>> {
   static_assert(sizeof...(Cmpts) > 0);
   using CmptList = TypeList<Cmpts...>;
-  static_assert(IsSet_v<CmptList>, "Components must be different");
+  static_assert(IsSet_v<CmptList>, "Componnents must be different");
 
   template <typename Sys>
   static void run(World* w, Sys&& s) {
@@ -50,7 +66,7 @@ template <typename... Cmpts>
 struct ParallelEach<TypeList<Cmpts*...>> {
   static_assert(sizeof...(Cmpts) > 0);
   using CmptList = TypeList<Cmpts...>;
-  static_assert(IsSet_v<CmptList>, "Components must be different");
+  static_assert(IsSet_v<CmptList>, "Componnents must be different");
 
   template <typename Sys>
   static void run(World* w, Sys&& s) {

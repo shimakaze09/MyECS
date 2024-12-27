@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <MyECS/core/Chunk.h>
+#include <MyECS/core/detail/Chunk.h>
 
 using namespace My;
 using namespace std;

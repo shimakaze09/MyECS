@@ -6,8 +6,6 @@
 
 #include "../core/Entity.h"
 
-#include <set>
-
 namespace My::Cmpt {
 // auto delete children
 class Node {
@@ -20,7 +18,6 @@ class Node {
 
   inline const My::Entity* Entity() const noexcept { return entity; }
 
-  // don't call it in parallel
   void AddChild(Node* child);
   void DelChild(Node* child);
 

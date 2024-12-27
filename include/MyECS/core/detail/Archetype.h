@@ -5,18 +5,15 @@
 #pragma once
 
 #include "Chunk.h"
-#include "EntityBase.h"
 #include "Pool.h"
+#include "EntityBase.h"
 
 #include <MyTemplate/TypeID.h>
 
-#include <cassert>
 #include <map>
 #include <set>
-#include <tuple>
-#include <vector>
 
-namespace My {
+namespace {
 class ArchetypeMngr;
 class Entity;
 
@@ -131,12 +128,12 @@ class Archetype {
     return id.IsContain<Cmpts...>();
   }
 
-  // template <typename Cmpt, typename... Args>
-  // inline Cmpt* Init(size_t idx, Args&&... args) noexcept {
-  //   Cmpt* cmpt = reinterpret_cast<Cmpt*>(At<Cmpt>(idx));
-  //   new (cmpt) Cmpt(std::forward<Args>(args)...);
-  //   return cmpt;
-  // }
+  /*template<typename Cmpt, typename... Args>
+		inline Cmpt* Init(size_t idx, Args&&... args) noexcept {
+			Cmpt* cmpt = reinterpret_cast<Cmpt*>(At<Cmpt>(idx));
+			new (cmpt) Cmpt(std::forward<Args>(args)...);
+			return cmpt;
+		}*/
 
  private:
   template <typename Cmpt>
@@ -152,13 +149,13 @@ class Archetype {
 
   ArchetypeMngr* mngr;
   ID id;
-  std::map<size_t, std::pair<size_t, size_t>> h2so;  // hash to {size, offset}
+  std::map<size_t, std::pair<size_t, size_t>> h2so;  // hash to (size, offset)
   size_t chunkCapacity;
   std::vector<Chunk*> chunks;
   size_t num{0};
 
-  static pool<Chunk> chunkPool;  // TODO: lock
+  static Pool<Chunk> chunkPool;  // TODO: lock
 };
-}  // namespace My
+}  // namespace
 
-#include "detail/Archetype.inl"
+#include "Archetype.inl"

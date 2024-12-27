@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <MyECS/core/ArchetypeMngr.h>
+#include <MyECS/core/detail/ArchetypeMngr.h>
 
 using namespace My;
 
