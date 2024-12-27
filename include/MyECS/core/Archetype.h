@@ -142,6 +142,8 @@ class Archetype {
   template <typename Cmpt>
   const std::vector<Cmpt*> LocateOne();
   template <typename Cmpt>
+  Cmpt* New(size_t idx, EntityData* e);
+  template <typename Cmpt>
   static Cmpt* New(void* addr, EntityData* e);
 
  private:

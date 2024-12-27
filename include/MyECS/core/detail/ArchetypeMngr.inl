@@ -70,7 +70,7 @@ const std::tuple<Cmpts*...> ArchetypeMngr::EntityAttach(EntityData* e) {
   // move src to dst
   size_t dstIdx = dstArchetype->CreateEntity();
 
-  ((e->RegistCmptRelease<Cmpts>(dstArchetype->At<Cmpts>(dstIdx))), ...);
+  (dstArchetype->New<Cmpts>(dstIdx, e), ...);
   for (auto cmptHash : srcID) {
     auto [srcCmpt, srcSize] = srcArchetype->At(cmptHash, srcIdx);
     auto [dstCmpt, dstSize] = dstArchetype->At(cmptHash, dstIdx);
