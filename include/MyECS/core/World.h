@@ -6,7 +6,7 @@
 
 #include "Entity.h"
 
-#include <MyTemplate/FuncTraits.h>
+#include <MyTemplate/Func.h>
 
 #include <thread>
 
