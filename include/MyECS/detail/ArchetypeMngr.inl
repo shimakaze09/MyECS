@@ -29,7 +29,7 @@ const std::tuple<EntityBase*, Cmpts*...> ArchetypeMngr::CreateEntity() {
   entity->idx = idx;
   ai2e[{archetype, idx}] = entity;
 
-  // ((entity->RegistCmptRelease(std::get<Find_v<CmptList, Cmpts>>(cmpts))),...);
+  // ((entity->RegistCmptFuncs(std::get<Find_v<CmptList, Cmpts>>(cmpts))),...);
 
   using CmptList = TypeList<Cmpts...>;
   return {entity, std::get<Find_v<CmptList, Cmpts>>(cmpts)...};
@@ -84,8 +84,8 @@ const std::tuple<Cmpts*...> ArchetypeMngr::EntityAttach(EntityBase* e) {
   if (srcMovedIdx != static_cast<size_t>(-1)) {
     auto srcMovedEntityTarget = ai2e.find({srcArchetype, srcMovedIdx});
     auto srcMovedEntity = srcMovedEntityTarget->second;
-    for (auto p : pairs)
-      srcMovedEntity->MoveCmpt(p.first, p.second);
+    for (auto [src, dst] : pairs)
+      srcMovedEntity->MoveCmpt(src, dst);
     ai2e.erase(srcMovedEntityTarget);
     ai2e[{srcArchetype, srcIdx}] = srcMovedEntity;
     srcMovedEntity->idx = srcMovedIdx;
@@ -145,8 +145,8 @@ void ArchetypeMngr::EntityDetach(EntityBase* e) {
   if (srcMovedIdx != static_cast<size_t>(-1)) {
     auto srcMovedEntityTarget = ai2e.find({srcArchetype, srcMovedIdx});
     auto srcMovedEntity = srcMovedEntityTarget->second;
-    for (auto p : pairs)
-      srcMovedEntity->MoveCmpt(p.first, p.second);
+    for (auto [src, dst] : pairs)
+      srcMovedEntity->MoveCmpt(src, dst);
     ai2e.erase(srcMovedEntityTarget);
     ai2e[{srcArchetype, srcIdx}] = srcMovedEntity;
     srcMovedEntity->idx = srcMovedIdx;

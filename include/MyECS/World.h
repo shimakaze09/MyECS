@@ -21,8 +21,8 @@ struct ParallelEach;
 namespace My {
 class World {
  public:
-  World();
-  ~World();
+  inline World();
+  inline ~World();
 
   template <typename... Cmpts>
   inline std::tuple<Entity*, Cmpts*...> CreateEntity();

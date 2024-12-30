@@ -8,7 +8,7 @@
 #include "EntityBase.h"
 #include "Pool.h"
 
-#include <MyTemplate/Typelist.h>
+#include <MyTemplate/TypeList.h>
 
 namespace My {
 class World;
@@ -17,10 +17,7 @@ class ArchetypeMngr {
  public:
   ArchetypeMngr(World* w) : w(w) {}
 
-  ~ArchetypeMngr() {
-    for (auto p : id2a)
-      delete p.second;
-  }
+  ~ArchetypeMngr();
 
   inline World* World() const noexcept { return w; }
 
@@ -49,7 +46,7 @@ class ArchetypeMngr {
 
  private:
   Pool<EntityBase> entityPool;
-  std::map<std::pair<Archetype*, size_t>, EntityBase*>
+  std::map<std::tuple<Archetype*, size_t>, EntityBase*>
       ai2e;  // (archetype, idx) -> entity
   std::set<Archetype::ID> ids;
   My::World* w;

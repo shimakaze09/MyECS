@@ -2,9 +2,7 @@
 // Created by Admin on 26/12/2024.
 //
 
-#pragma once
-
-#include <MyECS/core/detail/Chunk.h>
+#include <MyECS/detail/Chunk.h>
 
 using namespace My;
 using namespace std;

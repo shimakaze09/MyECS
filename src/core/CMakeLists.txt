@@ -1,10 +1,12 @@
 GLOBAL_GROUP_SOURCES(RST SOURCES PATHS
         ${CMAKE_CURRENT_SOURCE_DIR}
-        "${PROJECT_SOURCE_DIR}/include/MyECS/core"
+        "${PROJECT_SOURCE_DIR}/include/MyECS"
 )
+
+TO_PACKAGE_NAME(PACKAGE_NAME MyTemplate 0.2.0)
 
 ADD_TARGET(MODE "LIB"
         SOURCES ${SOURCES}
         INTERFACE_INC ON
-        LIBS My::MyTemplate_core
+        LIBS  "My::${PACKAGE_NAME}_core"
 )

@@ -2,7 +2,7 @@
 // Created by Admin on 27/12/2024.
 //
 
-#include <MyECS/core/World.h>
+#include <MyECS/World.h>
 
 #include <chrono>
 #include <iostream>
@@ -13,23 +13,25 @@ using namespace My;
 
 struct velocity {
   float v{0.f};
-  float pad[31];
+  float pad[31]{};
 };
 
 struct position {
   float x{0.f};
-  float pad[31];
+  float pad[31]{};
 };
 
 int main() {
   constexpr size_t N = 1 << 22;
   constexpr size_t M = 100;
+
   World w;
   vector<velocity*> vs;
   vector<position*> ps;
-  vector<pair<size_t, size_t>> table;
+  vector<tuple<size_t, size_t>> table;
   vs.reserve(N);
   ps.reserve(N);
+  table.reserve(N);
 
   default_random_engine engine;
   uniform_real_distribution uni_f(0.f, 1.f);
@@ -60,15 +62,16 @@ int main() {
   auto t0 = chrono::steady_clock::now();
   for (size_t i = 0; i < N; i++) {
     // simulate entity pointer
-    auto vpidx = table[i];
-    auto p = ps[vpidx.first];
-    auto v = ps[vpidx.second];
+    auto [vidx, pidx] = table[i];
+    auto v = ps[vidx];
+    auto p = ps[pidx];
     // component pointer
     auto& pX = p->x;
     auto vX = v->x;
     for (size_t i = 0; i < M; i++)
       pX += vX * 0.01f;
   }
+
   auto t1 = chrono::steady_clock::now();
   w.Each(sys);
   auto t2 = chrono::steady_clock::now();
