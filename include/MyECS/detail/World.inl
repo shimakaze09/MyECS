@@ -25,11 +25,8 @@ inline void World::ParallelEach(Sys&& s) {
 
 template <typename... Cmpts>
 std::tuple<Entity*, Cmpts*...> World::CreateEntity() {
-  // static_assert(sizeof...(Cmpts) > 0);
-  static_assert(IsSet_v<TypeList<Cmpts...>>, "Componnents must be different");
-  static_assert(((std::is_constructible_v<Cmpts> ||
-                  std::is_constructible_v<Cmpts, Entity*>) &&
-                 ...));
+  static_assert(IsSet_v<TypeList<Cmpts...>>, "Components must be different");
+  (CmptMngr::Instance().Regist<Cmpts>(), ...);
   auto rst = mngr->CreateEntity<Cmpts...>();
   return {reinterpret_cast<Entity*>(std::get<0>(rst)),
           std::get<1 + Find_v<TypeList<Cmpts...>, Cmpts>>(rst)...};
@@ -41,7 +38,7 @@ template <typename... Cmpts>
 struct Each<TypeList<Cmpts*...>> {
   static_assert(sizeof...(Cmpts) > 0);
   using CmptList = TypeList<Cmpts...>;
-  static_assert(IsSet_v<CmptList>, "Componnents must be different");
+  static_assert(IsSet_v<CmptList>, "Components must be different");
 
   template <typename Sys>
   static void run(World* w, Sys&& s) {
@@ -66,7 +63,7 @@ template <typename... Cmpts>
 struct ParallelEach<TypeList<Cmpts*...>> {
   static_assert(sizeof...(Cmpts) > 0);
   using CmptList = TypeList<Cmpts...>;
-  static_assert(IsSet_v<CmptList>, "Componnents must be different");
+  static_assert(IsSet_v<CmptList>, "Components must be different");
 
   template <typename Sys>
   static void run(World* w, Sys&& s) {

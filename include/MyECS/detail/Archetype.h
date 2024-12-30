@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Chunk.h"
+#include "CmptMngr.h"
 #include "EntityBase.h"
 #include "Pool.h"
 
@@ -94,21 +95,20 @@ class Archetype {
   std::vector<std::tuple<void*, size_t>> Components(size_t idx);
 
   // no init
-  inline size_t CreateEntity() {
+  inline size_t RequestBuffer() {
     if (num == chunks.size() * chunkCapacity)
       chunks.push_back(chunkPool.request());
     return num++;
   }
 
-  // init cmpts (with e if std::is_constructible_v<Cmpt, Entity*>)
+  // init cmpts
   template <typename... Cmpts>
-  const std::tuple<size_t, std::tuple<Cmpts*...>> CreateEntity(EntityBase* e);
+  const std::tuple<size_t, std::tuple<Cmpts*...>> CreateEntity();
 
-  // erase idx-th entity
+  // erase idx-th empty entity
   // if idx != num-1, back entity will put at idx, return num-1
   // else return static_cast<size_t>(-1)
-  // return: (movedIdx, [(src, dst)...])
-  std::tuple<size_t, std::vector<std::tuple<void*, void*>>> Erase(size_t idx);
+  size_t Erase(size_t idx);
 
   inline size_t Size() const noexcept { return num; }
 
@@ -128,10 +128,6 @@ class Archetype {
  private:
   template <typename Cmpt>
   const std::vector<Cmpt*> LocateOne();
-  template <typename Cmpt>
-  Cmpt* New(size_t idx, EntityBase* e);
-  template <typename Cmpt>
-  static Cmpt* New(void* addr, EntityBase* e);
 
  private:
   friend class Entity;

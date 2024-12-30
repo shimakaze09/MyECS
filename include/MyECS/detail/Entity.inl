@@ -18,10 +18,8 @@ const std::vector<std::tuple<void*, size_t>> Entity::Components() const {
 template <typename... Cmpts>
 inline std::tuple<Cmpts*...> Entity::Attach() {
   static_assert(sizeof...(Cmpts) > 0);
-  static_assert(IsSet_v<TypeList<Cmpts...>>, "Componnents must be different");
-  static_assert(((std::is_constructible_v<Cmpts> ||
-                  std::is_constructible_v<Cmpts, Entity*>) &&
-                 ...));
+  static_assert(IsSet_v<TypeList<Cmpts...>>, "Components must be different");
+  (CmptMngr::Instance().Regist<Cmpts>(), ...);
   assert(IsAlive());
   return archetype->mngr->EntityAttach<Cmpts...>(this);
 }
@@ -38,7 +36,7 @@ inline Cmpt* Entity::GetOrAttach() {
 template <typename... Cmpts>
 inline void Entity::Detach() {
   static_assert(sizeof...(Cmpts) > 0);
-  static_assert(IsSet_v<TypeList<Cmpts...>>, "Componnents must be different");
+  static_assert(IsSet_v<TypeList<Cmpts...>>, "Components must be different");
   assert(IsAlive());
   return archetype->mngr->EntityDetach<Cmpts...>(this);
 }
