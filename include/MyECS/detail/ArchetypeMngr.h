@@ -21,11 +21,7 @@ class ArchetypeMngr {
 
   inline World* World() const noexcept { return w; }
 
-  inline Archetype* GetArchetypeOf(const Archetype::ID& archetypeID) {
-    auto target = id2a.find(archetypeID);
-    assert(target != id2a.end());
-    return target->second;
-  }
+  inline Archetype* GetArchetypeOf(const Archetype::ID& archetypeID);
 
   template <typename... Cmpts>
   inline Archetype* GetOrCreateArchetypeOf();
@@ -48,9 +44,11 @@ class ArchetypeMngr {
   Pool<EntityBase> entityPool;
   std::map<std::tuple<Archetype*, size_t>, EntityBase*>
       ai2e;  // (archetype, idx) -> entity
+
   std::set<Archetype::ID> ids;
-  My::World* w;
   std::map<Archetype::ID, Archetype*> id2a;  // id to archetype
+
+  My::World* w;
 };
 }  // namespace My
 

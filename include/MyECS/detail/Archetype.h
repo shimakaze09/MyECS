@@ -18,8 +18,10 @@ namespace My {
 class ArchetypeMngr;
 class Entity;
 
+// TODO: clear up
 class Archetype {
  public:
+  // TODO: ID -> CmptIDSet
   struct ID : private std::set<size_t> {
     ID() = default;
 
@@ -66,6 +68,7 @@ class Archetype {
   template <typename... Cmpts>
   Archetype(ArchetypeMngr* mngr, TypeList<Cmpts...>) noexcept;
 
+  // TODO: simplify
   template <typename... Cmpts>
   struct Add {
     static Archetype* From(Archetype* srcArchetype) noexcept;
