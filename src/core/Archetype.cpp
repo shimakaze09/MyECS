@@ -7,8 +7,6 @@
 using namespace std;
 using namespace My;
 
-Pool<Chunk> Archetype::chunkPool;
-
 Archetype::~Archetype() {
   for (auto c : chunks)
     chunkPool.recycle(c);

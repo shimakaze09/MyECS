@@ -140,7 +140,7 @@ class Archetype {
   std::vector<Chunk*> chunks;
   size_t num{0};
 
-  static Pool<Chunk> chunkPool;  // TODO: lock
+  Pool<Chunk> chunkPool;  // TODO: lock
 };
 }  // namespace My
 
