@@ -32,18 +32,18 @@ SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
 
 INCLUDE(FETCHCONTENT)
 
-MESSAGE(STATUS "Looking for: MyCMake v0.3.0")
-find_package(MyCMake 0.3.0 QUIET)
+MESSAGE(STATUS "Looking for: MyCMake v0.3.3")
+find_package(MyCMake 0.3.3 QUIET)
 IF (${MyCMake_FOUND})
     MESSAGE(STATUS "MyCMake v${MyCMake_VERSION} found")
 ELSE ()
     SET(ADDRESS "https://github.com/shimakaze09/MyCMake.git")
     MESSAGE(STATUS "MyCMake v${MyCMake_VERSION} not found\n"
-            "fetch from ${ADDRESS} with tag v0.3.0")
+            "fetch from ${ADDRESS} with tag v0.3.3")
     FETCHCONTENT_DECLARE(
             MyCMake
             GIT_REPOSITORY ${ADDRESS}
-            GIT_TAG "v0.3.0"
+            GIT_TAG "v0.3.3"
     )
     MESSAGE(STATUS "Building MyCMake...")
     FETCHCONTENT_MAKEAVAILABLE(MyCMake)
@@ -55,6 +55,6 @@ INIT_INSTALL_PREFIX()
 
 ADD_DEP(MyTemplate 0.2.0)
 
-ADD_SUB_DIRS(src)
+ADD_SUB_DIRS_REC(src)
 
 EXPORT_TARGETS(DIRECTORIES "include")
