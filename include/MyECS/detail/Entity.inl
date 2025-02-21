@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "SystemMngr.h"
+
 namespace My {
 template <typename Cmpt>
 inline Cmpt* Entity::Get() {
@@ -21,6 +23,7 @@ inline std::tuple<Cmpts*...> Entity::Attach() {
   static_assert(IsSet_v<TypeList<Cmpts...>>, "Components must be different");
   (CmptMngr::Instance().Regist<Cmpts>(), ...);
   assert(IsAlive());
+  (archetype->sysmngr->Regist<Cmpts>(archetype->mngr), ...);
   return archetype->mngr->EntityAttach<Cmpts...>(this);
 }
 
@@ -34,7 +37,7 @@ inline Cmpt* Entity::GetOrAttach() {
 }
 
 template <typename... Cmpts>
-inline void Entity::Detach() {
+void Entity::Detach() {
   static_assert(sizeof...(Cmpts) > 0);
   static_assert(IsSet_v<TypeList<Cmpts...>>, "Components must be different");
   assert(IsAlive());

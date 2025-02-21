@@ -17,6 +17,7 @@
 namespace My {
 class ArchetypeMngr;
 class Entity;
+class SystemMngr;
 
 // TODO: clear up
 class Archetype {
@@ -66,7 +67,8 @@ class Archetype {
   Archetype() = default;
   // argument is for type deduction
   template <typename... Cmpts>
-  Archetype(ArchetypeMngr* mngr, TypeList<Cmpts...>) noexcept;
+  Archetype(SystemMngr* sysmngr, ArchetypeMngr* mngr,
+            TypeList<Cmpts...>) noexcept;
 
   // TODO: simplify
   template <typename... Cmpts>
@@ -137,6 +139,7 @@ class Archetype {
   friend class ArchetypeMngr;
 
   ArchetypeMngr* mngr;
+  SystemMngr* sysmngr;
   ID id;
   std::map<size_t, std::tuple<size_t, size_t>> h2so;  // hash to (size, offset)
   size_t chunkCapacity;

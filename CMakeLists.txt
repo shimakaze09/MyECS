@@ -2,7 +2,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.20 FATAL_ERROR)
 
 # Set the project
-PROJECT(MyECS VERSION 0.3.3 LANGUAGES CXX)
+PROJECT(MyECS VERSION 0.5.0 LANGUAGES CXX)
 MESSAGE(STATUS "Project: ${PROJECT_NAME} ${PROJECT_VERSION}")
 
 # Add 'd' postfix for debug builds
@@ -32,28 +32,28 @@ SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
 
 INCLUDE(FETCHCONTENT)
 
-MESSAGE(STATUS "Looking for: MyCMake v0.3.3")
-find_package(MyCMake 0.3.3 QUIET)
+MESSAGE(STATUS "Looking for: MyCMake v0.4.0")
+find_package(MyCMake 0.4.0 QUIET)
 IF (${MyCMake_FOUND})
-    MESSAGE(STATUS "MyCMake v${MyCMake_VERSION} found")
+    MESSAGE(STATUS "MyCMake v0.4.0 found")
 ELSE ()
     SET(ADDRESS "https://github.com/shimakaze09/MyCMake.git")
-    MESSAGE(STATUS "MyCMake v${MyCMake_VERSION} not found\n"
-            "fetch from ${ADDRESS} with tag v0.3.3")
+    MESSAGE(STATUS "MyCMake v0.4.0 not found\n"
+            "fetch from ${ADDRESS} with tag v0.4.0")
     FETCHCONTENT_DECLARE(
             MyCMake
             GIT_REPOSITORY ${ADDRESS}
-            GIT_TAG "v0.3.3"
+            GIT_TAG "v0.4.0"
     )
     MESSAGE(STATUS "Building MyCMake...")
     FETCHCONTENT_MAKEAVAILABLE(MyCMake)
-    MESSAGE(STATUS "MyCMake v${MyCMake_VERSION} built")
+    MESSAGE(STATUS "MyCMake v0.4.0 built")
 ENDIF ()
 
 # Set default build path prefix
 INIT_INSTALL_PREFIX()
 
-ADD_DEP(MyTemplate 0.2.0)
+ADD_DEP(MyTemplate 0.3.0)
 
 ADD_SUB_DIRS_REC(src)
 

@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Entity.h"
+#include "detail/SystemMngr.h"
 
 #include <MyTemplate/Func.h>
 
@@ -21,11 +22,12 @@ struct ParallelEach;
 namespace My {
 class World {
  public:
-  inline World();
-  inline ~World();
+  World();
 
   template <typename... Cmpts>
   inline std::tuple<Entity*, Cmpts*...> CreateEntity();
+
+  void Update(bool dump = false);
 
   // s must be a callable object and it's argument-list isn't empty
   template <typename Sys>
@@ -41,7 +43,9 @@ class World {
   template <typename ArgList>
   friend struct detail::World_::ParallelEach;
 
-  ArchetypeMngr* mngr;
+  SystemMngr sysMngr;
+  tf::Executor executor;
+  ArchetypeMngr mngr;
 };
 }  // namespace My
 

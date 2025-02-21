@@ -26,7 +26,7 @@ class Entity final : private EntityBase {
   inline Cmpt* GetOrAttach();
 
   template <typename... Cmpts>
-  inline void Detach();
+  void Detach();
 
   inline bool IsAlive() const noexcept;
 
