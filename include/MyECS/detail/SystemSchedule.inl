@@ -41,12 +41,9 @@ struct Schedule<TypeList<Cmpts...>> {
       std::unordered_map<size_t, SystemSchedule::RWSystems>& id2rw,
       tf::Taskflow* system) {
     if constexpr (std::is_const_v<Cmpt>) {
-      using RawCmpt = std::remove_const_t<Cmpt>;
-      id2rw[My::TypeID<RawCmpt>].readers.push_back(system);
+      id2rw[My::TypeID<std::remove_const_t<Cmpt>>].readers.push_back(system);
     } else {
-      assert(id2rw[My::TypeID<Cmpt>].writer == nullptr &&
-             "two component write same component");
-      id2rw[My::TypeID<Cmpt>].writer = system;
+      id2rw[My::TypeID<Cmpt>].writers.push_back(system);
     }
   }
 };

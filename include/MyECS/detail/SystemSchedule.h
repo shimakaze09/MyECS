@@ -31,7 +31,7 @@ class SystemSchedule {
 
  private:
   struct RWSystems {
-    System* writer{nullptr};
+    std::vector<System*> writers;
     std::vector<System*> readers;
   };
 

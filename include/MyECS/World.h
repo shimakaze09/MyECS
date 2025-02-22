@@ -18,7 +18,6 @@ template <typename Args>
 struct ParallelEach;
 }  // namespace My::detail::World_
 
-// no any lock !
 namespace My {
 class World {
  public:
@@ -30,11 +29,9 @@ class World {
   void Update(bool dump = false);
   void RunCommand();
 
-  // s must be a callable object and it's argument-list isn't empty
   template <typename Sys>
   inline void Each(Sys&& s);
 
-  // s must be a callable object and it's argument-list isn't empty
   template <typename Sys>
   inline void ParallelEach(Sys&& s);
 
