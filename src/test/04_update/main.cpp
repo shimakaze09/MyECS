@@ -18,9 +18,18 @@ struct Position {
 struct Velocity {
   float x;
 
-  void OnUpdate(Position* p) const {
+  void Update(Position* p) const {
     p->x += x;
     cout << "update Position" << endl;
+  }
+
+  void Update() const { cout << "update Position(aha)" << endl; }
+
+  static void OnSchedule(
+      std::map<SystemMngr::ScheduleType, SystemSchedule*>& type2schedule) {
+    (*type2schedule[SystemMngr::ScheduleType::OnUpdate])
+        .Regist(MemFuncOf<void(Position*) const>::run(&Velocity::Update))
+        .Regist(MemFuncOf<void() const>::run(&Velocity::Update));
   }
 };
 
@@ -35,7 +44,7 @@ struct Acceleration {
 
 int main() {
   World w;
-  auto [e0, v0, p0, a0] = w.CreateEntity<Velocity, Position, Acceleration>();
+  w.CreateEntity<Velocity, Position, Acceleration>();
   w.Update(true);
   return 0;
 }
