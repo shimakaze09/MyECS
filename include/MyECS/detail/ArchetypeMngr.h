@@ -12,6 +12,8 @@
 
 #include <taskflow/taskflow.hpp>
 
+#include <mutex>
+
 namespace My {
 class World;
 
@@ -45,6 +47,8 @@ class ArchetypeMngr {
   template <typename Sys>
   void GenTaskflow(tf::Taskflow* taskflow, Sys&& sys);
 
+  void AddCommand(const std::function<void()>& command);
+  void RunCommand();
 
  private:
   Pool<EntityBase> entityPool;
@@ -56,6 +60,8 @@ class ArchetypeMngr {
 
   My::World* w;
   SystemMngr* sysmngr;
+  std::vector<std::function<void()>> commandBuffer;
+  std::mutex commandBufferMutex;
 };
 }  // namespace My
 

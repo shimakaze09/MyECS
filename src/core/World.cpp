@@ -18,3 +18,7 @@ void World::Update(bool dump) {
     executor.run(taskflow).wait();
   }
 }
+
+void World::RunCommand() {
+  mngr.RunCommand();
+}

@@ -4,7 +4,10 @@
 
 #include <MyECS/detail/ArchetypeMngr.h>
 
+#include <mutex>
+
 using namespace My;
+using namespace std;
 
 ArchetypeMngr::~ArchetypeMngr() {
   for (auto p : id2a)
@@ -34,4 +37,16 @@ void ArchetypeMngr::Release(EntityBase* e) {
 
   archetype = nullptr;
   idx = static_cast<size_t>(-1);
+}
+
+void ArchetypeMngr::AddCommand(const std::function<void()>& command) {
+  lock_guard<mutex> guard(commandBufferMutex);
+  commandBuffer.push_back(command);
+}
+
+void ArchetypeMngr::RunCommand() {
+  lock_guard<mutex> guard(commandBufferMutex);
+  for (const auto& command : commandBuffer)
+    command();
+  commandBuffer.clear();
 }

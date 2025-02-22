@@ -10,17 +10,17 @@ namespace My {
 class Entity final : private EntityBase {
  public:
   template <typename Cmpt>
-  inline Cmpt* Get();
+  Cmpt* Get();
 
   template <typename Cmpt>
-  inline const Cmpt* Get() const {
-    return const_cast<Entity*>(this)->Get();
-  }
+  const Cmpt* Get() const;
 
-  inline const std::vector<std::tuple<void*, size_t>> Components() const;
+  My::World* World() const noexcept;
+
+  const std::vector<std::tuple<void*, size_t>> Components() const;
 
   template <typename... Cmpts>
-  inline std::tuple<Cmpts*...> Attach();
+  std::tuple<Cmpts*...> Attach();
 
   template <typename Cmpt>
   inline Cmpt* GetOrAttach();
@@ -28,9 +28,12 @@ class Entity final : private EntityBase {
   template <typename... Cmpts>
   void Detach();
 
-  inline bool IsAlive() const noexcept;
+  bool IsAlive() const noexcept;
 
-  inline void Release() noexcept;
+  void Release() noexcept;
+
+  // Attach, Detach, Release, World::CreateEntity
+  void AddCommand(const std::function<void()>& command);
 };
 
 static_assert(sizeof(Entity) == sizeof(EntityBase) &&
