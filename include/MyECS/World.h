@@ -9,8 +9,6 @@
 
 #include <MyTemplate/Func.h>
 
-#include <thread>
-
 namespace My::detail::World_ {
 template <typename Args>
 struct Each;
@@ -24,26 +22,32 @@ class World {
   World();
 
   template <typename... Cmpts>
-  inline std::tuple<Entity*, Cmpts*...> CreateEntity();
+  std::tuple<Entity*, Cmpts*...> CreateEntity();
 
   void Update(bool dump = false);
   void RunCommand();
 
   template <typename Sys>
-  inline void Each(Sys&& s);
+  void Each(Sys&& s);
 
   template <typename Sys>
-  inline void ParallelEach(Sys&& s);
+  void Each(Sys&& s) const;
+
+  template <typename Sys>
+  void ParallelEach(Sys&& s);
+
+  template <typename Sys>
+  void ParallelEach(Sys&& s) const;
 
  private:
+  SystemMngr sysMngr;
+  tf::Executor executor;
+  ArchetypeMngr mngr;
+
   template <typename ArgList>
   friend struct detail::World_::Each;
   template <typename ArgList>
   friend struct detail::World_::ParallelEach;
-
-  SystemMngr sysMngr;
-  tf::Executor executor;
-  ArchetypeMngr mngr;
 };
 }  // namespace My
 
