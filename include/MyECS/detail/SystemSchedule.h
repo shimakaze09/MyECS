@@ -5,7 +5,8 @@
 #pragma once
 
 #include "ArchetypeMngr.h"
-#include "Pool.h"
+
+#include <MyBL/Pool.h>
 
 #include <taskflow/taskflow.hpp>
 

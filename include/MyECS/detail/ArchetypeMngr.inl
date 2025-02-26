@@ -34,7 +34,7 @@ inline Archetype* ArchetypeMngr::GetArchetypeOf(
 
 template <typename... Cmpts>
 const std::tuple<EntityBase*, Cmpts*...> ArchetypeMngr::CreateEntity() {
-  auto entity = entityPool.request();
+  auto entity = entityPool.Request();
 
   Archetype* archetype = GetOrCreateArchetypeOf<Cmpts...>();
   auto [idx, cmpts] = archetype->CreateEntity<Cmpts...>();

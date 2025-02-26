@@ -7,5 +7,5 @@ ADD_TARGET_GDR(MODE "LIB"
         SOURCES ${SOURCES}
         INTERFACE_INC ON
         INC_DIRS "_deps"
-        PUBLIC_GLIBS "My::MyTemplate_core"
+        PUBLIC_GLIBS My::MyTemplate_core My::MyBL_core
 )

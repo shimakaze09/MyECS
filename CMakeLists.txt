@@ -32,29 +32,31 @@ SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
 
 INCLUDE(FETCHCONTENT)
 
-MESSAGE(STATUS "Looking for: MyCMake v0.4.0")
-find_package(MyCMake 0.4.0 QUIET)
+MESSAGE(STATUS "Looking for: MyCMake v0.4.1")
+find_package(MyCMake 0.4.1 QUIET)
 IF (${MyCMake_FOUND})
-    MESSAGE(STATUS "MyCMake v0.4.0 found")
+    MESSAGE(STATUS "MyCMake v0.4.1 found")
 ELSE ()
     SET(ADDRESS "https://github.com/shimakaze09/MyCMake.git")
-    MESSAGE(STATUS "MyCMake v0.4.0 not found\n"
-            "fetch from ${ADDRESS} with tag v0.4.0")
+    MESSAGE(STATUS "MyCMake v0.4.1 not found\n")
+    MESSAGE(STATUS "fetch from ${ADDRESS} with tag v0.4.1")
     FETCHCONTENT_DECLARE(
             MyCMake
             GIT_REPOSITORY ${ADDRESS}
-            GIT_TAG "v0.4.0"
+            GIT_TAG "v0.4.1"
     )
     MESSAGE(STATUS "Building MyCMake...")
     FETCHCONTENT_MAKEAVAILABLE(MyCMake)
-    MESSAGE(STATUS "MyCMake v0.4.0 built")
+    MESSAGE(STATUS "MyCMake v0.4.1 built")
 ENDIF ()
 
 # Set default build path prefix
 INIT_INSTALL_PREFIX()
 
-ADD_DEP(MyTemplate 0.3.0)
+ADD_DEP(MyTemplate 0.3.1)
+ADD_DEP(MyBL 0.1.0)
 
+ADD_SUB_DIRS_REC(include)
 ADD_SUB_DIRS_REC(src)
 
 EXPORT_TARGETS(DIRECTORIES "include")

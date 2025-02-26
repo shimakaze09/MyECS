@@ -6,9 +6,9 @@
 
 #include "Archetype.h"
 #include "EntityBase.h"
-#include "Pool.h"
 
 #include <MyTemplate/TypeList.h>
+#include <MyBL/Pool.h>
 
 #include <taskflow/taskflow.hpp>
 

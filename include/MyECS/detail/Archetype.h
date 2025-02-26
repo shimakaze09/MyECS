@@ -7,9 +7,9 @@
 #include "Chunk.h"
 #include "CmptMngr.h"
 #include "EntityBase.h"
-#include "Pool.h"
 
 #include <MyTemplate/TypeID.h>
+#include <MyBL/Pool.h>
 
 #include <map>
 #include <set>
@@ -102,7 +102,7 @@ class Archetype {
   // no init
   inline size_t RequestBuffer() {
     if (num == chunks.size() * chunkCapacity)
-      chunks.push_back(chunkPool.request());
+      chunks.push_back(chunkPool.Request());
     return num++;
   }
 

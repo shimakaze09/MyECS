@@ -9,7 +9,7 @@ using namespace My;
 
 Archetype::~Archetype() {
   for (auto c : chunks)
-    chunkPool.recycle(c);
+    chunkPool.Recycle(c);
 }
 
 bool Archetype::ID::operator<(const ID& id) const noexcept {
@@ -72,7 +72,7 @@ size_t Archetype::Erase(size_t idx) {
 
   if (chunks.size() * chunkCapacity - num >= chunkCapacity) {
     Chunk* back = chunks.back();
-    chunkPool.recycle(back);
+    chunkPool.Recycle(back);
   }
 
   return movedIdx;
