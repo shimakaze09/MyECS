@@ -24,10 +24,24 @@ class World {
   template <typename... Cmpts>
   std::tuple<Entity*, Cmpts*...> CreateEntity();
 
-  // OnSchedule, one-by-one
-  // OnUpdate, parallel
+  // static OnUpdateSchedule
+  // parallel OnStart
   // Commands, one-by-one
-  void Update(bool dump = false);
+  void Start();
+
+  // static OnUpdateSchedule
+  // parallel OnUpdate
+  // Commands, one-by-one
+  void Update();
+
+  // static OnStopSchedule
+  // parallel OnStop
+  // Commands, one-by-one
+  void Stop();
+
+  std::string DumpStartTaskflow() const;
+  std::string DumpUpdateTaskflow() const;
+  std::string DumpStopTaskflow() const;
 
   // if Sys's return type is bool, Each stop when return false
   template <typename Sys>
@@ -45,6 +59,9 @@ class World {
 
  private:
   SystemMngr sysMngr;
+  tf::Taskflow startTaskflow;
+  tf::Taskflow updateTaskflow;
+  tf::Taskflow stopTaskflow;
   tf::Executor executor;
   ArchetypeMngr mngr;
 

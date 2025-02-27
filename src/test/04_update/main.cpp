@@ -27,10 +27,9 @@ struct Velocity {
 
   void Update() const {}
 
-  static void OnSchedule(SystemSchedule& schedule) {
-    schedule
-        .Regist(MemFuncOf<void(Position*)const>::run(&Velocity::Update))
-        .Regist(MemFuncOf<void()const>::run(&Velocity::Update));
+  static void OnUpdateSchedule(SystemSchedule& schedule) {
+    schedule.Regist(MemFuncOf<void(Position*) const>::run(&Velocity::Update))
+        .Regist(MemFuncOf<void() const>::run(&Velocity::Update));
   }
 };
 
@@ -47,6 +46,7 @@ int main() {
   World w;
   for (size_t i = 0; i < 10000; i++)
     w.CreateEntity<Velocity, Position, Acceleration>();
-  w.Update(true);
+  w.Update();
+  cout << w.DumpUpdateTaskflow() << endl;
   return 0;
 }

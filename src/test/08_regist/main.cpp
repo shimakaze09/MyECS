@@ -40,6 +40,7 @@ struct Acceleration {
 int main() {
   World w;
   w.CreateEntity<Velocity, Position, Acceleration>();
-  w.Update(true);
+  w.Update();
+  cout << w.DumpUpdateTaskflow() << endl;
   return 0;
 }
