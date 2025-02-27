@@ -27,11 +27,10 @@ struct Velocity {
 
   void Update() const {}
 
-  static void OnSchedule(
-      std::map<SystemMngr::ScheduleType, SystemSchedule*>& type2schedule) {
-    (*type2schedule[SystemMngr::ScheduleType::OnUpdate])
-        .Regist(MemFuncOf<void(Position*) const>::run(&Velocity::Update))
-        .Regist(MemFuncOf<void() const>::run(&Velocity::Update));
+  static void OnSchedule(SystemSchedule& schedule) {
+    schedule
+        .Regist(MemFuncOf<void(Position*)const>::run(&Velocity::Update))
+        .Regist(MemFuncOf<void()const>::run(&Velocity::Update));
   }
 };
 

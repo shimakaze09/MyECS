@@ -2,13 +2,13 @@
 // Created by Admin on 22/02/2025.
 //
 
-#include <MyECS/detail/SystemSchedule.h>
+#include <MyECS/SystemSchedule.h>
 
 using namespace My;
 using namespace std;
 
-System* SystemSchedule::RequestSystem() {
-  System* sys = syspool.Request();
+System* SystemSchedule::RequestSystem(std::string_view name) {
+  System* sys = syspool.Request(string(name));
   requestedSysVec.push_back(sys);
   return sys;
 }

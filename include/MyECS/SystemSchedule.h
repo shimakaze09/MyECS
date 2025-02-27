@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "ArchetypeMngr.h"
+#include "detail/ArchetypeMngr.h"
 
 #include <MyBL/Pool.h>
 
@@ -23,20 +23,24 @@ class SystemSchedule {
   SystemSchedule(ArchetypeMngr* mngr);
   ~SystemSchedule();
 
-  void Clear();
-
   template <typename Func>
-  SystemSchedule& Regist(Func&& func);
+  SystemSchedule& Regist(Func&& func, std::string_view name);
+
+  template <typename Cmpt, typename Func>
+  SystemSchedule& Regist(Func Cmpt::* func);
+
+ private:
+  friend class SystemMngr;
+  void Clear();
 
   bool GenTaskflow(tf::Taskflow& taskflow) const;
 
- private:
   struct RWSystems {
     std::vector<System*> writers;
     std::vector<System*> readers;
   };
 
-  System* RequestSystem();
+  System* RequestSystem(std::string_view name);
 
   bool IsDAG() const noexcept;
 
@@ -50,4 +54,4 @@ class SystemSchedule {
 };
 }  // namespace My
 
-#include "SystemSchedule.inl"
+#include "detail/SystemSchedule.inl"

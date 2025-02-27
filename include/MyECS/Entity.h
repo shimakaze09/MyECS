@@ -34,6 +34,7 @@ class Entity final : private EntityBase {
 
   // Attach, Detach, Release, World::CreateEntity
   // Run after World::Update, one by one, then will be cleared
+  // run in main thread
   void AddCommand(const std::function<void()>& command);
 };
 
