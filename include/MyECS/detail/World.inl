@@ -59,8 +59,13 @@ struct Each<TypeList<Cmpts*...>> {
         auto cmptsTuple = std::make_tuple(
             std::get<Find_v<CmptList, Cmpts>>(cmptsVecTuple)[i]...);
         size_t J = std::min(chunkCapacity, num - (i * chunkCapacity));
-        for (size_t j = 0; j < J; j++)
-          s((std::get<Find_v<CmptList, Cmpts>>(cmptsTuple) + j)...);
+        for (size_t j = 0; j < J; j++) {
+          if constexpr (std::is_same_v<FuncTraits_Ret<Sys>, bool>) {
+            if (!s((std::get<Find_v<CmptList, Cmpts>>(cmptsTuple) + j)...))
+              return;
+          } else
+            s((std::get<Find_v<CmptList, Cmpts>>(cmptsTuple) + j)...);
+        }
       }
     }
   }
