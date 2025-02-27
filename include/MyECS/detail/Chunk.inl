@@ -12,6 +12,11 @@ struct StaticInfo;
 namespace My {
 template <typename... Cmpts>
 static constexpr auto Chunk::StaticInfo() noexcept {
+  if constexpr (sizeof...(Cmpts) > 1) {
+    static_assert(std::min({std::alignment_of_v<Cmpts>...}) ==
+                      std::max({std::alignment_of_v<Cmpts>...}),
+                  "different alignment");
+  }
   return detail::Chunk_::StaticInfo<Cmpts...>::run();
 }
 }  // namespace My

@@ -24,8 +24,10 @@ class World {
   template <typename... Cmpts>
   std::tuple<Entity*, Cmpts*...> CreateEntity();
 
+  // OnSchedule, one-by-one
+  // OnUpdate, parallel
+  // Commands, one-by-one
   void Update(bool dump = false);
-  void RunCommand();
 
   template <typename Sys>
   void Each(Sys&& s);

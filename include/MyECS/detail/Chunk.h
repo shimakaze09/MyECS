@@ -16,7 +16,7 @@ namespace My {
 using byte = uint8_t;
 static_assert(sizeof(byte) == 1);
 
-struct Chunk {
+struct alignas(128) Chunk {
   static constexpr size_t size = 16 * 1024;
 
   template <size_t N>
