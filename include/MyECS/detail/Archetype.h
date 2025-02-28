@@ -20,10 +20,8 @@ namespace My {
 class ArchetypeMngr;
 class Entity;
 
-// TODO: clear up
 class Archetype {
  public:
-  // TODO: ID -> CmptIDSet
   struct ID : private std::set<size_t> {
     ID() = default;
 
