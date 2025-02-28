@@ -9,7 +9,7 @@
 using namespace std;
 using namespace My;
 
-struct Position {
+struct alignas(8) Position {
   float x;
 
   void OnUpdate() const {
@@ -17,7 +17,11 @@ struct Position {
   }
 };
 
-struct Velocity {
+struct alignas(8) EntityHandle {
+  Entity* e;
+};
+
+struct alignas(8) Velocity {
   float x;
 
   void Update(Position* p) const {
@@ -33,7 +37,7 @@ struct Velocity {
   }
 };
 
-struct Acceleration {
+struct alignas(8) Acceleration {
   float x;
 
   void OnUpdate(Velocity* v) const {
@@ -43,11 +47,20 @@ struct Acceleration {
 };
 
 int main() {
-  CmptRegister::Instance().Regist<Position, Velocity, Acceleration>();
+  alignof(EntityHandle);
+  CmptRegister::Instance()
+      .Regist<Position, Velocity, Acceleration, EntityHandle>();
 
   World w;
-  for (size_t i = 0; i < 10000; i++)
-    w.CreateEntity<Velocity, Position, Acceleration>();
+  for (size_t i = 0; i < 2; i++) {
+    auto [e, v, p, eh] = w.CreateEntity<Velocity, Position, EntityHandle>();
+    eh->e = e;
+  }
+  w.Update();
+  cout << w.DumpUpdateTaskflow() << endl;
+  w.Each([&w](EntityHandle* eh, Velocity*) {
+    w.AddCommand([e = eh->e]() { e->Attach<Acceleration>(); });
+  });
   w.Update();
   cout << w.DumpUpdateTaskflow() << endl;
   return 0;

@@ -76,6 +76,7 @@ struct Each<TypeList<Cmpts*...>> {
         }
       }
     }
+    w->mngr.RunCommands();
   }
 
   template <typename Sys>
@@ -97,6 +98,7 @@ struct ParallelEach<TypeList<Cmpts*...>> {
     tf::Taskflow taskflow;
     w->mngr.GenTaskflow(&taskflow, std::forward<Sys>(s));
     w->executor.run(taskflow).wait();
+    w->mngr.RunCommands();
   }
 
   template <typename Sys>

@@ -24,7 +24,7 @@ void World::Start() {
 
   executor.run(startTaskflow).wait();
 
-  mngr.RunCommand();
+  mngr.RunCommands();
 }
 
 void World::Update() {
@@ -36,7 +36,7 @@ void World::Update() {
 
   executor.run(updateTaskflow).wait();
 
-  mngr.RunCommand();
+  mngr.RunCommands();
 }
 
 void World::Stop() {
@@ -48,7 +48,7 @@ void World::Stop() {
 
   executor.run(stopTaskflow).wait();
 
-  mngr.RunCommand();
+  mngr.RunCommands();
 }
 
 string World::DumpStartTaskflow() const {
@@ -61,4 +61,8 @@ string World::DumpUpdateTaskflow() const {
 
 string World::DumpStopTaskflow() const {
   return stopTaskflow.dump();
+}
+
+void World::AddCommand(const std::function<void()>& command) {
+  mngr.AddCommand(command);
 }

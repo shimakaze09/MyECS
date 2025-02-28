@@ -55,7 +55,7 @@ class Archetype {
   template <typename... Cmpts>
   const std::tuple<size_t, std::tuple<Cmpts*...>> CreateEntity();
 
-  // erase idx-th empty entity
+  // erase idx-th entity
   // if idx != num-1, back entity will put at idx, return num-1
   // else return static_cast<size_t>(-1)
   size_t Erase(size_t idx);
