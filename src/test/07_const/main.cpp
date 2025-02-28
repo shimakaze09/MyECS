@@ -5,6 +5,8 @@
 #include <MyECS/World.h>
 #include <iostream>
 
+using namespace My;
+
 struct velocity {
   float value{0.f};
 };
@@ -19,7 +21,8 @@ void Print(const My::World& w) {
 }
 
 int main() {
-  My::World w;
+  CmptRegister::Instance().Regist<velocity, position>();
+  World w;
 
   for (size_t i = 0; i < 10; i++) {
     auto [entity, v, p] = w.CreateEntity<velocity, position>();

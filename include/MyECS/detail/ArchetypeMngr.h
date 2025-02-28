@@ -7,7 +7,6 @@
 #include "Archetype.h"
 #include "EntityBase.h"
 
-#include <MyTemplate/TypeList.h>
 #include <MyBL/Pool.h>
 
 #include <taskflow/taskflow.hpp>
@@ -19,7 +18,7 @@ class World;
 
 class ArchetypeMngr {
  public:
-  ArchetypeMngr(SystemMngr* sysmngr, World* w) : sysmngr{sysmngr}, w{w} {}
+  ArchetypeMngr(World* w) : w{w} {}
 
   ~ArchetypeMngr();
 
@@ -52,6 +51,7 @@ class ArchetypeMngr {
 
  private:
   Pool<EntityBase> entityPool;
+
   std::map<std::tuple<Archetype*, size_t>, EntityBase*>
       ai2e;  // (archetype, idx) -> entity
 
@@ -59,7 +59,6 @@ class ArchetypeMngr {
   std::map<Archetype::ID, Archetype*> id2a;  // id to archetype
 
   My::World* w;
-  SystemMngr* sysmngr;
   std::vector<std::function<void()>> commandBuffer;
   std::mutex commandBufferMutex;
 };

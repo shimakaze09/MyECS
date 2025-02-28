@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <MyTemplate/TypeList.h>
-
 #include <array>
 #include <cassert>
 #include <cstdint>

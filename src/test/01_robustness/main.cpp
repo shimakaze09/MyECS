@@ -34,6 +34,8 @@ struct position {
 };
 
 int main() {
+  CmptRegister::Instance().Regist<velocity, position>();
+
   World w;
   set<Entity*> entities;
 

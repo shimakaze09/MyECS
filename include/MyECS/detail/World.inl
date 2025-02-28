@@ -4,6 +4,10 @@
 
 #pragma once
 
+#include "../CmptRegister.h"
+
+#include <MyTemplate/Func.h>
+
 namespace My {
 template <typename Sys>
 void World::Each(Sys&& s) {
@@ -32,9 +36,10 @@ void World::ParallelEach(Sys&& s) const {
 template <typename... Cmpts>
 std::tuple<Entity*, Cmpts*...> World::CreateEntity() {
   static_assert(IsSet_v<TypeList<Cmpts...>>, "Componnents must be different");
-  (CmptMngr::Instance().Regist<Cmpts>(), ...);
+  (CmptLifecycleMngr::Instance().Regist<Cmpts>(), ...);
   auto rst = mngr.CreateEntity<Cmpts...>();
-  (sysMngr.Regist<Cmpts>(), ...);
+  assert("[ERROR] hasn't registed <Cmpts>" &&
+         CmptRegister::Instance().template IsRegisted<Cmpts...>());
   return {reinterpret_cast<Entity*>(std::get<0>(rst)),
           std::get<1 + Find_v<TypeList<Cmpts...>, Cmpts>>(rst)...};
 }

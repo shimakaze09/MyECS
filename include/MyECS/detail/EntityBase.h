@@ -4,9 +4,6 @@
 
 #pragma once
 
-#include <functional>
-#include <map>
-
 namespace My {
 class Archetype;
 

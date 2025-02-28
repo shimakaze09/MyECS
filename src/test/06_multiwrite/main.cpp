@@ -30,6 +30,8 @@ struct Restore {
 };
 
 int main() {
+  CmptRegister::Instance().Regist<Health, Hurt, Restore>();
+
   World w;
   w.CreateEntity<Health, Hurt, Restore>();
   for (size_t i = 0; i < 20; i++) {

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <MyTemplate/Func.h>
+#include <MyTemplate/Typelist.h>
 
 namespace My::detail::ArchetypeMngr_ {
 template <typename ArgList>
@@ -17,7 +18,7 @@ inline Archetype* ArchetypeMngr::GetOrCreateArchetypeOf() {
   auto id = Archetype::ID(TypeList<Cmpts...>{});
   auto target = id2a.find(id);
   if (target == id2a.end()) {
-    auto archetype = new Archetype(sysmngr, this, TypeList<Cmpts...>{});
+    auto archetype = new Archetype(this, TypeList<Cmpts...>{});
     id2a[id] = archetype;
     ids.insert(archetype->GetID());
     return archetype;
@@ -89,7 +90,7 @@ const std::tuple<Cmpts*...> ArchetypeMngr::EntityAttach(EntityBase* e) {
     auto [srcCmpt, srcSize] = srcArchetype->At(cmptHash, srcIdx);
     auto [dstCmpt, dstSize] = dstArchetype->At(cmptHash, dstIdx);
     assert(srcSize == dstSize);
-    CmptMngr::Instance().MoveConstruct(cmptHash, dstCmpt, srcCmpt);
+    CmptLifecycleMngr::Instance().MoveConstruct(cmptHash, dstCmpt, srcCmpt);
   }
 
   // erase
@@ -145,9 +146,9 @@ void ArchetypeMngr::EntityDetach(EntityBase* e) {
     if (dstID.IsContain(cmptHash)) {
       auto [dstCmpt, dstSize] = dstArchetype->At(cmptHash, dstIdx);
       assert(srcSize == dstSize);
-      CmptMngr::Instance().MoveConstruct(cmptHash, dstCmpt, srcCmpt);
+      CmptLifecycleMngr::Instance().MoveConstruct(cmptHash, dstCmpt, srcCmpt);
     } else
-      CmptMngr::Instance().Destruct(cmptHash, srcCmpt);
+      CmptLifecycleMngr::Instance().Destruct(cmptHash, srcCmpt);
   }
 
   // erase

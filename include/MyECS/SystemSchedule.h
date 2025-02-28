@@ -37,7 +37,7 @@ class SystemSchedule {
   // SystemSchedule& RegistNotParallel(Func Cmpt::* func);
 
  private:
-  friend class SystemMngr;
+  friend class World;
   void Clear();
 
   bool GenTaskflow(tf::Taskflow& taskflow) const;

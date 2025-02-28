@@ -22,6 +22,8 @@ struct position {
 };
 
 int main() {
+  CmptRegister::Instance().Regist<velocity, position>();
+
   constexpr size_t N = 1 << 22;
   constexpr size_t M = 100;
 

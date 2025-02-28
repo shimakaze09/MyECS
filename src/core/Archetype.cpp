@@ -63,7 +63,7 @@ size_t Archetype::Erase(size_t idx) {
       auto [size, offset] = so;
       byte* dst = dstBuffer + offset + dstIdxInChunk * size;
       byte* src = srcBuffer + offset + srcIdxInChunk * size;
-      CmptMngr::Instance().MoveConstruct(h, dst, src);
+      CmptLifecycleMngr::Instance().MoveConstruct(h, dst, src);
     }
   } else
     movedIdx = static_cast<size_t>(-1);

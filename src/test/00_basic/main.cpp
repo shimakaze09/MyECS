@@ -14,6 +14,8 @@ struct position {
 };
 
 int main() {
+  My::CmptRegister::Instance().Regist<velocity, position>();
+
   My::World w;
 
   for (size_t i = 0; i < 10; i++) {

@@ -5,13 +5,12 @@
 #pragma once
 
 #include <MyTemplate/Concept.h>
-#include <MyTemplate/Func.h>
+#include <MyTemplate/TypeID.h>
 #include <MyTemplate/Typelist.h>
 
-namespace My::detail::SystemMngr_ {
-template <typename T>
-Concept(HaveOnRegist, &T::OnRegist);
+#include <cassert>
 
+namespace My::detail::SystemMngr_ {
 template <typename T>
 Concept(HaveOnStart, &T::OnStart);
 
@@ -34,18 +33,6 @@ Concept(HaveOnStopSchedule, &T::OnStopSchedule);
 namespace My {
 template <typename Cmpt>
 void SystemMngr::Regist() {
-  if (registedCmptID.find(TypeID<Cmpt>) != registedCmptID.end())
-    return;
-  registedCmptID.insert(TypeID<Cmpt>);
-
-  if constexpr (Require<detail::SystemMngr_::HaveOnRegist, Cmpt>) {
-    static bool flag = false;
-    if (!flag) {
-      Cmpt::OnRegist();
-      flag = false;
-    }
-  }
-
   if constexpr (Require<detail::SystemMngr_::HaveOnStart, Cmpt>) {
     staticStartScheduleFuncs.push_back(
         [](SystemSchedule& schedule) { schedule.Regist(&Cmpt::OnStart); });

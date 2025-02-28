@@ -5,9 +5,7 @@
 #pragma once
 
 #include "Entity.h"
-#include "detail/SystemMngr.h"
-
-#include <MyTemplate/Func.h>
+#include "SystemSchedule.h"
 
 namespace My::detail::World_ {
 template <typename Args>
@@ -58,12 +56,17 @@ class World {
   void ParallelEach(Sys&& s) const;
 
  private:
-  SystemMngr sysMngr;
+  ArchetypeMngr mngr;
+
+  SystemSchedule startSchedule;
+  SystemSchedule updateSchedule;
+  SystemSchedule stopSchedule;
+
   tf::Taskflow startTaskflow;
   tf::Taskflow updateTaskflow;
   tf::Taskflow stopTaskflow;
+
   tf::Executor executor;
-  ArchetypeMngr mngr;
 
   template <typename ArgList>
   friend struct detail::World_::Each;

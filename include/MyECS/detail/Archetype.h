@@ -5,11 +5,13 @@
 #pragma once
 
 #include "Chunk.h"
-#include "CmptMngr.h"
+#include "CmptLifecycleMngr.h"
 #include "EntityBase.h"
 
-#include <MyTemplate/TypeID.h>
 #include <MyBL/Pool.h>
+
+#include <MyTemplate/TypeID.h>
+#include <MyTemplate/Typelist.h>
 
 #include <map>
 #include <set>
@@ -17,7 +19,6 @@
 namespace My {
 class ArchetypeMngr;
 class Entity;
-class SystemMngr;
 
 // TODO: clear up
 class Archetype {
@@ -67,8 +68,7 @@ class Archetype {
   Archetype() = default;
   // argument is for type deduction
   template <typename... Cmpts>
-  Archetype(SystemMngr* sysmngr, ArchetypeMngr* mngr,
-            TypeList<Cmpts...>) noexcept;
+  Archetype(ArchetypeMngr* mngr, TypeList<Cmpts...>) noexcept;
 
   // TODO: simplify
   template <typename... Cmpts>
@@ -139,14 +139,13 @@ class Archetype {
   friend class ArchetypeMngr;
 
   ArchetypeMngr* mngr;
-  SystemMngr* sysmngr;
   ID id;
   std::map<size_t, std::tuple<size_t, size_t>> h2so;  // hash to (size, offset)
   size_t chunkCapacity;
   std::vector<Chunk*> chunks;
   size_t num{0};
 
-  Pool<Chunk> chunkPool;  // TODO: lock
+  Pool<Chunk> chunkPool;
 };
 }  // namespace My
 

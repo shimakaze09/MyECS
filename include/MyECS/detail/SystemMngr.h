@@ -4,30 +4,27 @@
 
 #pragma once
 
-#include <MyDP/Basic/xSTL/xMap.h>
-#include "../SystemSchedule.h"
-
 #include <functional>
 
 namespace My {
+class SystemSchedule;
+class ArchetypeMngr;
+
 class SystemMngr {
  public:
-  SystemMngr(ArchetypeMngr* archetypeMngr);
+  static SystemMngr& Instance() {
+    static SystemMngr instance;
+    return instance;
+  }
 
   template <typename Cmpt>
   void Regist();
 
-  void GenStartTaskflow(tf::Taskflow& taskflow);
-  void GenUpdateTaskflow(tf::Taskflow& taskflow);
-  void GenStopTaskflow(tf::Taskflow& taskflow);
+  void GenStartSchedule(SystemSchedule& schedule);
+  void GenUpdateSchedule(SystemSchedule& schedule);
+  void GenStopSchedule(SystemSchedule& schedule);
 
  private:
-  std::unordered_set<size_t> registedCmptID;
-
-  SystemSchedule startSchedule;
-  SystemSchedule updateSchedule;
-  SystemSchedule stopSchedule;
-
   std::vector<std::function<void(SystemSchedule&)>> staticStartScheduleFuncs;
   std::vector<std::function<void(SystemSchedule&)>> staticUpdateScheduleFuncs;
   std::vector<std::function<void(SystemSchedule&)>> staticStopScheduleFuncs;
@@ -35,6 +32,9 @@ class SystemMngr {
   std::vector<std::function<void(SystemSchedule&)>> dynamicStartScheduleFuncs;
   std::vector<std::function<void(SystemSchedule&)>> dynamicUpdateScheduleFuncs;
   std::vector<std::function<void(SystemSchedule&)>> dynamicStopScheduleFuncs;
+
+ private:
+  SystemMngr() = default;
 };
 }  // namespace My
 
