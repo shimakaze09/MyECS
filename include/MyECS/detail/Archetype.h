@@ -81,7 +81,7 @@ class Archetype {
   friend class Entity;
   friend class ArchetypeMngr;
 
-  ArchetypeMngr* mngr;
+  ArchetypeMngr* mngr{nullptr};
   CmptIDSet id;
   std::map<size_t, std::tuple<size_t, size_t>> h2so;  // hash to (size, offset)
   size_t chunkCapacity;
