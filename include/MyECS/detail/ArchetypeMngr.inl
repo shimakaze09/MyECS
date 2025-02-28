@@ -75,7 +75,7 @@ const std::tuple<Cmpts*...> ArchetypeMngr::EntityAttach(EntityBase* e) {
   Archetype* dstArchetype;
   auto target = id2a.find(dstID);
   if (target == id2a.end()) {
-    dstArchetype = Archetype::Add<Cmpts...>::From(srcArchetype);
+    dstArchetype = Archetype::Add<Cmpts...>(srcArchetype);
     assert(dstID == dstArchetype->GetID());
     id2a[dstID] = dstArchetype;
     ids.insert(dstID);
@@ -132,7 +132,7 @@ void ArchetypeMngr::EntityDetach(EntityBase* e) {
   Archetype* dstArchetype;
   auto target = id2a.find(dstID);
   if (target == id2a.end()) {
-    dstArchetype = Archetype::Remove<Cmpts...>::From(srcArchetype);
+    dstArchetype = Archetype::Remove<Cmpts...>(srcArchetype);
     assert(dstID == dstArchetype->GetID());
     id2a[dstID] = dstArchetype;
     ids.insert(dstID);
@@ -190,19 +190,17 @@ struct GenTaskflow<TypeList<Cmpts*...>> {
 
   template <typename Sys>
   static void run(tf::Taskflow* taskflow, ArchetypeMngr* mngr, Sys&& s) {
-    taskflow->clear();
+    assert(taskflow->empty());
     for (auto archetype :
          mngr->GetArchetypeWith<std::remove_const_t<Cmpts>...>()) {
-      auto cmptsVecTuple = archetype->Locate<std::remove_const_t<Cmpts>...>();
+      auto cmptsTupleVec = archetype->Locate<std::remove_const_t<Cmpts>...>();
       size_t num = archetype->Size();
       size_t chunkNum = archetype->ChunkNum();
       size_t chunkCapacity = archetype->ChunkCapacity();
 
       for (size_t i = 0; i < chunkNum; i++) {
-        auto cmptsTuple = std::make_tuple(
-            std::get<Find_v<CmptList, Cmpts>>(cmptsVecTuple)[i]...);
         size_t J = std::min(chunkCapacity, num - (i * chunkCapacity));
-        taskflow->emplace([s, cmptsTuple, J]() {
+        taskflow->emplace([s, cmptsTuple = std::move(cmptsTupleVec[i]), J]() {
           for (size_t j = 0; j < J; j++)
             s((std::get<Find_v<CmptList, Cmpts>>(cmptsTuple) + j)...);
         });
