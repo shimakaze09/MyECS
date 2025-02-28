@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Chunk.h"
+#include "CmptIDSet.h"
 #include "CmptLifecycleMngr.h"
 #include "EntityBase.h"
 
@@ -22,47 +23,6 @@ class Entity;
 
 class Archetype {
  public:
-  struct ID : private std::set<size_t> {
-    ID() = default;
-
-    template <typename... Cmpts>
-    ID(TypeList<Cmpts...>) noexcept {
-      Add<Cmpts...>();
-    }
-
-    template <typename... Cmpts>
-    void Add() noexcept {
-      (insert(TypeID<Cmpts>), ...);
-    }
-
-    template <typename... Cmpts>
-    void Remove() noexcept {
-      (erase(TypeID<Cmpts>), ...);
-    }
-
-    template <typename... Cmpts>
-    bool IsContain() const noexcept {
-      return ((find(TypeID<Cmpts>) != end()) && ...);
-    }
-
-    bool IsContain(size_t cmptHash) const noexcept {
-      return find(cmptHash) != end();
-    }
-
-    template <typename... Cmpts>
-    bool Is() const noexcept {
-      return sizeof...(Cmpts) == size() && IsContain<Cmpts...>();
-    }
-
-    using std::set<size_t>::begin;
-    using std::set<size_t>::end;
-
-    bool operator<(const ID& id) const noexcept;
-    bool operator==(const ID& id) const noexcept;
-
-    friend class Archetype;
-  };
-
   // argument TypeList<Cmpts...> is for type deduction
   template <typename... Cmpts>
   Archetype(ArchetypeMngr* mngr, TypeList<Cmpts...>) noexcept;
@@ -106,7 +66,7 @@ class Archetype {
 
   inline size_t ChunkCapacity() const noexcept { return chunkCapacity; }
 
-  inline const ID& GetID() const noexcept { return id; }
+  inline const CmptIDSet& ID() const noexcept { return id; }
 
   inline ArchetypeMngr* GetArchetypeMngr() const noexcept { return mngr; }
 
@@ -122,7 +82,7 @@ class Archetype {
   friend class ArchetypeMngr;
 
   ArchetypeMngr* mngr;
-  ID id;
+  CmptIDSet id;
   std::map<size_t, std::tuple<size_t, size_t>> h2so;  // hash to (size, offset)
   size_t chunkCapacity;
   std::vector<Chunk*> chunks;

@@ -24,7 +24,7 @@ class ArchetypeMngr {
 
   inline World* World() const noexcept { return w; }
 
-  inline Archetype* GetArchetypeOf(const Archetype::ID& archetypeID);
+  inline Archetype* GetArchetypeOf(const CmptIDSet& archetypeID);
 
   template <typename... Cmpts>
   inline Archetype* GetOrCreateArchetypeOf();
@@ -58,8 +58,8 @@ class ArchetypeMngr {
   std::map<std::tuple<Archetype*, size_t>, EntityBase*>
       ai2e;  // (archetype, idx) -> entity
 
-  std::set<Archetype::ID> ids;
-  std::map<Archetype::ID, Archetype*> id2a;  // id to archetype
+  std::set<CmptIDSet> ids;
+  std::map<CmptIDSet, Archetype*> id2a;  // id to archetype
 
   My::World* w;
   std::vector<std::function<void()>> commandBuffer;

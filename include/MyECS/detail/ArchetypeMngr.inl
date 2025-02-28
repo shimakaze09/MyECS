@@ -15,19 +15,18 @@ struct GenTaskflow;
 namespace My {
 template <typename... Cmpts>
 inline Archetype* ArchetypeMngr::GetOrCreateArchetypeOf() {
-  auto id = Archetype::ID(TypeList<Cmpts...>{});
+  auto id = CmptIDSet(TypeList<Cmpts...>{});
   auto target = id2a.find(id);
   if (target == id2a.end()) {
     auto archetype = new Archetype(this, TypeList<Cmpts...>{});
     id2a[id] = archetype;
-    ids.insert(archetype->GetID());
+    ids.insert(archetype->ID());
     return archetype;
   } else
     return target->second;
 }
 
-inline Archetype* ArchetypeMngr::GetArchetypeOf(
-    const Archetype::ID& archetypeID) {
+Archetype* ArchetypeMngr::GetArchetypeOf(const CmptIDSet& archetypeID) {
   auto target = id2a.find(archetypeID);
   assert(target != id2a.end());
   return target->second;
@@ -43,8 +42,6 @@ const std::tuple<EntityBase*, Cmpts*...> ArchetypeMngr::CreateEntity() {
   entity->archetype = archetype;
   entity->idx = idx;
   ai2e[{archetype, idx}] = entity;
-
-  // ((entity->RegistCmptFuncs(std::get<Find_v<CmptList, Cmpts>>(cmpts))),...);
 
   using CmptList = TypeList<Cmpts...>;
   return {entity, std::get<Find_v<CmptList, Cmpts>>(cmpts)...};
@@ -67,7 +64,7 @@ const std::tuple<Cmpts*...> ArchetypeMngr::EntityAttach(EntityBase* e) {
   Archetype* srcArchetype = e->archetype;
   size_t srcIdx = e->idx;
 
-  auto& srcID = srcArchetype->GetID();
+  auto& srcID = srcArchetype->ID();
   auto dstID = srcID;
   dstID.Add<Cmpts...>();
 
@@ -76,7 +73,7 @@ const std::tuple<Cmpts*...> ArchetypeMngr::EntityAttach(EntityBase* e) {
   auto target = id2a.find(dstID);
   if (target == id2a.end()) {
     dstArchetype = Archetype::Add<Cmpts...>(srcArchetype);
-    assert(dstID == dstArchetype->GetID());
+    assert(dstID == dstArchetype->ID());
     id2a[dstID] = dstArchetype;
     ids.insert(dstID);
   } else
@@ -124,7 +121,7 @@ void ArchetypeMngr::EntityDetach(EntityBase* e) {
   Archetype* srcArchetype = e->archetype;
   size_t srcIdx = e->idx;
 
-  auto& srcID = srcArchetype->GetID();
+  auto& srcID = srcArchetype->ID();
   auto dstID = srcID;
   dstID.Remove<Cmpts...>();
 
@@ -133,7 +130,7 @@ void ArchetypeMngr::EntityDetach(EntityBase* e) {
   auto target = id2a.find(dstID);
   if (target == id2a.end()) {
     dstArchetype = Archetype::Remove<Cmpts...>(srcArchetype);
-    assert(dstID == dstArchetype->GetID());
+    assert(dstID == dstArchetype->ID());
     id2a[dstID] = dstArchetype;
     ids.insert(dstID);
   } else
