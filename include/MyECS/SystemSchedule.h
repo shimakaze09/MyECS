@@ -43,8 +43,9 @@ class SystemSchedule {
   bool GenTaskflow(tf::Taskflow& taskflow) const;
 
   struct RWSystems {
+    std::vector<System*> pre_readers;
     std::vector<System*> writers;
-    std::vector<System*> readers;
+    std::vector<System*> post_readers;
   };
 
   System* RequestSystem(std::string_view name);

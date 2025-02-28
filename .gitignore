@@ -686,3 +686,6 @@ FodyWeavers.xsd
 # Bin and Lib
 **/bin/*
 **/lib/*
+
+# Dependencies
+_deps/

@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "../CmptTag.h"
+
 #include <MyTemplate/Func.h>
 #include <MyTemplate/Typelist.h>
 
@@ -194,18 +196,19 @@ void ArchetypeMngr::GenTaskflow(tf::Taskflow* taskflow, Sys&& sys) {
 }  // namespace My
 
 namespace My::detail::ArchetypeMngr_ {
-template <typename... Cmpts>
-struct GenTaskflow<TypeList<Cmpts*...>> {
-  static_assert(sizeof...(Cmpts) > 0);
-  using CmptList = TypeList<std::remove_const_t<Cmpts>...>;
+template <typename... TagedCmpts>
+struct GenTaskflow<TypeList<TagedCmpts...>> {
+  static_assert(sizeof...(TagedCmpts) > 0);
+  using CmptList = TypeList<CmptTag::RemoveTag_t<TagedCmpts>...>;
   static_assert(IsSet_v<CmptList>, "Componnents must be different");
 
   template <typename Sys>
   static void run(tf::Taskflow* taskflow, ArchetypeMngr* mngr, Sys&& s) {
     assert(taskflow->empty());
     for (auto archetype :
-         mngr->GetArchetypeWith<std::remove_const_t<Cmpts>...>()) {
-      auto cmptsTupleVec = archetype->Locate<std::remove_const_t<Cmpts>...>();
+         mngr->GetArchetypeWith<CmptTag::RemoveTag_t<TagedCmpts>...>()) {
+      auto cmptsTupleVec =
+          archetype->Locate<CmptTag::RemoveTag_t<TagedCmpts>...>();
       size_t num = archetype->Size();
       size_t chunkNum = archetype->ChunkNum();
       size_t chunkCapacity = archetype->ChunkCapacity();
@@ -214,7 +217,7 @@ struct GenTaskflow<TypeList<Cmpts*...>> {
         size_t J = std::min(chunkCapacity, num - (i * chunkCapacity));
         taskflow->emplace([s, cmptsTuple = std::move(cmptsTupleVec[i]), J]() {
           for (size_t j = 0; j < J; j++)
-            s((std::get<Find_v<CmptList, std::remove_const_t<Cmpts>>>(
+            s((std::get<Find_v<CmptList, CmptTag::RemoveTag_t<TagedCmpts>>>(
                    cmptsTuple) +
                j)...);
         });
