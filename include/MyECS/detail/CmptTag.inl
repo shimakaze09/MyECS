@@ -38,6 +38,11 @@ template <typename Cmpt>
 struct IsNewest<const Cmpt*> : std::true_type {};
 
 template <typename TagedCmpt>
+struct IsTimePoint
+    : IValue<bool, IsWrite_v<TagedCmpt> || IsLastFrame_v<TagedCmpt> ||
+                       IsNewest_v<TagedCmpt>> {};
+
+template <typename TagedCmpt>
 struct IsBefore : std::false_type {};
 
 template <typename... Cmpts>
@@ -48,4 +53,22 @@ struct IsAfter : std::false_type {};
 
 template <typename... Cmpts>
 struct IsAfter<After<Cmpts...>> : std::true_type {};
+
+template <typename T>
+struct IsNot : std::false_type {};
+
+template <typename... Cmpts>
+struct IsNot<Not<Cmpts...>> : std::true_type {};
+
+namespace detail::CmptTag_ {
+template <typename I, typename X>
+struct AccNot : IType<I> {};
+
+template <typename I, typename... NotCmpts>
+struct AccNot<I, Not<NotCmpts...>> : Concat<I, TypeList<NotCmpts...>> {};
+}  // namespace detail::CmptTag_
+
+template <typename ArgList>
+struct GetAllNotList
+    : Accumulate<ArgList, detail::CmptTag_::AccNot, TypeList<>> {};
 }  // namespace My::CmptTag

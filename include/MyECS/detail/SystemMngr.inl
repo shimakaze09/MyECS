@@ -6,9 +6,9 @@
 
 namespace My {
 template <typename System>
-void SystemMngr::Register() {
+void SystemMngr::RegisterOne() {
   static_assert(HaveAnySchedule<System>,
-                "<System> has no any schedule function");
+                "<System> has no any schedule fuction");
 
   if constexpr (Require<HaveOnStartSchedule, System>)
     n2start.emplace(TypeID<System>, GetSchedule<System, SysType::OnStart>());
@@ -18,10 +18,15 @@ void SystemMngr::Register() {
     n2stop.emplace(TypeID<System>, GetSchedule<System, SysType::OnStop>());
 }
 
+template <typename... Systems>
+void SystemMngr::Register() {
+  (RegisterOne<Systems>(), ...);
+}
+
 template <typename System>
 bool SystemMngr::IsRegistered() const {
   static_assert(HaveAnySchedule<System>,
-                "<System> has no any schedule function");
+                "<System> has no any schedule fuction");
 
   if constexpr (Require<HaveOnStartSchedule, System>)
     return n2start.find(TypeID<System>) != n2start.end();
@@ -34,7 +39,7 @@ bool SystemMngr::IsRegistered() const {
 template <typename System>
 void SystemMngr::Deregister() noexcept {
   static_assert(HaveAnySchedule<System>,
-                "<System> has no any schedule function");
+                "<System> has no any schedule fuction");
 
   if constexpr (Require<HaveOnStartSchedule, System>)
     n2start.erase(TypeID<System>);

@@ -93,21 +93,24 @@ struct ScheduleAdd<type, TypeList<Args...>> {
       (Register<Args>(schedule, job), ...);
   }
 
-  template <typename TagedCmpt>
+  template <typename Arg>
   static void Register(Schedule& schedule, Job* job) {
-    if constexpr (CmptTag::IsLastFrame_v<TagedCmpt>)
-      schedule.id2rw[My::TypeID<CmptTag::RemoveTag_t<TagedCmpt>>]
+    if constexpr (CmptTag::IsLastFrame_v<Arg>)
+      schedule.id2rw[My::TypeID<CmptTag::RemoveTag_t<Arg>>]
           .pre_readers.push_back(job);
-    else if constexpr (CmptTag::IsWrite_v<TagedCmpt>)
-      schedule.id2rw[My::TypeID<CmptTag::RemoveTag_t<TagedCmpt>>]
-          .writers.insert(job);
-    else if constexpr (CmptTag::IsNewest_v<TagedCmpt>)
-      schedule.id2rw[My::TypeID<CmptTag::RemoveTag_t<TagedCmpt>>]
+    else if constexpr (CmptTag::IsWrite_v<Arg>)
+      schedule.id2rw[My::TypeID<CmptTag::RemoveTag_t<Arg>>].writers.insert(job);
+    else if constexpr (CmptTag::IsNewest_v<Arg>)
+      schedule.id2rw[My::TypeID<CmptTag::RemoveTag_t<Arg>>]
           .post_readers.push_back(job);
-    else if constexpr (CmptTag::IsBefore_v<TagedCmpt>)
-      RegisterBefore(schedule, job, typename TagedCmpt::CmptList{});
-    else  // if constexpr (CmptTag::IsAfter_v<TagedCmpt>)
-      RegisterAfter(schedule, job, typename TagedCmpt::CmptList{});
+    else if constexpr (CmptTag::IsBefore_v<Arg>)
+      RegisterBefore(schedule, job, typename Arg::CmptList{});
+    else if constexpr (CmptTag::IsAfter_v<Arg>)
+      RegisterAfter(schedule, job, typename Arg::CmptList{});
+    else if constexpr (CmptTag::IsNot_v<Arg>)
+      ;  // do nothing
+    else
+      static_assert(false, "ERROR::ScheduleAdd: unknown <Arg>");
   }
 
   template <typename... Cmpts>

@@ -32,7 +32,17 @@ class CmptIDSet : std::set<size_t> {
     return ((find(TypeID<Cmpts>) != end()) && ...);
   }
 
-  bool IsContain(const CmptIDSet& ids) const noexcept {
+  template <typename... Cmpts>
+  bool IsContain(TypeList<Cmpts...>) const noexcept {
+    return IsContain<Cmpts...>();
+  }
+
+  bool IsContain(size_t cmptHash) const noexcept {
+    return find(cmptHash) != end();
+  }
+
+  template <typename IDContainer>
+  bool IsContain(const IDContainer& ids) const noexcept {
     for (auto id : ids) {
       if (!IsContain(id))
         return false;
@@ -40,8 +50,27 @@ class CmptIDSet : std::set<size_t> {
     return true;
   }
 
-  bool IsContain(size_t cmptHash) const noexcept {
-    return find(cmptHash) != end();
+  template <typename... Cmpts>
+  bool IsNotContain() const noexcept {
+    return ((find(TypeID<Cmpts>) == end()) && ...);
+  }
+
+  template <typename... Cmpts>
+  bool IsNotContain(TypeList<Cmpts...>) const noexcept {
+    return IsNotContain<Cmpts...>();
+  }
+
+  bool IsNotContain(size_t cmptHash) const noexcept {
+    return find(cmptHash) == end();
+  }
+
+  template <typename IDContainer>
+  bool IsNotContain(const IDContainer& ids) const noexcept {
+    for (auto id : ids) {
+      if (IsContain(id))
+        return false;
+    }
+    return true;
   }
 
   template <typename... Cmpts>

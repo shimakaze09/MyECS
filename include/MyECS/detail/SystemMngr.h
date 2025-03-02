@@ -9,12 +9,16 @@
 namespace My {
 class SystemMngr {
  public:
-  template <typename System>
+  template <typename... Systems>
   void Register();
   template <typename System>
   bool IsRegistered() const;
   template <typename System>
   void Deregister() noexcept;
+
+ private:
+  template <typename System>
+  void RegisterOne();
 
  private:
   friend class CmptSysMngr;
