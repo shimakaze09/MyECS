@@ -27,7 +27,7 @@ inline Archetype* ArchetypeMngr::GetOrCreateArchetypeOf() {
       const auto& query = id2query.find(queryHash)->second;
       if (id.IsContain(query.allCmptIDs) && id.IsContainAny(query.anyCmptIDs) &&
           id.IsNotContain(query.noneCmptIDs) &&
-          id.IsNotContain(query.locateCmptIDs)) {
+          id.IsContain(query.locateCmptIDs)) {
         archetypes.insert(archetype);
       }
     }
@@ -111,7 +111,7 @@ const std::tuple<Cmpts*...> ArchetypeMngr::EntityAttach(EntityBase* e) {
       if (dstID.IsContain(query.allCmptIDs) &&
           dstID.IsContainAny(query.anyCmptIDs) &&
           dstID.IsNotContain(query.noneCmptIDs) &&
-          dstID.IsNotContain(query.locateCmptIDs)) {
+          dstID.IsContain(query.locateCmptIDs)) {
         archetypes.insert(dstArchetype);
       }
     }
@@ -177,7 +177,7 @@ void ArchetypeMngr::EntityDetach(EntityBase* e) {
       if (dstID.IsContain(query.allCmptIDs) &&
           dstID.IsContainAny(query.anyCmptIDs) &&
           dstID.IsNotContain(query.noneCmptIDs) &&
-          dstID.IsNotContain(query.locateCmptIDs)) {
+          dstID.IsContain(query.locateCmptIDs)) {
         archetypes.insert(dstArchetype);
       }
     }
@@ -243,7 +243,7 @@ struct GenJob<TypeList<Args...>, TypeList<TagedCmpts...>,
   using AllList = CmptTag::ConcatedAllList_t<TypeList<Args...>>;
   using AnyList = CmptTag::ConcatedAnyList_t<TypeList<Args...>>;
   using NoneList = CmptTag::ConcatedNoneList_t<TypeList<Args...>>;
-  static_assert(IsSet_v<CmptList>, "Compnonents must be different");
+  static_assert(IsSet_v<CmptList>, "Components must be different");
 
   template <typename Sys>
   static void run(Job* job, ArchetypeMngr* mngr, Sys&& s) {

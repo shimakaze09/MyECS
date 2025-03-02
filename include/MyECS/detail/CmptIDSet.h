@@ -28,12 +28,15 @@ class CmptIDSet : std::set<size_t> {
   }
 
   template <typename... Cmpts>
-  bool IsContain() const noexcept {
-    return ((find(TypeID<Cmpts>) != end()) && ...);
+  constexpr bool IsContain() const noexcept {
+    if constexpr (sizeof...(Cmpts) == 0)
+      return true;
+    else
+      return ((find(TypeID<Cmpts>) != end()) && ...);
   }
 
   template <typename... Cmpts>
-  bool IsContain(TypeList<Cmpts...>) const noexcept {
+  constexpr bool IsContain(TypeList<Cmpts...>) const noexcept {
     return IsContain<Cmpts...>();
   }
 
@@ -51,31 +54,41 @@ class CmptIDSet : std::set<size_t> {
   }
 
   template <typename... Cmpts>
-  bool IsContainAny() const noexcept {
-    return ((find(TypeID<Cmpts>) != end()) || ...);
+  constexpr bool IsContainAny() const noexcept {
+    if constexpr (sizeof...(Cmpts) == 0)
+      return true;
+    else
+      return ((find(TypeID<Cmpts>) != end()) || ...);
   }
 
   template <typename... Cmpts>
-  bool IsContainAny(TypeList<Cmpts...>) const noexcept {
+  constexpr bool IsContainAny(TypeList<Cmpts...>) const noexcept {
     return IsContainAny<Cmpts...>();
   }
 
   template <typename IDContainer>
   bool IsContainAny(const IDContainer& ids) const noexcept {
+    if (ids.empty())
+      return true;
+
     for (auto id : ids) {
       if (IsContain(id))
         return true;
     }
+
     return false;
   }
 
   template <typename... Cmpts>
-  bool IsNotContain() const noexcept {
-    return ((find(TypeID<Cmpts>) == end()) && ...);
+  constexpr bool IsNotContain() const noexcept {
+    if constexpr (sizeof...(Cmpts) == 0)
+      return true;
+    else
+      return ((find(TypeID<Cmpts>) == end()) && ...);
   }
 
   template <typename... Cmpts>
-  bool IsNotContain(TypeList<Cmpts...>) const noexcept {
+  constexpr bool IsNotContain(TypeList<Cmpts...>) const noexcept {
     return IsNotContain<Cmpts...>();
   }
 
