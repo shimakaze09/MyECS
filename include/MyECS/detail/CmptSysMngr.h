@@ -4,8 +4,8 @@
 
 #pragma once
 
+#include "../ScheduleRegistrar.h"
 #include "SystemMngr.h"
-#include "SystemSchedule.inl"
 
 #include <functional>
 
@@ -22,11 +22,11 @@ class CmptSysMngr {
   template <typename Cmpt>
   void Register();
 
-  void GenSchedule(SystemSchedule<SysType::OnStart>& schedule,
+  void GenSchedule(ScheduleRegistrar<SysType::OnStart>& registrar,
                    const SystemMngr& sysMngr);
-  void GenSchedule(SystemSchedule<SysType::OnUpdate>& schedule,
+  void GenSchedule(ScheduleRegistrar<SysType::OnUpdate>& registrar,
                    const SystemMngr& sysMngr);
-  void GenSchedule(SystemSchedule<SysType::OnStop>& schedule,
+  void GenSchedule(ScheduleRegistrar<SysType::OnStop>& registrar,
                    const SystemMngr& sysMngr);
 
  private:

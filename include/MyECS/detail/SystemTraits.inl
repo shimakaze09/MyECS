@@ -32,16 +32,8 @@ template <typename System, SysType type>
 constexpr ScheduleFunc<type>* GetSchedule() noexcept {
   static_assert(HaveSchedule<System, type>,
                 "<System> has no corresponding schedule function: "
-                "OnSchedule(SystemShcedule<SysType::...>&)");
+                "OnSchedule(SystemSchedule<SysType::...>&)");
 
-  if constexpr (type == SysType::OnStart)
-    return MemFuncOf<void(SystemSchedule<SysType::OnStart>&)>::run(
-        &System::OnSchedule);
-  else if constexpr (type == SysType::OnUpdate)
-    return MemFuncOf<void(SystemSchedule<SysType::OnUpdate>&)>::run(
-        &System::OnSchedule);
-  else  // if constexpr (type == SysType::Stop)
-    return MemFuncOf<void(SystemSchedule<SysType::OnStop>&)>::run(
-        &System::OnSchedule);
+  return MemFuncOf<ScheduleFunc<type>>::run(&System::OnSchedule);
 }
 }  // namespace My

@@ -35,7 +35,7 @@ void World::ParallelEach(Sys&& s) const {
 
 template <typename... Cmpts>
 std::tuple<Entity*, Cmpts*...> World::CreateEntity() {
-  static_assert(IsSet_v<TypeList<Cmpts...>>, "Components must be different");
+  static_assert(IsSet_v<TypeList<Cmpts...>>, "Compnonents must be different");
   (CmptLifecycleMngr::Instance().Register<Cmpts>(), ...);
   auto rst = mngr.CreateEntity<Cmpts...>();
   assert("[ERROR] hasn't registed <Cmpts>" &&
@@ -96,7 +96,7 @@ struct ParallelEach<TypeList<Cmpts*...>> {
   template <typename Sys>
   static void run(World* w, Sys&& s) {
     tf::Taskflow taskflow;
-    w->mngr.GenTaskflow(&taskflow, std::forward<Sys>(s));
+    w->mngr.GenJob(&taskflow, std::forward<Sys>(s));
     w->executor.run(taskflow).wait();
     w->mngr.RunCommands();
   }

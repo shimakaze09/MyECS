@@ -7,9 +7,9 @@
 #include "Archetype.h"
 #include "EntityBase.h"
 
-#include <MyBL/Pool.h>
+#include "Job.h"
 
-#include <taskflow/taskflow.hpp>
+#include <MyBL/Pool.h>
 
 #include <mutex>
 
@@ -30,7 +30,7 @@ class ArchetypeMngr {
   inline Archetype* GetOrCreateArchetypeOf();
 
   template <typename... Cmpts>
-  const std::set<Archetype*> GetArchetypeWith();
+  const std::set<Archetype*>& GetArchetypeWith();
 
   template <typename... Cmpts>
   const std::tuple<EntityBase*, Cmpts*...> CreateEntity();
@@ -45,12 +45,14 @@ class ArchetypeMngr {
   void Release(EntityBase* e);
 
   template <typename Sys>
-  void GenTaskflow(tf::Taskflow* taskflow, Sys&& sys);
+  void GenJob(Job* job, Sys&& sys);
 
   void AddCommand(const std::function<void()>& command);
   void RunCommands();
 
  private:
+  My::World* w;
+
   Pool<EntityBase> entityPool;
 
   std::map<std::tuple<Archetype*, size_t>, EntityBase*>
@@ -67,7 +69,6 @@ class ArchetypeMngr {
   // Typelist<Cmpts...> is sorted
   std::unordered_map<size_t, CmptIDSet> cmpts2ids;
 
-  My::World* w;
   std::vector<std::function<void()>> commandBuffer;
   std::mutex commandBufferMutex;
 };

@@ -15,11 +15,11 @@ namespace My {
 // enum
 enum class SysType { OnStart, OnUpdate, OnStop };
 
-template <SysType>
-class SystemSchedule;
+template <SysType type>
+class ScheduleRegistrar;
 
 template <SysType type>
-using ScheduleFunc = void(SystemSchedule<type>&);
+using ScheduleFunc = void(ScheduleRegistrar<type>&);
 
 template <typename Cmpt>
 Concept(HaveOnStart, &Cmpt::OnStart);

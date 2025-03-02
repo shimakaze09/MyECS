@@ -64,9 +64,9 @@ struct Writer7 {
     void operator()(Data* data) const { cout << num << endl; }
   };
 
-  static void OnSchedule(SystemSchedule<SysType::OnUpdate>& schedule) {
+  static void OnSchedule(ScheduleRegistrar<SysType::OnUpdate>& registrar) {
     string sname = string(MyUpdateSystem::name);
-    schedule.Register(sname, MyUpdateSystem{})
+    registrar.Register(sname, MyUpdateSystem{})
         .After<Writer1>(sname)
         .Before<Writer5>(MyUpdateSystem::name);
   }

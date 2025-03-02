@@ -5,7 +5,6 @@
 #include <MyECS/SystemTraits.h>
 #include <MyECS/World.h>
 
-
 #include <iostream>
 
 using namespace std;
@@ -33,8 +32,8 @@ struct alignas(8) Velocity {
 
   void Update() const {}
 
-  static void OnSchedule(SystemSchedule<SysType::OnUpdate>& schedule) {
-    schedule.Register(MemFuncOf<void(Position*) const>::run(&Velocity::Update))
+  static void OnSchedule(ScheduleRegistrar<SysType::OnUpdate>& registrar) {
+    registrar.Register(MemFuncOf<void(Position*) const>::run(&Velocity::Update))
         .Register(MemFuncOf<void() const>::run(&Velocity::Update));
   }
 };

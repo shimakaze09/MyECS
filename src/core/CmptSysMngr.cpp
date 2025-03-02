@@ -5,40 +5,39 @@
 #include <MyECS/detail/CmptSysMngr.h>
 
 using namespace My;
-using namespace std;
 
-void CmptSysMngr::GenSchedule(SystemSchedule<SysType::OnStart>& schedule,
+void CmptSysMngr::GenSchedule(ScheduleRegistrar<SysType::OnStart>& registrar,
                               const SystemMngr& sysMngr) {
   for (const auto& func : dynamicStartScheduleFuncs)
-    func(schedule);
+    func(registrar);
 
   for (const auto& func : staticStartScheduleFuncs)
-    func(schedule);
+    func(registrar);
 
   for (const auto& [n, func] : sysMngr.n2start)
-    func(schedule);
+    func(registrar);
 }
 
-void CmptSysMngr::GenSchedule(SystemSchedule<SysType::OnUpdate>& schedule,
+void CmptSysMngr::GenSchedule(ScheduleRegistrar<SysType::OnUpdate>& registrar,
                               const SystemMngr& sysMngr) {
   for (const auto& func : dynamicUpdateScheduleFuncs)
-    func(schedule);
+    func(registrar);
 
   for (const auto& func : staticUpdateScheduleFuncs)
-    func(schedule);
+    func(registrar);
 
   for (const auto& [n, func] : sysMngr.n2update)
-    func(schedule);
+    func(registrar);
 }
 
-void CmptSysMngr::GenSchedule(SystemSchedule<SysType::OnStop>& schedule,
+void CmptSysMngr::GenSchedule(ScheduleRegistrar<SysType::OnStop>& registrar,
                               const SystemMngr& sysMngr) {
   for (const auto& func : dynamicStopScheduleFuncs)
-    func(schedule);
+    func(registrar);
 
   for (const auto& func : staticStopScheduleFuncs)
-    func(schedule);
+    func(registrar);
 
   for (const auto& [n, func] : sysMngr.n2stop)
-    func(schedule);
+    func(registrar);
 }
