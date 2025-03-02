@@ -7,7 +7,7 @@
 using namespace My;
 using namespace std;
 
-void SystemMngr::GenStartSchedule(SystemSchedule& schedule) {
+void SystemMngr::GenSchedule(SystemSchedule<SysType::OnStart>& schedule) {
   for (const auto& func : dynamicStartScheduleFuncs)
     func(schedule);
 
@@ -15,7 +15,7 @@ void SystemMngr::GenStartSchedule(SystemSchedule& schedule) {
     func(schedule);
 }
 
-void SystemMngr::GenUpdateSchedule(SystemSchedule& schedule) {
+void SystemMngr::GenSchedule(SystemSchedule<SysType::OnUpdate>& schedule) {
   for (const auto& func : dynamicUpdateScheduleFuncs)
     func(schedule);
 
@@ -23,7 +23,7 @@ void SystemMngr::GenUpdateSchedule(SystemSchedule& schedule) {
     func(schedule);
 }
 
-void SystemMngr::GenStopSchedule(SystemSchedule& schedule) {
+void SystemMngr::GenSchedule(SystemSchedule<SysType::OnStop>& schedule) {
   for (const auto& func : dynamicStopScheduleFuncs)
     func(schedule);
 

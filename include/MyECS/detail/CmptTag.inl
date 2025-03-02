@@ -7,8 +7,10 @@
 #include <type_traits>
 
 namespace My::CmptTag {
-template <typename TagedCmpt>
-struct RemoveTag;
+template <typename T>
+struct RemoveTag {
+  using type = T;
+};
 
 template <typename Cmpt>
 struct RemoveTag<const Cmpt*> {
@@ -45,4 +47,16 @@ struct IsNewest : std::false_type {};
 
 template <typename Cmpt>
 struct IsNewest<const Cmpt*> : std::true_type {};
+
+template <typename TagedCmpt>
+struct IsBefore : std::false_type {};
+
+template <typename... Cmpts>
+struct IsBefore<Before<Cmpts...>> : std::true_type {};
+
+template <typename TagedCmpt>
+struct IsAfter : std::false_type {};
+
+template <typename... Cmpts>
+struct IsAfter<After<Cmpts...>> : std::true_type {};
 }  // namespace My::CmptTag

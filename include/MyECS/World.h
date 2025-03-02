@@ -22,7 +22,7 @@ class World {
   template <typename... Cmpts>
   std::tuple<Entity*, Cmpts*...> CreateEntity();
 
-  // static OnUpdateSchedule
+  // static OnStartSchedule
   // parallel OnStart
   // Commands, one-by-one
   void Start();
@@ -64,9 +64,9 @@ class World {
  private:
   ArchetypeMngr mngr;
 
-  SystemSchedule startSchedule;
-  SystemSchedule updateSchedule;
-  SystemSchedule stopSchedule;
+  SystemSchedule<SysType::OnStart> startSchedule;
+  SystemSchedule<SysType::OnUpdate> updateSchedule;
+  SystemSchedule<SysType::OnStop> stopSchedule;
 
   tf::Taskflow startTaskflow;
   tf::Taskflow updateTaskflow;

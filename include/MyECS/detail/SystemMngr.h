@@ -4,10 +4,11 @@
 
 #pragma once
 
+#include "SystemSchedule.inl"
+
 #include <functional>
 
 namespace My {
-class SystemSchedule;
 class ArchetypeMngr;
 
 class SystemMngr {
@@ -20,18 +21,24 @@ class SystemMngr {
   template <typename Cmpt>
   void Regist();
 
-  void GenStartSchedule(SystemSchedule& schedule);
-  void GenUpdateSchedule(SystemSchedule& schedule);
-  void GenStopSchedule(SystemSchedule& schedule);
+  void GenSchedule(SystemSchedule<SysType::OnStart>& schedule);
+  void GenSchedule(SystemSchedule<SysType::OnUpdate>& schedule);
+  void GenSchedule(SystemSchedule<SysType::OnStop>& schedule);
 
  private:
-  std::vector<std::function<void(SystemSchedule&)>> staticStartScheduleFuncs;
-  std::vector<std::function<void(SystemSchedule&)>> staticUpdateScheduleFuncs;
-  std::vector<std::function<void(SystemSchedule&)>> staticStopScheduleFuncs;
+  std::vector<std::function<void(SystemSchedule<SysType::OnStart>&)>>
+      staticStartScheduleFuncs;
+  std::vector<std::function<void(SystemSchedule<SysType::OnUpdate>&)>>
+      staticUpdateScheduleFuncs;
+  std::vector<std::function<void(SystemSchedule<SysType::OnStop>&)>>
+      staticStopScheduleFuncs;
 
-  std::vector<std::function<void(SystemSchedule&)>> dynamicStartScheduleFuncs;
-  std::vector<std::function<void(SystemSchedule&)>> dynamicUpdateScheduleFuncs;
-  std::vector<std::function<void(SystemSchedule&)>> dynamicStopScheduleFuncs;
+  std::vector<std::function<void(SystemSchedule<SysType::OnStart>&)>>
+      dynamicStartScheduleFuncs;
+  std::vector<std::function<void(SystemSchedule<SysType::OnUpdate>&)>>
+      dynamicUpdateScheduleFuncs;
+  std::vector<std::function<void(SystemSchedule<SysType::OnStop>&)>>
+      dynamicStopScheduleFuncs;
 
  private:
   SystemMngr() = default;

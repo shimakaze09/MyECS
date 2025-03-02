@@ -4,53 +4,35 @@
 
 #pragma once
 
-#include <MyTemplate/Concept.h>
-#include <MyTemplate/TypeID.h>
-#include <MyTemplate/Typelist.h>
-
-#include <cassert>
-
-namespace My::detail::SystemMngr_ {
-template <typename T>
-Concept(HaveOnStart, &T::OnStart);
-
-template <typename T>
-Concept(HaveOnUpdate, &T::OnUpdate);
-
-template <typename T>
-Concept(HaveOnStop, &T::OnStop);
-
-template <typename T>
-Concept(HaveOnStartSchedule, &T::OnStartSchedule);
-
-template <typename T>
-Concept(HaveOnUpdateSchedule, &T::OnUpdateSchedule);
-
-template <typename T>
-Concept(HaveOnStopSchedule, &T::OnStopSchedule);
-}  // namespace My::detail::SystemMngr_
+#include "../SystemTraits.h"
 
 namespace My {
 template <typename Cmpt>
 void SystemMngr::Regist() {
-  if constexpr (Require<detail::SystemMngr_::HaveOnStart, Cmpt>) {
+  if constexpr (Require<HaveOnStart, Cmpt>) {
     staticStartScheduleFuncs.push_back(
-        [](SystemSchedule& schedule) { schedule.Regist(&Cmpt::OnStart); });
+        [](SystemSchedule<SysType::OnStart>& schedule) {
+          schedule.Regist<Cmpt>();
+        });
   }
-  if constexpr (Require<detail::SystemMngr_::HaveOnUpdate, Cmpt>) {
+  if constexpr (Require<HaveOnUpdate, Cmpt>) {
     staticUpdateScheduleFuncs.push_back(
-        [](SystemSchedule& schedule) { schedule.Regist(&Cmpt::OnUpdate); });
+        [](SystemSchedule<SysType::OnUpdate>& schedule) {
+          schedule.Regist<Cmpt>();
+        });
   }
-  if constexpr (Require<detail::SystemMngr_::HaveOnStop, Cmpt>) {
+  if constexpr (Require<HaveOnStop, Cmpt>) {
     staticStopScheduleFuncs.push_back(
-        [](SystemSchedule& schedule) { schedule.Regist(&Cmpt::OnStop); });
+        [](SystemSchedule<SysType::OnStop>& schedule) {
+          schedule.Regist<Cmpt>();
+        });
   }
 
-  if constexpr (Require<detail::SystemMngr_::HaveOnStartSchedule, Cmpt>)
+  if constexpr (Require<HaveOnStartSchedule, Cmpt>)
     dynamicStartScheduleFuncs.push_back(&Cmpt::OnStartSchedule);
-  if constexpr (Require<detail::SystemMngr_::HaveOnUpdateSchedule, Cmpt>)
+  if constexpr (Require<HaveOnUpdateSchedule, Cmpt>)
     dynamicUpdateScheduleFuncs.push_back(&Cmpt::OnUpdateSchedule);
-  if constexpr (Require<detail::SystemMngr_::HaveOnStopSchedule, Cmpt>)
+  if constexpr (Require<HaveOnStopSchedule, Cmpt>)
     dynamicStopScheduleFuncs.push_back(&Cmpt::OnStopSchedule);
 }
 }  // namespace My

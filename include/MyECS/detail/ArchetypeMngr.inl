@@ -10,7 +10,7 @@
 #include <MyTemplate/Typelist.h>
 
 namespace My::detail::ArchetypeMngr_ {
-template <typename ArgList>
+template <typename ArgList, typename OrderList, typename TaggedCmptList>
 struct GenTaskflow;
 }  // namespace My::detail::ArchetypeMngr_
 
@@ -119,11 +119,11 @@ const std::tuple<Cmpts*...> ArchetypeMngr::EntityAttach(EntityBase* e) {
   e->archetype = dstArchetype;
   e->idx = dstIdx;
 
-  // if (srcArchetype->Size() == 0 && srcArchetype->CmptNum() != 0) {
-  //   ids.erase(srcArchetype->id);
-  //   id2a.erase(srcArchetype->id);
-  //   delete srcArchetype;
-  // }
+  /*if (srcArchetype->Size() == 0 && srcArchetype->CmptNum() != 0) {
+			ids.erase(srcArchetype->id);
+			id2a.erase(srcArchetype->id);
+			delete srcArchetype;
+		}*/
 
   return {dstArchetype->At<Cmpts>(dstIdx)...};
 }
@@ -189,16 +189,23 @@ void ArchetypeMngr::EntityDetach(EntityBase* e) {
 
 template <typename Sys>
 void ArchetypeMngr::GenTaskflow(tf::Taskflow* taskflow, Sys&& sys) {
+  using ArgList = FuncTraits_ArgList<std::decay_t<Sys>>;
+  using OrderList = CmptTag::GetOrderList_t<ArgList>;
+  using TaggedCmptList = CmptTag::RemoveOrders_t<ArgList>;
   return detail::ArchetypeMngr_::GenTaskflow<
-      FuncTraits_ArgList<std::decay_t<Sys>>>::run(taskflow, this,
-                                                  std::forward<Sys>(sys));
+      ArgList, OrderList, TaggedCmptList>::run(taskflow, this,
+                                               std::forward<Sys>(sys));
 }
 }  // namespace My
 
 namespace My::detail::ArchetypeMngr_ {
-template <typename... TagedCmpts>
-struct GenTaskflow<TypeList<TagedCmpts...>> {
+template <typename... Args, typename... Orders, typename... TagedCmpts>
+struct GenTaskflow<TypeList<Args...>, TypeList<Orders...>,
+                   TypeList<TagedCmpts...>> {
   static_assert(sizeof...(TagedCmpts) > 0);
+  using ArgList = TypeList<Args...>;
+  using OrderList = TypeList<Orders...>;
+  using TagedCmptList = TypeList<TagedCmpts...>;
   using CmptList = TypeList<CmptTag::RemoveTag_t<TagedCmpts>...>;
   static_assert(IsSet_v<CmptList>, "Componnents must be different");
 
@@ -216,10 +223,15 @@ struct GenTaskflow<TypeList<TagedCmpts...>> {
       for (size_t i = 0; i < chunkNum; i++) {
         size_t J = std::min(chunkCapacity, num - (i * chunkCapacity));
         taskflow->emplace([s, cmptsTuple = std::move(cmptsTupleVec[i]), J]() {
-          for (size_t j = 0; j < J; j++)
-            s((std::get<Find_v<CmptList, CmptTag::RemoveTag_t<TagedCmpts>>>(
-                   cmptsTuple) +
-               j)...);
+          for (size_t j = 0; j < J; j++) {
+            s(std::get<Args>(std::make_tuple(
+                static_cast<TagedCmpts>(
+                    (std::get<
+                         Find_v<CmptList, CmptTag::RemoveTag_t<TagedCmpts>>>(
+                         cmptsTuple) +
+                     j))...,
+                Orders{}...))...);
+          }
         });
       }
     }
