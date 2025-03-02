@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../CmptRegister.h"
+#include "../CmptRegistrar.h"
 
 namespace My {
 template <typename Cmpt>
@@ -23,9 +23,8 @@ std::tuple<Cmpts*...> Entity::Attach() {
   static_assert(sizeof...(Cmpts) > 0);
   static_assert(IsSet_v<TypeList<Cmpts...>>, "Components must be different");
   assert("[ERROR] hasn't registed <Cmpts>" &&
-         CmptRegister::Instance().template IsRegisted<Cmpts...>());
+         CmptRegistrar::Instance().template IsRegistered<Cmpts...>());
   assert(IsAlive());
-  (archetype->sysmngr->Regist<Cmpts>(), ...);
   return archetype->mngr->EntityAttach<Cmpts...>(this);
 }
 

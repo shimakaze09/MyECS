@@ -14,7 +14,7 @@ struct position {
 };
 
 int main() {
-  My::CmptRegister::Instance().Regist<velocity, position>();
+  My::CmptRegistrar::Instance().Register<velocity, position>();
 
   My::World w;
 

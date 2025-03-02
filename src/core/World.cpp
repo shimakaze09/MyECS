@@ -4,7 +4,7 @@
 
 #include <MyECS/World.h>
 
-#include <MyECS/detail/SystemMngr.h>
+#include <MyECS/detail/CmptSysMngr.h>
 
 using namespace My;
 using namespace std;
@@ -19,7 +19,7 @@ void World::Start() {
   startSchedule.Clear();
   startTaskflow.clear();
 
-  SystemMngr::Instance().GenSchedule(startSchedule);
+  CmptSysMngr::Instance().GenSchedule(startSchedule, *this);
   startSchedule.GenTaskflow(startTaskflow);
 
   executor.run(startTaskflow).wait();
@@ -31,7 +31,7 @@ void World::Update() {
   updateSchedule.Clear();
   updateTaskflow.clear();
 
-  SystemMngr::Instance().GenSchedule(updateSchedule);
+  CmptSysMngr::Instance().GenSchedule(updateSchedule, *this);
   updateSchedule.GenTaskflow(updateTaskflow);
 
   executor.run(updateTaskflow).wait();
@@ -43,7 +43,7 @@ void World::Stop() {
   stopSchedule.Clear();
   stopTaskflow.clear();
 
-  SystemMngr::Instance().GenSchedule(stopSchedule);
+  CmptSysMngr::Instance().GenSchedule(stopSchedule, *this);
   stopSchedule.GenTaskflow(stopTaskflow);
 
   executor.run(stopTaskflow).wait();

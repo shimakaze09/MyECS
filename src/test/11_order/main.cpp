@@ -57,12 +57,18 @@ struct Writer5 {
 };
 
 struct Writer7 {
-  void MyUpdate(Data* data) const { cout << "7" << endl; }
+  struct MyUpdateSystem {
+    static constexpr std::string_view name = "Writer7::MyUpdateSystem";
+    int num = 7;
+
+    void operator()(Data* data) const { cout << num << endl; }
+  };
 
   static void OnSchedule(SystemSchedule<SysType::OnUpdate>& schedule) {
-    SystemSchedule<SysType::OnUpdate>::Config config;
-    config.After<Writer1>().Before<Writer5>();
-    schedule.Regist(&MyUpdate, config);
+    string sname = string(MyUpdateSystem::name);
+    schedule.Register(sname, MyUpdateSystem{})
+        .After<Writer1>(sname)
+        .Before<Writer5>(MyUpdateSystem::name);
   }
 };
 
@@ -75,12 +81,15 @@ struct AfterRead2 {
 };
 
 int main() {
-  CmptRegister::Instance()
-      .Regist<Data, Writer1, Writer2, Writer3, Writer4, Writer5, Writer6,
-              Writer7, PreRead1, PreRead2, AfterRead1, AfterRead2>();
+  GetCmptSys<Writer2, SysType::OnUpdate>();
+
+  CmptRegistrar::Instance()
+      .Register<Data, Writer1, Writer2, Writer3, Writer4, Writer5, Writer6,
+                PreRead1, PreRead2, AfterRead1, AfterRead2>();
   World w;
   w.CreateEntity<Data, Writer1, Writer2, Writer3, Writer4, Writer5, Writer6,
-                 Writer7, PreRead1, PreRead2, AfterRead1, AfterRead2>();
+                 PreRead1, PreRead2, AfterRead1, AfterRead2>();
+  w.Register<Writer7>();
   w.Start();
   w.Update();
   w.Stop();

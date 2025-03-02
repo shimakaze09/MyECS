@@ -6,6 +6,7 @@
 
 #include "Entity.h"
 #include "SystemSchedule.h"
+#include "detail/SystemMngr.h"
 
 namespace My::detail::World_ {
 template <typename Args>
@@ -15,7 +16,7 @@ struct ParallelEach;
 }  // namespace My::detail::World_
 
 namespace My {
-class World {
+class World : public SystemMngr {
  public:
   World();
 

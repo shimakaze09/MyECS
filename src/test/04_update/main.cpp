@@ -2,8 +2,9 @@
 // Created by Admin on 22/02/2025.
 //
 
-#include <MyECS/World.h>
 #include <MyECS/SystemTraits.h>
+#include <MyECS/World.h>
+
 
 #include <iostream>
 
@@ -33,8 +34,8 @@ struct alignas(8) Velocity {
   void Update() const {}
 
   static void OnSchedule(SystemSchedule<SysType::OnUpdate>& schedule) {
-    schedule.Regist(MemFuncOf<void(Position*) const>::run(&Velocity::Update))
-        .Regist(MemFuncOf<void() const>::run(&Velocity::Update));
+    schedule.Register(MemFuncOf<void(Position*) const>::run(&Velocity::Update))
+        .Register(MemFuncOf<void() const>::run(&Velocity::Update));
   }
 };
 
@@ -49,8 +50,8 @@ struct alignas(8) Acceleration {
 
 int main() {
   Require<HaveOnStartSchedule, Velocity>;
-  CmptRegister::Instance()
-      .Regist<Position, Velocity, Acceleration, EntityHandle>();
+  CmptRegistrar::Instance()
+      .Register<Position, Velocity, Acceleration, EntityHandle>();
 
   World w;
   for (size_t i = 0; i < 2; i++) {

@@ -12,7 +12,7 @@ using namespace My;
 struct Position {
   float x;
 
-  static void OnRegist() { cout << "regist Position" << endl; }
+  static void OnRegister() { cout << "regist Position" << endl; }
 
   void OnUpdate() const { cout << "position: " << x << endl; }
 };
@@ -20,7 +20,7 @@ struct Position {
 struct Velocity {
   float x;
 
-  static void OnRegist() { cout << "regist Velocity" << endl; }
+  static void OnRegister() { cout << "regist Velocity" << endl; }
 
   void OnUpdate(Position* p) const {
     cout << "velocity: " << x << endl;
@@ -38,7 +38,7 @@ struct Acceleration {
 };
 
 int main() {
-  CmptRegister::Instance().Regist<Position, Velocity, Acceleration>();
+  CmptRegistrar::Instance().Register<Position, Velocity, Acceleration>();
 
   World w;
   w.CreateEntity<Velocity, Position, Acceleration>();

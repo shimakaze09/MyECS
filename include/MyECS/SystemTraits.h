@@ -18,6 +18,9 @@ enum class SysType { OnStart, OnUpdate, OnStop };
 template <SysType>
 class SystemSchedule;
 
+template <SysType type>
+using ScheduleFunc = void(SystemSchedule<type>&);
+
 template <typename Cmpt>
 Concept(HaveOnStart, &Cmpt::OnStart);
 
@@ -27,45 +30,42 @@ Concept(HaveOnUpdate, &Cmpt::OnUpdate);
 template <typename Cmpt>
 Concept(HaveOnStop, &Cmpt::OnStop);
 
-template <typename Cmpt>
-Concept(
-    HaveOnStartSchedule,
-    MemFuncOf<void(SystemSchedule<SysType::OnStart>&)>::run(&Cmpt::OnSchedule));
+template <typename System>
+Concept(HaveOnStartSchedule,
+        MemFuncOf<ScheduleFunc<SysType::OnStart>>::run(&System::OnSchedule));
 
-template <typename Cmpt>
+template <typename System>
 Concept(HaveOnUpdateSchedule,
-        MemFuncOf<void(SystemSchedule<SysType::OnUpdate>&)>::run(
-            &Cmpt::OnSchedule));
+        MemFuncOf<ScheduleFunc<SysType::OnUpdate>>::run(&System::OnSchedule));
 
-template <typename Cmpt>
-Concept(
-    HaveOnStopSchedule,
-    MemFuncOf<void(SystemSchedule<SysType::OnStop>&)>::run(&Cmpt::OnSchedule));
+template <typename System>
+Concept(HaveOnStopSchedule,
+        MemFuncOf<ScheduleFunc<SysType::OnStop>>::run(&System::OnSchedule));
 
 template <typename Cmpt, SysType type>
-constexpr bool HaveSys =
-    type == SysType::OnStart && Require<HaveOnStart, Cmpt> ||
-    type == SysType::OnUpdate && Require<HaveOnUpdate, Cmpt> ||
-    type == SysType::OnStop && Require<HaveOnStop, Cmpt>;
+constexpr bool HaveCmptSys =
+    ((type == SysType::OnStart) && Require<HaveOnStart, Cmpt>) ||
+    ((type == SysType::OnUpdate) && Require<HaveOnUpdate, Cmpt>) ||
+    ((type == SysType::OnStop) && Require<HaveOnStop, Cmpt>);
 
-template <typename Cmpt, SysType type>
+template <typename System, SysType type>
 constexpr bool HaveSchedule =
-    type == SysType::OnStart && Require<HaveOnStartSchedule, Cmpt> ||
-    type == SysType::OnUpdate && Require<HaveOnUpdateSchedule, Cmpt> ||
-    type == SysType::OnStop && Require<HaveOnStopSchedule, Cmpt>;
+    ((type == SysType::OnStart) && Require<HaveOnStartSchedule, System>) ||
+    ((type == SysType::OnUpdate) && Require<HaveOnUpdateSchedule, System>) ||
+    ((type == SysType::OnStop) && Require<HaveOnStopSchedule, System>);
 
-template <typename Cmpt, SysType type,
-          typename = std::enable_if_t<HaveSys<Cmpt, type>>>
-constexpr auto GetSys() noexcept;
+template <typename System>
+constexpr bool HaveAnySchedule = Require<HaveOnStartSchedule, System> ||
+                                 Require<HaveOnUpdateSchedule, System> ||
+                                 Require<HaveOnStopSchedule, System>;
 
-template <SysType type>
-using ScheduleType = void (*)(SystemSchedule<type>&);
-template <typename Cmpt, SysType type,
-          typename = std::enable_if_t<HaveSchedule<Cmpt, type>>>
-constexpr ScheduleType<type> GetSchedule() noexcept;
+template <typename Cmpt, SysType type>
+constexpr auto GetCmptSys() noexcept;
 
-template <typename Cmpt, SysType type,
-          typename = std::enable_if_t<HaveSys<Cmpt, type>>>
+template <typename System, SysType type>
+constexpr ScheduleFunc<type>* GetSchedule() noexcept;
+
+template <typename Cmpt, SysType type>
 constexpr std::string_view DefaultSysName() noexcept;
 }  // namespace My
 
