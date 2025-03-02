@@ -8,7 +8,7 @@
 
 #include <MyDP/Basic/xSTL/xMap.h>
 
-#include "detail/Job.h"
+#include "Job.h"
 
 namespace My {
 struct Schedule {

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Schedule.h"
+#include "Schedule.h"
 
 namespace My {
 class SystemMngr {

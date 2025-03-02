@@ -2,7 +2,7 @@
 // Created by Admin on 2/03/2025.
 //
 
-#include <MyECS/Schedule.h>
+#include <MyECS/detail/Schedule.h>
 
 using namespace My;
 using namespace std;

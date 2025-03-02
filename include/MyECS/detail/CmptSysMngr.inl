@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../SystemTraits.h"
+#include "SystemTraits.h"
 
 namespace My {
 template <typename Cmpt>

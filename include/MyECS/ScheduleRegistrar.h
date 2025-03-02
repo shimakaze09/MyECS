@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "Schedule.h"
-#include "SystemTraits.h"
 #include "detail/ArchetypeMngr.h"
+#include "detail/Schedule.h"
+#include "detail/SystemTraits.h"
 
 namespace My {
 template <SysType type>
@@ -17,10 +17,6 @@ class ScheduleRegistrar {
 
   template <typename Cmpt, typename Func>
   ScheduleRegistrar& Register(const std::string& name, Func Cmpt::* func);
-
-  // use nameof::nameof_type<Func Cmpt::*>()
-  template <typename Cmpt, typename Func>
-  ScheduleRegistrar& Register(Func Cmpt::* func);
 
   ScheduleRegistrar& Order(std::string_view first, const std::string& second);
   template <typename CmptFirst, typename CmptSecond>

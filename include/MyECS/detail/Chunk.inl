@@ -21,8 +21,6 @@ static constexpr auto Chunk::StaticInfo() noexcept {
 }
 }  // namespace My
 
-// =========================================================================================
-
 namespace My::detail::Chunk_ {
 template <typename... Cmpts>
 struct StaticInfo {

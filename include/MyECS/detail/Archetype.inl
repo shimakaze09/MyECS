@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "CmptLifecycleMngr.h"
+
 #include <cassert>
 
 namespace My {
@@ -11,8 +13,6 @@ template <typename... Cmpts>
 Archetype::Archetype(ArchetypeMngr* mngr, TypeList<Cmpts...>) noexcept
     : mngr(mngr), id(TypeList<Cmpts...>{}) {
   using CmptList = TypeList<Cmpts...>;
-
-  constexpr size_t N = sizeof...(Cmpts);
 
   constexpr auto info = Chunk::StaticInfo<Cmpts...>();
   chunkCapacity = info.capacity;

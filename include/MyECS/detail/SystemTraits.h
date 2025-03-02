@@ -69,4 +69,4 @@ template <typename Cmpt, SysType type>
 constexpr std::string_view DefaultSysName() noexcept;
 }  // namespace My
 
-#include "detail/SystemTraits.inl"
+#include "SystemTraits.inl"

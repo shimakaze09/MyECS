@@ -2,7 +2,6 @@
 // Created by Admin on 22/02/2025.
 //
 
-#include <MyECS/SystemTraits.h>
 #include <MyECS/World.h>
 
 #include <iostream>
@@ -33,8 +32,10 @@ struct alignas(8) Velocity {
   void Update() const {}
 
   static void OnSchedule(ScheduleRegistrar<SysType::OnUpdate>& registrar) {
-    registrar.Register(MemFuncOf<void(Position*) const>::run(&Velocity::Update))
-        .Register(MemFuncOf<void() const>::run(&Velocity::Update));
+    registrar
+        .Register("Update1",
+                  MemFuncOf<void(Position*) const>::run(&Velocity::Update))
+        .Register("Update2", MemFuncOf<void() const>::run(&Velocity::Update));
   }
 };
 
