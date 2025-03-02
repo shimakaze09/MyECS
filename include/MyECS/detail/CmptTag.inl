@@ -7,25 +7,14 @@
 #include <type_traits>
 
 namespace My::CmptTag {
-template <typename T>
-struct RemoveTag {
-  using type = T;
-};
+template <typename Cmpt>
+struct RemoveTag<const Cmpt*> : IType<Cmpt> {};
 
 template <typename Cmpt>
-struct RemoveTag<const Cmpt*> {
-  using type = Cmpt;
-};
+struct RemoveTag<Cmpt*> : IType<Cmpt> {};
 
 template <typename Cmpt>
-struct RemoveTag<Cmpt*> {
-  using type = Cmpt;
-};
-
-template <typename Cmpt>
-struct RemoveTag<LastFrame<Cmpt>> {
-  using type = Cmpt;
-};
+struct RemoveTag<LastFrame<Cmpt>> : IType<Cmpt> {};
 
 template <typename TagedCmpt>
 struct IsLastFrame : std::false_type {};

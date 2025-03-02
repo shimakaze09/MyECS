@@ -39,8 +39,8 @@ class CmptLifecycleMngr {
   }
 
  private:
-  std::map<size_t, std::function<void(void*)>> destructors;
-  std::map<size_t, std::function<void(void*, void*)>>
+  std::unordered_map<size_t, std::function<void(void*)>> destructors;
+  std::unordered_map<size_t, std::function<void(void*, void*)>>
       move_constructors;  // dst <- src
 
   CmptLifecycleMngr() = default;

@@ -7,7 +7,6 @@
 #include "Chunk.h"
 #include "CmptIDSet.h"
 #include "CmptLifecycleMngr.h"
-#include "EntityBase.h"
 
 #include <MyBL/Pool.h>
 
@@ -19,7 +18,6 @@
 
 namespace My {
 class ArchetypeMngr;
-class Entity;
 
 class Archetype {
  public:

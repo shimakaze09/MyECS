@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <cassert>
+
 namespace My {
 template <typename... Cmpts>
 Archetype::Archetype(ArchetypeMngr* mngr, TypeList<Cmpts...>) noexcept

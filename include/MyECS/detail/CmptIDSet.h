@@ -6,6 +6,7 @@
 
 #include <MyTemplate/TemplateList.h>
 #include <MyTemplate/TypeID.h>
+
 #include <set>
 
 namespace My {
@@ -14,9 +15,7 @@ class CmptIDSet : std::set<size_t> {
   CmptIDSet() = default;
 
   template <typename... Cmpts>
-  CmptIDSet(TypeList<Cmpts...>) noexcept {
-    Add<Cmpts...>();
-  }
+  CmptIDSet(TypeList<Cmpts...>) noexcept : std::set<size_t>{TypeID<Cmpts>...} {}
 
   template <typename... Cmpts>
   void Add() noexcept {
@@ -52,6 +51,7 @@ class CmptIDSet : std::set<size_t> {
 
   using std::set<size_t>::begin;
   using std::set<size_t>::end;
+  using std::set<size_t>::size;
 
   friend bool operator<(const CmptIDSet& x, const CmptIDSet& y) noexcept {
     return static_cast<const std::set<size_t>&>(x) <
@@ -62,8 +62,5 @@ class CmptIDSet : std::set<size_t> {
     return static_cast<const std::set<size_t>&>(x) ==
            static_cast<const std::set<size_t>&>(y);
   }
-
- private:
-  friend class Archetype;
 };
 }  // namespace My

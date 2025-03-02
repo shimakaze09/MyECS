@@ -5,7 +5,6 @@
 #pragma once
 
 #include <array>
-#include <cassert>
 #include <cstdint>
 #include <tuple>
 #include <vector>

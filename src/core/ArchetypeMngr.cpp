@@ -4,8 +4,6 @@
 
 #include <MyECS/detail/ArchetypeMngr.h>
 
-#include <mutex>
-
 using namespace My;
 using namespace std;
 

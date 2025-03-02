@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <MyTemplate/Func.h>
-
 #include "../SystemSchedule.h"
+
+#include <UTemplate/Func.h>
 
 namespace My::detail::SystemSchedule_ {
 template <typename Func>
@@ -250,13 +250,15 @@ struct Schedule<type, TypeList<TagedCmpts...>> {
   template <typename TagedCmpt>
   static void Register(SystemSchedule<type>* sysSchedule,
                        tf::Taskflow* system) {
-    using Cmpt = CmptTag::RemoveTag_t<TagedCmpt>;
     if constexpr (CmptTag::IsLastFrame_v<TagedCmpt>)
-      sysSchedule->id2rw[My::TypeID<Cmpt>].pre_readers.push_back(system);
+      sysSchedule->id2rw[My::TypeID<CmptTag::RemoveTag_t<TagedCmpt>>]
+          .pre_readers.push_back(system);
     else if constexpr (CmptTag::IsWrite_v<TagedCmpt>)
-      sysSchedule->id2rw[My::TypeID<Cmpt>].writers.insert(system);
+      sysSchedule->id2rw[My::TypeID<CmptTag::RemoveTag_t<TagedCmpt>>]
+          .writers.insert(system);
     else if constexpr (CmptTag::IsNewest_v<TagedCmpt>)
-      sysSchedule->id2rw[My::TypeID<Cmpt>].post_readers.push_back(system);
+      sysSchedule->id2rw[My::TypeID<CmptTag::RemoveTag_t<TagedCmpt>>]
+          .post_readers.push_back(system);
     else if constexpr (CmptTag::IsBefore_v<TagedCmpt>)
       RegisterBefore(sysSchedule, system, typename TagedCmpt::CmptList{});
     else  // if constexpr (CmptTag::IsAfter_v<TagedCmpt>)
