@@ -107,7 +107,7 @@ struct ScheduleAdd<type, TypeList<Args...>> {
       RegisterBefore(schedule, job, typename Arg::CmptList{});
     else if constexpr (CmptTag::IsAfter_v<Arg>)
       RegisterAfter(schedule, job, typename Arg::CmptList{});
-    else if constexpr (CmptTag::IsNone_v<Arg>)
+    else if constexpr (CmptTag::IsQuery_v<Arg>)
       ;  // do nothing
     else
       static_assert(false, "ERROR::ScheduleAdd: unknown <Arg>");

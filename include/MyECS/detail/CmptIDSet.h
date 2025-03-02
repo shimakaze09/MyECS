@@ -51,6 +51,25 @@ class CmptIDSet : std::set<size_t> {
   }
 
   template <typename... Cmpts>
+  bool IsContainAny() const noexcept {
+    return ((find(TypeID<Cmpts>) != end()) || ...);
+  }
+
+  template <typename... Cmpts>
+  bool IsContainAny(TypeList<Cmpts...>) const noexcept {
+    return IsContainAny<Cmpts...>();
+  }
+
+  template <typename IDContainer>
+  bool IsContainAny(const IDContainer& ids) const noexcept {
+    for (auto id : ids) {
+      if (IsContain(id))
+        return true;
+    }
+    return false;
+  }
+
+  template <typename... Cmpts>
   bool IsNotContain() const noexcept {
     return ((find(TypeID<Cmpts>) == end()) && ...);
   }

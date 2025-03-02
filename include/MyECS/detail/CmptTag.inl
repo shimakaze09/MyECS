@@ -54,6 +54,50 @@ struct IsAfter : std::false_type {};
 template <typename... Cmpts>
 struct IsAfter<After<Cmpts...>> : std::true_type {};
 
+// ==========================================================================================
+
+// - All
+
+template <typename T>
+struct IsAll : std::false_type {};
+
+template <typename... Cmpts>
+struct IsAll<All<Cmpts...>> : std::true_type {};
+
+namespace detail::CmptTag_ {
+template <typename I, typename X>
+struct AccAll : IType<I> {};
+
+template <typename I, typename... AllCmpts>
+struct AccAll<I, All<AllCmpts...>> : Concat<I, TypeList<AllCmpts...>> {};
+}  // namespace detail::CmptTag_
+
+template <typename ArgList>
+struct ConcatedAllList
+    : Accumulate<ArgList, detail::CmptTag_::AccAll, TypeList<>> {};
+
+// - Any
+
+template <typename T>
+struct IsAny : std::false_type {};
+
+template <typename... Cmpts>
+struct IsAny<Any<Cmpts...>> : std::true_type {};
+
+namespace detail::CmptTag_ {
+template <typename I, typename X>
+struct AccAny : IType<I> {};
+
+template <typename I, typename... AnyCmpts>
+struct AccAny<I, Any<AnyCmpts...>> : Concat<I, TypeList<AnyCmpts...>> {};
+}  // namespace detail::CmptTag_
+
+template <typename ArgList>
+struct ConcatedAnyList
+    : Accumulate<ArgList, detail::CmptTag_::AccAny, TypeList<>> {};
+
+// - None
+
 template <typename T>
 struct IsNone : std::false_type {};
 
@@ -69,6 +113,6 @@ struct AccNone<I, None<NoneCmpts...>> : Concat<I, TypeList<NoneCmpts...>> {};
 }  // namespace detail::CmptTag_
 
 template <typename ArgList>
-struct GetAllNoneList
+struct ConcatedNoneList
     : Accumulate<ArgList, detail::CmptTag_::AccNone, TypeList<>> {};
 }  // namespace My::CmptTag
