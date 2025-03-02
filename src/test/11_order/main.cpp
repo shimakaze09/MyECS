@@ -12,43 +12,75 @@ using namespace My;
 
 struct Data {};
 
+struct PreRead1 {
+  void OnUpdate(CmptTag::LastFrame<Data> data) const {
+    cout << "PreRead1" << endl;
+  }
+};
+
+struct PreRead2 {
+  void OnUpdate(CmptTag::LastFrame<Data> data) const {
+    cout << "PreRead2" << endl;
+  }
+};
+
 struct Writer1 {
-  void OnUpdate(Data* data) const { cout << "1" << endl; }
+  void OnUpdate(Data* data) const { cout << "Writer1" << endl; }
 };
 
 struct Writer3 {
-  void OnUpdate(Data* data) const { cout << "3" << endl; }
+  void OnUpdate(Data* data) const { cout << "Writer3" << endl; }
 };
 
 struct Writer4 {
   void OnUpdate(CmptTag::Before<Writer1>, Data* data) const {
-    cout << "4" << endl;
+    cout << "Writer4" << endl;
   }
 };
 
 struct Writer6 {
   void OnUpdate(CmptTag::Before<Writer3>, Data* data) const {
-    cout << "6" << endl;
+    cout << "Writer6" << endl;
   }
 };
 
 struct Writer2 {
   void OnUpdate(CmptTag::Before<Writer4, Writer6>, Data* data) const {
-    cout << "2" << endl;
+    cout << "Writer2" << endl;
   }
 };
 
 struct Writer5 {
   void OnUpdate(CmptTag::After<Writer1>, Data* data) const {
-    cout << "5" << endl;
+    cout << "Writer5" << endl;
   }
+};
+
+struct Writer7 {
+  void MyUpdate(Data* data) const { cout << "7" << endl; }
+
+  static void OnSchedule(SystemSchedule<SysType::OnUpdate>& schedule) {
+    SystemSchedule<SysType::OnUpdate>::Config config;
+    config.After<Writer1>().Before<Writer5>();
+    schedule.Regist(&MyUpdate, config);
+  }
+};
+
+struct AfterRead1 {
+  void OnUpdate(const Data* data) const { cout << "AfterRead1" << endl; }
+};
+
+struct AfterRead2 {
+  void OnUpdate(const Data* data) const { cout << "AfterRead2" << endl; }
 };
 
 int main() {
   CmptRegister::Instance()
-      .Regist<Data, Writer1, Writer2, Writer3, Writer4, Writer5, Writer6>();
+      .Regist<Data, Writer1, Writer2, Writer3, Writer4, Writer5, Writer6,
+              Writer7, PreRead1, PreRead2, AfterRead1, AfterRead2>();
   World w;
-  w.CreateEntity<Data, Writer1, Writer2, Writer3, Writer4, Writer5, Writer6>();
+  w.CreateEntity<Data, Writer1, Writer2, Writer3, Writer4, Writer5, Writer6,
+                 Writer7, PreRead1, PreRead2, AfterRead1, AfterRead2>();
   w.Start();
   w.Update();
   w.Stop();

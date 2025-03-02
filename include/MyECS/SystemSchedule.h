@@ -6,13 +6,14 @@
 
 #include "detail/ArchetypeMngr.h"
 
-#include <MyDP/Basic/xSTL/xMap.h>
-
 #include <MyBL/Pool.h>
 
 #include <taskflow/taskflow.hpp>
 
 #include "SystemTraits.h"
+
+#include <MyDP/Basic/Read.h>
+#include <MyDP/Basic/xSTL/xMap.h>
 
 namespace My::detail::SystemSchedule_ {
 template <SysType type, typename ArgList>
@@ -25,28 +26,53 @@ using System = tf::Taskflow;
 template <SysType type>
 class SystemSchedule {
  public:
+  class Config {
+   public:
+    Read<Config, std::vector<std::string>> befores;
+    Read<Config, std::vector<std::string>> afters;
+
+    Config& Before(const std::string& name);
+
+    // use nameof::nameof_type<Func Cmpt::*>()
+    template <typename Cmpt, typename Func>
+    Config& Before(Func Cmpt::* func);
+
+    template <typename Cmpt>
+    Config& Before();
+
+    Config& After(const std::string& name);
+
+    // use nameof::nameof_type<Func Cmpt::*>()
+    template <typename Cmpt, typename Func>
+    Config& After(Func Cmpt::* func);
+
+    template <typename Cmpt>
+    Config& After();
+  };
+
   template <typename Func>
-  SystemSchedule& Regist(Func&& func, std::string_view name);
+  SystemSchedule& Regist(Func&& func, std::string_view name,
+                         const Config& config = Config{});
+
+  template <typename Cmpt, typename Func>
+  SystemSchedule& Regist(Func Cmpt::* func, std::string_view name,
+                         const Config& config = Config{});
 
   // use nameof::nameof_type<Func Cmpt::*>()
   template <typename Cmpt, typename Func>
-  SystemSchedule& Regist(Func Cmpt::* func);
+  SystemSchedule& Regist(Func Cmpt::* func, const Config& config = Config{});
 
-  template <typename Cmpt, typename = std::enable_if_t<HaveSys<Cmpt, type>>>
-  SystemSchedule& Regist();
-
-  // TODO: not parallel
-  /*template<typename Func>
-  SystemSchedule& RegistNotParallel(Func&& func, std::string_view name);
-
-  template<typename Cmpt, typename Func>
-  SystemSchedule& RegistNotParallel(Func Cmpt::* func);*/
+  // TODO: regist not parallel
 
  private:
   friend class World;
+  friend class SystemMngr;
 
   SystemSchedule(ArchetypeMngr* mngr);
   ~SystemSchedule();
+
+  template <typename Cmpt>
+  SystemSchedule& Regist();
 
   void Clear();
 
@@ -58,7 +84,7 @@ class SystemSchedule {
     std::vector<System*> post_readers;
   };
 
-  System* RequestSystem(std::string_view name);
+  System* RequestSystem(const std::string& name);
 
   bool IsDAG() const noexcept;
 
