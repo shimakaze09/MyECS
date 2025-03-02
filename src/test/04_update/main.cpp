@@ -3,6 +3,7 @@
 //
 
 #include <MyECS/World.h>
+#include <MyECS/SystemTraits.h>
 
 #include <iostream>
 
@@ -31,7 +32,7 @@ struct alignas(8) Velocity {
 
   void Update() const {}
 
-  static void OnUpdateSchedule(SystemSchedule<SysType::OnUpdate>& schedule) {
+  static void OnSchedule(SystemSchedule<SysType::OnUpdate>& schedule) {
     schedule.Regist(MemFuncOf<void(Position*) const>::run(&Velocity::Update))
         .Regist(MemFuncOf<void() const>::run(&Velocity::Update));
   }
@@ -47,7 +48,7 @@ struct alignas(8) Acceleration {
 };
 
 int main() {
-  alignof(EntityHandle);
+  Require<HaveOnStartSchedule, Velocity>;
   CmptRegister::Instance()
       .Regist<Position, Velocity, Acceleration, EntityHandle>();
 

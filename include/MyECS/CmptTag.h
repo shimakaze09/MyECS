@@ -52,6 +52,8 @@ struct IsNewest;
 template <typename TagedCmpt>
 static constexpr bool IsNewest_v = IsNewest<TagedCmpt>::value;
 
+// ======================================================================
+
 template <typename... Cmpts>
 struct Before {
   using CmptList = TypeList<Cmpts...>;
