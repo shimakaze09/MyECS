@@ -29,7 +29,7 @@ class ArchetypeMngr {
   template <typename... Cmpts>
   inline Archetype* GetOrCreateArchetypeOf();
 
-  template <typename NotCmptList, typename CmptList>
+  template <typename NoneCmptList, typename CmptList>
   const std::set<Archetype*>& QueryArchetypes();
 
   template <typename... Cmpts>
@@ -65,8 +65,8 @@ class ArchetypeMngr {
   std::map<CmptIDSet, Archetype*> id2a;  // id to archetype
 
   // Query Cache
-  // TypeID<Typelist<Cmpts...>, TypeList<NotCmpts...>> to archetype set
-  // Typelist<Cmpts...> and TypeList<NotCmpts...> are **sorted**
+  // TypeID<Typelist<Cmpts...>, TypeList<NoneCmpts...>> to archetype set
+  // Typelist<Cmpts...> and TypeList<NoneCmpts...> are **sorted**
   std::unordered_map<size_t, std::set<Archetype*>> queryCache;
 
   // TypeID<Typelist<Cmpts...>> to Cmpt ID set

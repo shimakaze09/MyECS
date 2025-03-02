@@ -102,17 +102,17 @@ using GetOrderList_t = typename GetOrderList<ArgList>::type;
 // ======================================================================
 
 template <typename... Cmpts>
-struct Not {
+struct None {
   using CmptList = TypeList<Cmpts...>;
 };
 template <typename T>
-struct IsNot;
+struct IsNone;
 template <typename T>
-static constexpr bool IsNot_v = IsNot<T>::value;
+static constexpr bool IsNone_v = IsNone<T>::value;
 template <typename ArgList>
-struct GetAllNotList;  // TypeList<NotCmpts...>, sorted
+struct GetAllNoneList;  // TypeList<NoneCmpts...>, sorted
 template <typename ArgList>
-using GetAllNotList_t = typename GetAllNotList<ArgList>::type;
+using GetAllNoneList_t = typename GetAllNoneList<ArgList>::type;
 }  // namespace CmptTag
 }  // namespace My
 
