@@ -37,8 +37,12 @@ class ArchetypeMngr {
   const std::tuple<EntityBase*, Cmpts*...> CreateEntity();
 
   // TODO: CreateEntities
+
   template <typename... Cmpts>
   const std::tuple<Cmpts*...> EntityAttach(EntityBase* e);
+
+  template <typename Cmpt, typename... Args>
+  Cmpt* EntityAssignAttach(EntityBase* e, Args... args);
 
   template <typename... Cmpts>
   void EntityDetach(EntityBase* e);
@@ -53,9 +57,12 @@ class ArchetypeMngr {
 
  private:
   template <typename... Cmpts>
+  const std::tuple<Cmpts*...> EntityAttachWithoutInit(EntityBase* e);
+
+  template <typename... Cmpts>
   static std::vector<size_t> TypeListToIDVec(TypeList<Cmpts...>);
 
-  My::World* w;
+  Ubpa::World* w;
 
   Pool<EntityBase> entityPool;
 

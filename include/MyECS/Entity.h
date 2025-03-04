@@ -11,7 +11,6 @@ class Entity final : private EntityBase {
  public:
   template <typename Cmpt>
   Cmpt* Get();
-
   template <typename Cmpt>
   const Cmpt* Get() const;
 
@@ -22,6 +21,9 @@ class Entity final : private EntityBase {
 
   template <typename... Cmpts>
   std::tuple<Cmpts*...> Attach();
+
+  template <typename Cmpt, typename... Args>
+  Cmpt* AssignAttach(Args... args);
 
   template <typename Cmpt>
   inline Cmpt* GetOrAttach();

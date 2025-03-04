@@ -52,11 +52,9 @@ void World::ParallelEach(Sys&& s) const {
 
 template <typename... Cmpts>
 std::tuple<Entity*, Cmpts*...> World::CreateEntity() {
-  static_assert(IsSet_v<TypeList<Cmpts...>>, "Components must be different");
-  (RuntimeCmptTraits::Instance().Register<Cmpts>(), ...);
-  auto rst = mngr.CreateEntity<Cmpts...>();
-  assert("[ERROR] hasn't registered <Cmpts>" &&
+  assert("World::CreateEntity: <Cmpts> are unregistered" &&
          CmptRegistrar::Instance().template IsRegistered<Cmpts...>());
+  auto rst = mngr.CreateEntity<Cmpts...>();
   return {reinterpret_cast<Entity*>(std::get<0>(rst)),
           std::get<1 + Find_v<TypeList<Cmpts...>, Cmpts>>(rst)...};
 }
