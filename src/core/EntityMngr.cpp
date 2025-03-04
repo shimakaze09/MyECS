@@ -2,7 +2,7 @@
 // Created by Admin on 26/12/2024.
 //
 
-#include <MyECS/EntityMngr.h>
+#include <MyECS/detail/EntityMngr.h>
 
 using namespace My;
 using namespace std;

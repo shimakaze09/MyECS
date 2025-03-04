@@ -4,10 +4,9 @@
 
 #pragma once
 
-#include "detail/Archetype.h"
-#include "detail/EntityData.h"
-
-#include "detail/Job.h"
+#include "Archetype.h"
+#include "EntityData.h"
+#include "Job.h"
 
 #include <MyContainer/Pool.h>
 
@@ -101,4 +100,4 @@ class EntityMngr {
 };
 }  // namespace My
 
-#include "detail/EntityMngr.inl"
+#include "EntityMngr.inl"

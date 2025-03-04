@@ -4,8 +4,7 @@
 
 #pragma once
 
-#include "EntityMngr.h"
-
+#include "detail/EntityMngr.h"
 #include "detail/Schedule.h"
 #include "detail/SystemTraits.h"
 
@@ -30,9 +29,9 @@ class ScheduleRegistrar {
   // TODO: regist not parallel
 
  private:
-  friend class World;
+  friend class SystemMngr;
 
-  ScheduleRegistrar(EntityMngr* mngr) noexcept : mngr{mngr} {}
+  ScheduleRegistrar(EntityMngr* mngr) : mngr{mngr} {}
 
   EntityMngr* mngr;
   Schedule schedule;

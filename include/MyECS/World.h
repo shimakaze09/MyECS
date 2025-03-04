@@ -6,7 +6,7 @@
 
 #include "Entity.h"
 #include "ScheduleRegistrar.h"
-#include "detail/SystemMngr.h"
+#include "SystemMngr.h"
 
 namespace My {
 class World : public SystemMngr {
@@ -31,10 +31,6 @@ class World : public SystemMngr {
   // Commands, one-by-one
   void Stop();
 
-  std::string DumpStartTaskflow() const;
-  std::string DumpUpdateTaskflow() const;
-  std::string DumpStopTaskflow() const;
-
   // if Sys's return type is bool, Each stop when return false
   // run commands later
   template <typename Sys>
@@ -56,17 +52,7 @@ class World : public SystemMngr {
   void AddCommand(const std::function<void()>& command);
 
  private:
-  EntityMngr mngr;
-
-  ScheduleRegistrar<SysType::OnStart> startRegistrar;
-  ScheduleRegistrar<SysType::OnUpdate> updateRegistrar;
-  ScheduleRegistrar<SysType::OnStop> stopRegistrar;
-
-  Job startJobGraph;
-  Job updateJobGraph;
-  Job stopJobGraph;
-
-  mutable JobExecutor executor;
+  EntityMngr entityMngr;
 };
 }  // namespace My
 
