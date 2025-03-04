@@ -28,8 +28,8 @@ template <typename T>
 struct hash;
 
 template <>
-struct hash<Ubpa::EntityQuery> {
-  size_t operator()(const Ubpa::EntityQuery& query) const noexcept {
+struct hash<My::EntityQuery> {
+  size_t operator()(const My::EntityQuery& query) const noexcept {
     return query.HashCode();
   }
 };

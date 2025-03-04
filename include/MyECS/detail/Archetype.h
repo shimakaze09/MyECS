@@ -33,7 +33,7 @@ class Archetype {
   template <typename... Cmpts>
   const std::vector<std::tuple<Cmpts*...>> Locate() const;
 
-  std::vector<std::vector<void*>> Locate(
+  std::tuple<std::vector<std::vector<void*>>, std::vector<size_t>> Locate(
       const std::set<CmptType>& cmptTypes) const;
 
   std::tuple<void*, size_t> At(CmptType type, size_t idx) const;
