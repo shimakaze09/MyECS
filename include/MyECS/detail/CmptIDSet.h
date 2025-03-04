@@ -40,7 +40,7 @@ class CmptIDSet : std::set<size_t> {
     return IsContain<Cmpts...>();
   }
 
-  bool IsContain(size_t cmptHash) const { return find(cmptHash) != end(); }
+  bool IsContain(size_t cmptID) const { return find(cmptID) != end(); }
 
   template <typename IDContainer>
   bool IsContain(const IDContainer& ids) const {
@@ -90,7 +90,7 @@ class CmptIDSet : std::set<size_t> {
     return IsNotContain<Cmpts...>();
   }
 
-  bool IsNotContain(size_t cmptHash) const { return find(cmptHash) == end(); }
+  bool IsNotContain(size_t cmptID) const { return find(cmptID) == end(); }
 
   template <typename IDContainer>
   bool IsNotContain(const IDContainer& ids) const {

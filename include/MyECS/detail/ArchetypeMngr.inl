@@ -116,11 +116,10 @@ const std::tuple<Cmpts*...> ArchetypeMngr::EntityAttach(EntityBase* e) {
   size_t dstIdx = dstArchetype->RequestBuffer();
 
   (new (dstArchetype->At<Cmpts>(dstIdx)) Cmpts, ...);
-  for (auto cmptHash : srcID) {
-    auto [srcCmpt, srcSize] = srcArchetype->At(cmptHash, srcIdx);
-    auto [dstCmpt, dstSize] = dstArchetype->At(cmptHash, dstIdx);
-    assert(srcSize == dstSize);
-    CmptLifecycleMngr::Instance().MoveConstruct(cmptHash, dstCmpt, srcCmpt);
+  for (auto cmptID : srcID) {
+    void* srcCmpt = srcArchetype->At(cmptID, srcIdx);
+    void* dstCmpt = dstArchetype->At(cmptID, dstIdx);
+    CmptLifecycleMngr::Instance().MoveConstruct(cmptID, dstCmpt, srcCmpt);
   }
 
   // erase
@@ -180,12 +179,11 @@ void ArchetypeMngr::EntityDetach(EntityBase* e) {
 
   // move src to dst
   size_t dstIdx = dstArchetype->RequestBuffer();
-  for (auto cmptHash : srcID) {
-    auto [srcCmpt, srcSize] = srcArchetype->At(cmptHash, srcIdx);
-    if (dstID.IsContain(cmptHash)) {
-      auto [dstCmpt, dstSize] = dstArchetype->At(cmptHash, dstIdx);
-      assert(srcSize == dstSize);
-      CmptLifecycleMngr::Instance().MoveConstruct(cmptHash, dstCmpt, srcCmpt);
+  for (auto cmptID : srcID) {
+    void* srcCmpt = srcArchetype->At(cmptID, srcIdx);
+    if (dstID.IsContain(cmptID)) {
+      void* dstCmpt = dstArchetype->At(cmptID, dstIdx);
+      CmptLifecycleMngr::Instance().MoveConstruct(cmptID, dstCmpt, srcCmpt);
     }
   }
 

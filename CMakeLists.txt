@@ -20,7 +20,8 @@ IF (NOT MyCMake_FOUND)
     MESSAGE(STATUS "MyCMake 0.5.0 built")
 ENDIF ()
 
-ADD_DEP(MyBL 0.1.6)
+ADD_DEP(MyContainer 0.0.1)
+ADD_DEP(MyDP 0.4.3)
 
 ADD_SUB_DIRS_REC(include)
 ADD_SUB_DIRS_REC(src)
