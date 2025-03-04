@@ -10,7 +10,7 @@
 
 namespace My {
 template <typename... Cmpts>
-Archetype::Archetype(ArchetypeMngr* mngr, TypeList<Cmpts...>) noexcept
+Archetype::Archetype(EntityMngr* mngr, TypeList<Cmpts...>) noexcept
     : mngr(mngr), id(TypeList<Cmpts...>{}) {
   using CmptList = TypeList<Cmpts...>;
 
@@ -87,14 +87,20 @@ Cmpt* Archetype::At(size_t idx) const {
 template <typename... Cmpts>
 const std::tuple<size_t, std::tuple<Cmpts*...>> Archetype::CreateEntity() {
   assert((id.IsContain<Cmpts>() && ...) && id.size() == sizeof...(Cmpts));
+  static_assert((std::is_constructible_v<Cmpts> && ...),
+                "Archetype::CreateEntity: <Cmpts> isn't constructible");
+  static_assert(IsSet_v<TypeList<Cmpts...>>,
+                "Archetype::CreateEntity: <Cmpts> must be different");
 
   using CmptList = TypeList<Cmpts...>;
   size_t idx = RequestBuffer();
   size_t idxInChunk = idx % chunkCapacity;
   byte* buffer = chunks[idx / chunkCapacity]->Data();
+  auto soTuple = std::make_tuple(id2so.find(TypeID<Cmpts>)->second...);
   std::tuple<Cmpts*...> cmpts = {
-      new (buffer + std::get<1>(id2so[TypeID<Cmpts>]) +
-           idxInChunk * std::get<0>(id2so[TypeID<Cmpts>])) Cmpts...};
+      new (buffer + std::get<1>(std::get<Find_v<CmptList, Cmpts>>(soTuple)) +
+           idxInChunk * std::get<0>(std::get<Find_v<CmptList, Cmpts>>(soTuple)))
+          Cmpts...};
 
   return {idx, cmpts};
 }

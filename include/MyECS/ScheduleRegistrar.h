@@ -4,7 +4,8 @@
 
 #pragma once
 
-#include "detail/ArchetypeMngr.h"
+#include "EntityMngr.h"
+
 #include "detail/Schedule.h"
 #include "detail/SystemTraits.h"
 
@@ -31,9 +32,9 @@ class ScheduleRegistrar {
  private:
   friend class World;
 
-  ScheduleRegistrar(ArchetypeMngr* mngr) noexcept : mngr{mngr} {}
+  ScheduleRegistrar(EntityMngr* mngr) noexcept : mngr{mngr} {}
 
-  ArchetypeMngr* mngr;
+  EntityMngr* mngr;
   Schedule schedule;
 
   friend class CmptSysMngr;

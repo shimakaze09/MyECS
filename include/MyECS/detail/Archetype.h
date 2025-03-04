@@ -15,13 +15,13 @@
 #include <map>
 
 namespace My {
-class ArchetypeMngr;
+class EntityMngr;
 
 class Archetype {
  public:
   // argument TypeList<Cmpts...> is for type deduction
   template <typename... Cmpts>
-  Archetype(ArchetypeMngr* mngr, TypeList<Cmpts...>) noexcept;
+  Archetype(EntityMngr* mngr, TypeList<Cmpts...>) noexcept;
 
   template <typename... Cmpts>
   static Archetype* Add(Archetype* from) noexcept;
@@ -60,7 +60,7 @@ class Archetype {
 
   const CmptIDSet& ID() const noexcept { return id; }
 
-  ArchetypeMngr* GetArchetypeMngr() const noexcept { return mngr; }
+  EntityMngr* GetEntityMngr() const noexcept { return mngr; }
 
   size_t CmptNum() const noexcept { return id.size(); }
 
@@ -71,9 +71,9 @@ class Archetype {
   Archetype() = default;
 
   friend class Entity;
-  friend class ArchetypeMngr;
+  friend class EntityMngr;
 
-  ArchetypeMngr* mngr{nullptr};
+  EntityMngr* mngr{nullptr};
   CmptIDSet id;
   std::map<size_t, std::tuple<size_t, size_t>>
       id2so;  // component id to (size, offset)

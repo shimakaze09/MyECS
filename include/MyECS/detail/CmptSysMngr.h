@@ -10,7 +10,7 @@
 #include <functional>
 
 namespace My {
-class ArchetypeMngr;
+class EntityMngr;
 
 class CmptSysMngr {
  public:

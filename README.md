@@ -10,3 +10,10 @@ A custom Entity-Component-System framework for game development.
 - **Schedule**: Stores all jobs and their dependency relationships; once all declarations are complete, it can be
   assembled into a comprehensive task
 - **ScheduleRegistrar**: Interface through which users register systems for the current frame
+
+## TODO
+
+- [ ] EntityBase -> Entity
+- [ ] EntityQuery
+- [ ] Query Entity
+- [ ] SystemMngr += ScheduleRegistrar

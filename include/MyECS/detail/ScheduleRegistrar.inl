@@ -85,7 +85,7 @@ namespace My::detail::ScheduleRegistrar_ {
 template <SysType type, typename... Args>
 struct ScheduleAdd<type, TypeList<Args...>> {
   template <typename Sys>
-  static auto run(ArchetypeMngr* mngr, Schedule& schedule, Sys&& sys,
+  static auto run(EntityMngr* mngr, Schedule& schedule, Sys&& sys,
                   const std::string& name) noexcept {
     auto job = schedule.RequestJob(name);
     mngr->GenJob(job, sys);

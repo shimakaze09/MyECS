@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "detail/ArchetypeMngr.h"
+#include "EntityMngr.h"
 
 namespace My {
 class Entity final : private EntityBase {

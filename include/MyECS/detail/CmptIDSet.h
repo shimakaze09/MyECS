@@ -10,6 +10,7 @@
 #include <set>
 
 namespace My {
+// TODO: hash
 class CmptIDSet : std::set<size_t> {
  public:
   CmptIDSet() = default;

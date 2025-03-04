@@ -4,23 +4,23 @@
 
 #pragma once
 
-#include "Archetype.h"
-#include "EntityBase.h"
+#include "detail/Archetype.h"
+#include "detail/EntityBase.h"
 
-#include "Job.h"
+#include "detail/Job.h"
 
-#include <UContainer/Pool.h>
+#include <MyContainer/Pool.h>
 
 #include <mutex>
 
 namespace My {
 class World;
 
-class ArchetypeMngr {
+class EntityMngr {
  public:
-  ArchetypeMngr(World* w) : w{w} {}
+  EntityMngr(World* w) : w{w} {}
 
-  ~ArchetypeMngr();
+  ~EntityMngr();
 
   World* World() const noexcept { return w; }
 
@@ -62,7 +62,7 @@ class ArchetypeMngr {
   template <typename... Cmpts>
   static std::vector<size_t> TypeListToIDVec(TypeList<Cmpts...>);
 
-  Ubpa::World* w;
+  My::World* w;
 
   Pool<EntityBase> entityPool;
 
@@ -101,4 +101,4 @@ class ArchetypeMngr {
 };
 }  // namespace My
 
-#include "ArchetypeMngr.inl"
+#include "detail/EntityMngr.inl"
