@@ -23,6 +23,11 @@ class CmptType {
     return TypeID<Cmpt>;
   }
 
+  template <typename Cmpt>
+  bool Is() const noexcept {
+    return hashcode == HashCodeOf<Cmpt>();
+  }
+
  private:
   size_t hashcode;
 };

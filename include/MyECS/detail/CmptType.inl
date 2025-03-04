@@ -5,11 +5,12 @@
 #pragma once
 
 namespace My {
-constexpr bool operator<(CmptType x, CmptType y) noexcept {
+inline constexpr bool operator<(const CmptType& x, const CmptType& y) noexcept {
   return x.HashCode() < y.HashCode();
 }
 
-constexpr bool operator==(CmptType x, CmptType y) noexcept {
+inline constexpr bool operator==(const CmptType& x,
+                                 const CmptType& y) noexcept {
   return x.HashCode() == y.HashCode();
 }
 }  // namespace My
@@ -20,7 +21,7 @@ struct hash;
 
 template <>
 struct hash<My::CmptType> {
-  constexpr size_t operator()(My::CmptType t) const noexcept {
+  constexpr size_t operator()(const My::CmptType& t) const noexcept {
     return t.HashCode();
   }
 };

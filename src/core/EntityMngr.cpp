@@ -12,6 +12,22 @@ EntityMngr::~EntityMngr() {
     delete p.second;
 }
 
+const std::set<Archetype*>& EntityMngr::QueryArchetypes(
+    const EntityQuery& query) const {
+  auto target = queryCache.find(query);
+  if (target != queryCache.end())
+    return target->second;
+
+  // queryCache is **mutable**
+  std::set<Archetype*>& archetypes = queryCache[query];
+  for (const auto& [h, a] : h2a) {
+    if (a->GetCmptTypeSet().IsMatch(query))
+      archetypes.insert(a);
+  }
+
+  return archetypes;
+}
+
 void EntityMngr::Release(EntityData* e) {
   auto archetype = e->archetype;
   auto idx = e->idx;
@@ -20,7 +36,7 @@ void EntityMngr::Release(EntityData* e) {
   auto movedEntityIdx = archetype->Erase(idx);
 
   if (movedEntityIdx != static_cast<size_t>(-1)) {
-    auto target = ai2e.find({ archetype, movedEntityIdx });
+    auto target = ai2e.find({archetype, movedEntityIdx});
     EntityData* movedEntity = target->second;
     ai2e.erase(target);
     movedEntity->idx = idx;
@@ -46,4 +62,27 @@ void EntityMngr::RunCommands() {
   for (const auto& command : commandBuffer)
     command();
   commandBuffer.clear();
+}
+
+void EntityMngr::GenJob(Job* job, SystemFunc* sys) const {
+  for (const Archetype* archetype : QueryArchetypes(sys->query)) {
+    auto chunkCmpts = archetype->Locate(sys->query.Locator().CmptTypes());
+
+    size_t num = archetype->EntityNum();
+    size_t chunkNum = archetype->ChunkNum();
+    size_t chunkCapacity = archetype->ChunkCapacity();
+
+    for (size_t i = 0; i < chunkNum; i++) {
+      size_t J = std::min(chunkCapacity, num - (i * chunkCapacity));
+      if (sys->IsNeedEntity()) {
+        // TODO
+      } else {
+        job->emplace([sys, cmpts = std::move(chunkCmpts[i]), J]() mutable {
+          for (size_t j = 0; j < J; j++) {
+            (*sys)(nullptr, cmpts.data());
+          }
+        });
+      }
+    }
+  }
 }

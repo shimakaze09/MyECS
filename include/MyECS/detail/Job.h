@@ -8,6 +8,7 @@
 
 namespace My {
 using Job = tf::Taskflow;
+using JobHandle = tf::Task;
 
 using JobExecutor = tf::Executor;
 }  // namespace My

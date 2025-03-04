@@ -10,8 +10,8 @@
 #include <MyTemplate/Typelist.h>
 
 namespace My::detail::EntityMngr_ {
-template <typename ArgList, typename TaggedCmptList, typename OtherArgList>
-struct GenJob;
+// template <typename ArgList, typename TaggedCmptList, typename OtherArgList>
+// struct GenJob;
 }  // namespace My::detail::EntityMngr_
 
 namespace My {
@@ -29,14 +29,9 @@ inline Archetype* EntityMngr::GetOrCreateArchetypeOf() {
 
   auto archetype = new Archetype(this, TypeList<Cmpts...>{});
   h2a[typesHashCode] = archetype;
-  for (auto& [queryHashCode, archetypes] : queryCache) {
-    const auto& query = queryHashmap.find(queryHashCode)->second;
-    if (types.IsContain(query.allCmptTypes) &&
-        types.IsContainAny(query.anyCmptTypes) &&
-        types.IsNotContain(query.noneCmptTypes) &&
-        types.IsContain(query.locateCmptTypes)) {
+  for (auto& [query, archetypes] : queryCache) {
+    if (types.IsMatch(query))
       archetypes.insert(archetype);
-    }
   }
   return archetype;
 }
@@ -51,36 +46,6 @@ const std::tuple<EntityData*, Cmpts*...> EntityMngr::CreateEntity() {
 
   using CmptList = TypeList<Cmpts...>;
   return {entity, std::get<Cmpts*>(cmpts)...};
-}
-
-template <typename AllList, typename AnyList, typename NoneList,
-          typename LocateList>
-const std::set<Archetype*>& EntityMngr::QueryArchetypes() const {
-  using SortedAllList = QuickSort_t<AllList, TypeID_Less>;
-  using SortedAnyList = QuickSort_t<AnyList, TypeID_Less>;
-  using SortedNoneList = QuickSort_t<NoneList, TypeID_Less>;
-  using SortedLocateList = QuickSort_t<LocateList, TypeID_Less>;
-  constexpr size_t queryHash = TypeID<
-      TypeList<SortedAllList, SortedAnyList, SortedNoneList, SortedLocateList>>;
-
-  auto target = queryCache.find(queryHash);
-  if (target != queryCache.end())
-    return target->second;
-
-  // queryHashmap and queryCache are **mutable**
-  std::set<Archetype*>& rst = queryCache[queryHash];
-  queryHashmap.emplace(queryHash, Query{TypeListToTypeVec(SortedAllList{}),
-                                        TypeListToTypeVec(SortedAnyList{}),
-                                        TypeListToTypeVec(SortedNoneList{}),
-                                        TypeListToTypeVec(SortedLocateList{})});
-
-  for (const auto& [h, a] : h2a) {
-    if (a->GetCmptTypeSet().IsMatch<AllList, AnyList, NoneList, LocateList>()) {
-      rst.insert(a);
-    }
-  }
-
-  return rst;
 }
 
 template <typename... Cmpts>
@@ -106,14 +71,9 @@ const std::tuple<Cmpts*...> EntityMngr::EntityAttachWithoutInit(EntityData* e) {
     dstArchetype = Archetype::Add<Cmpts...>(srcArchetype);
     assert(dstCmptTypeSet == dstArchetype->GetCmptTypeSet());
     h2a[dstCmptTypeSetHashCode] = dstArchetype;
-    for (auto& [queryHash, archetypes] : queryCache) {
-      const auto& query = queryHashmap.find(queryHash)->second;
-      if (dstCmptTypeSet.IsContain(query.allCmptTypes) &&
-          dstCmptTypeSet.IsContainAny(query.anyCmptTypes) &&
-          dstCmptTypeSet.IsNotContain(query.noneCmptTypes) &&
-          dstCmptTypeSet.IsContain(query.locateCmptTypes)) {
+    for (auto& [query, archetypes] : queryCache) {
+      if (dstCmptTypeSet.IsMatch(query))
         archetypes.insert(dstArchetype);
-      }
     }
   } else
     dstArchetype = target->second;
@@ -195,14 +155,9 @@ void EntityMngr::EntityDetach(EntityData* e) {
     dstArchetype = Archetype::Remove<Cmpts...>(srcArchetype);
     assert(dstCmptTypeSet == dstArchetype->GetCmptTypeSet());
     h2a[dstCmptTypeSetHashCode] = dstArchetype;
-    for (auto& [queryHash, archetypes] : queryCache) {
-      const auto& query = queryHashmap.find(queryHash)->second;
-      if (dstCmptTypeSet.IsContain(query.allCmptTypes) &&
-          dstCmptTypeSet.IsContainAny(query.anyCmptTypes) &&
-          dstCmptTypeSet.IsNotContain(query.noneCmptTypes) &&
-          dstCmptTypeSet.IsContain(query.locateCmptTypes)) {
+    for (auto& [query, archetypes] : queryCache) {
+      if (dstCmptTypeSet.IsMatch(query))
         archetypes.insert(dstArchetype);
-      }
     }
   } else
     dstArchetype = target->second;
@@ -240,15 +195,15 @@ void EntityMngr::EntityDetach(EntityData* e) {
   // }
 }
 
-template <typename Sys>
-void EntityMngr::GenJob(Job* job, Sys&& sys) const {
-  using ArgList = FuncTraits_ArgList<std::decay_t<Sys>>;
-  using TaggedCmptList = CmptTag::GetTimePointList_t<ArgList>;
-  using OtherArgList = CmptTag::RemoveTimePoint_t<ArgList>;
-  return detail::EntityMngr_::GenJob<ArgList, TaggedCmptList,
-                                     OtherArgList>::run(job, this,
-                                                        std::forward<Sys>(sys));
-}
+// template <typename Sys>
+// void EntityMngr::GenJob(Job* job, Sys&& sys) const {
+//   using ArgList = FuncTraits_ArgList<std::decay_t<Sys>>;
+//   using TaggedCmptList = CmptTag::GetTimePointList_t<ArgList>;
+//   using OtherArgList = CmptTag::RemoveTimePoint_t<ArgList>;
+//   return detail::EntityMngr_::GenJob<ArgList, TaggedCmptList,
+//                                      OtherArgList>::run(job, this,
+//                                                         std::forward<Sys>(sys));
+// }
 
 template <typename... Cmpts>
 std::vector<CmptType> EntityMngr::TypeListToTypeVec(TypeList<Cmpts...>) {
@@ -257,42 +212,43 @@ std::vector<CmptType> EntityMngr::TypeListToTypeVec(TypeList<Cmpts...>) {
 }  // namespace My
 
 namespace My::detail::EntityMngr_ {
-template <typename... Args, typename... TagedCmpts, typename... OtherArgs>
-struct GenJob<TypeList<Args...>, TypeList<TagedCmpts...>,
-              TypeList<OtherArgs...>> {
-  static_assert(sizeof...(TagedCmpts) > 0);
-  using CmptList = TypeList<CmptTag::RemoveTag_t<TagedCmpts>...>;
-  using AllList = CmptTag::ConcatedAllList_t<TypeList<Args...>>;
-  using AnyList = CmptTag::ConcatedAnyList_t<TypeList<Args...>>;
-  using NoneList = CmptTag::ConcatedNoneList_t<TypeList<Args...>>;
-  static_assert(IsSet_v<CmptList>, "Componnents must be different");
-
-  template <typename Sys>
-  static void run(Job* job, const EntityMngr* mngr, Sys&& s) {
-    assert(job->empty());
-    for (const Archetype* archetype :
-         mngr->QueryArchetypes<AllList, AnyList, NoneList, CmptList>()) {
-      auto cmptsTupleVec =
-          archetype->Locate<CmptTag::RemoveTag_t<TagedCmpts>...>();
-      size_t num = archetype->EntityNum();
-      size_t chunkNum = archetype->ChunkNum();
-      size_t chunkCapacity = archetype->ChunkCapacity();
-
-      for (size_t i = 0; i < chunkNum; i++) {
-        size_t J = std::min(chunkCapacity, num - (i * chunkCapacity));
-        job->emplace([s, cmptsTuple = std::move(cmptsTupleVec[i]), J]() {
-          for (size_t j = 0; j < J; j++) {
-            s(std::get<Args>(std::make_tuple(
-                static_cast<TagedCmpts>(
-                    (std::get<
-                         Find_v<CmptList, CmptTag::RemoveTag_t<TagedCmpts>>>(
-                         cmptsTuple) +
-                     j))...,
-                OtherArgs{}...))...);
-          }
-        });
-      }
-    }
-  }
-};
+// template <typename... Args, typename... TaggedCmpts, typename... OtherArgs>
+// struct GenJob<TypeList<Args...>, TypeList<TaggedCmpts...>,
+//               TypeList<OtherArgs...>> {
+//   static_assert(sizeof...(TaggedCmpts) > 0);
+//   using CmptList = TypeList<CmptTag::RemoveTag_t<TaggedCmpts>...>;
+//   using ConcatedAll = CmptTag::ConcatedAll_t<TypeList<Args...>>;
+//   using ConcatedAny = CmptTag::ConcatedAny_t<TypeList<Args...>>;
+//   using ConcatedNone = CmptTag::ConcatedNone_t<TypeList<Args...>>;
+//   static_assert(IsSet_v<CmptList>, "Componnents must be different");
+//
+//   template <typename Sys>
+//   static void run(Job* job, const EntityMngr* mngr, Sys&& s) {
+//     assert(job->empty());
+//     for (const Archetype* archetype :
+//          mngr->QueryArchetypes<ConcatedAll, ConcatedAny, ConcatedNone,
+//                                CmptList>()) {
+//       auto cmptsTupleVec =
+//           archetype->Locate<CmptTag::RemoveTag_t<TaggedCmpts>...>();
+//       size_t num = archetype->EntityNum();
+//       size_t chunkNum = archetype->ChunkNum();
+//       size_t chunkCapacity = archetype->ChunkCapacity();
+//
+//       for (size_t i = 0; i < chunkNum; i++) {
+//         size_t J = std::min(chunkCapacity, num - (i * chunkCapacity));
+//         job->emplace([s, cmptsTuple = std::move(cmptsTupleVec[i]), J]() {
+//           for (size_t j = 0; j < J; j++) {
+//             s(std::get<Args>(std::make_tuple(
+//                 static_cast<TaggedCmpts>(
+//                     (std::get<
+//                          Find_v<CmptList, CmptTag::RemoveTag_t<TaggedCmpts>>>(
+//                          cmptsTuple) +
+//                      j))...,
+//                 OtherArgs{}...))...);
+//           }
+//         });
+//       }
+//     }
+//   }
+// };
 }  // namespace My::detail::EntityMngr_

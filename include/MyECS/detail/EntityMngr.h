@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "../EntityQuery.h"
+#include "../SystemFunc.h"
 #include "Archetype.h"
 #include "EntityData.h"
 #include "Job.h"
@@ -26,9 +28,7 @@ class EntityMngr {
   template <typename... Cmpts>
   inline Archetype* GetOrCreateArchetypeOf();
 
-  template <typename AllList, typename AnyList, typename NoneList,
-            typename LocateList>
-  const std::set<Archetype*>& QueryArchetypes() const;
+  const std::set<Archetype*>& QueryArchetypes(const EntityQuery& query) const;
 
   template <typename... Cmpts>
   const std::tuple<EntityData*, Cmpts*...> CreateEntity();
@@ -46,8 +46,9 @@ class EntityMngr {
 
   void Release(EntityData* e);
 
-  template <typename Sys>
-  void GenJob(Job* job, Sys&& sys) const;
+  /*template<typename Sys>
+  void GenJob(Job* job, Sys&& sys) const;*/
+  void GenJob(Job* job, SystemFunc* sys) const;
 
   void AddCommand(const std::function<void()>& command);
   void RunCommands();
@@ -69,28 +70,7 @@ class EntityMngr {
   std::unordered_map<size_t, Archetype*>
       h2a;  // CmptTypeSet's hashcode to archetype
 
-  // Query Cache
-  // TypeID<AllList, AnyList, NoneList, LocateList> to archetype set
-  // AllList, AnyList, NoneList, LocateList are **sorted**
-  mutable std::unordered_map<size_t, std::set<Archetype*>> queryCache;
-
-  struct Query {
-    Query(const std::vector<CmptType>& allCmptTypes,
-          const std::vector<CmptType>& anyCmptTypes,
-          const std::vector<CmptType>& noneCmptTypes,
-          const std::vector<CmptType>& locateCmptTypes)
-        : allCmptTypes{allCmptTypes},
-          anyCmptTypes{anyCmptTypes},
-          noneCmptTypes{noneCmptTypes},
-          locateCmptTypes{locateCmptTypes} {}
-
-    std::vector<CmptType> allCmptTypes;     // sorted
-    std::vector<CmptType> anyCmptTypes;     // sorted
-    std::vector<CmptType> noneCmptTypes;    // sorted
-    std::vector<CmptType> locateCmptTypes;  // sorted
-  };
-
-  mutable std::unordered_map<size_t, Query> queryHashmap;
+  mutable std::unordered_map<EntityQuery, std::set<Archetype*>> queryCache;
 
   // command
   std::vector<std::function<void()>> commandBuffer;

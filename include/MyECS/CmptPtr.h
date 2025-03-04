@@ -18,7 +18,7 @@ class CmptPtr {
 
   template <typename Cmpt>
   Cmpt* As() const noexcept {
-    assert(type.HashCode() == TypeID<Cmpt>);
+    assert(type.HashCode() == CmptType::HashCodeOf<Cmpt>());
     return reinterpret_cast<Cmpt*>(p);
   }
 

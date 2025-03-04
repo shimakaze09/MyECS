@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "CmptSysMngr.h"
 #include "RuntimeCmptTraits.h "
 
 #include <MyTemplate/Concept.h>
@@ -38,7 +37,6 @@ void CmptRegistrar::RegisterOne() {
   if constexpr (Require<detail::CmptRegistrar_::HaveOnRegister, Cmpt>)
     Cmpt::OnRegister();
 
-  CmptSysMngr::Instance().Register<Cmpt>();
   RuntimeCmptTraits::Instance().Register<Cmpt>();
 
   registeredCmpts.insert(TypeID<Cmpt>);
