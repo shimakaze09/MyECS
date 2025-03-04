@@ -1,11 +1,6 @@
-GLOBAL_GROUP_SOURCES(RST SOURCES PATHS
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        "${PROJECT_SOURCE_DIR}/include/MyECS"
-)
-
-ADD_TARGET_GDR(MODE "LIB"
-        SOURCES ${SOURCES}
-        INTERFACE_INC ON
-        INC_DIRS "_deps"
-        PUBLIC_GLIBS My::MyTemplate_core My::MyBL_core
+ADD_TARGET(
+        MODE STATIC
+        SOURCE "${PROJECT_SOURCE_DIR}/include/MyECS"
+        LIB My::MyTemplate_core My::MyBL_core
+        INC include
 )
