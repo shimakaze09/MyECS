@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "CmptLifecycleMngr.h"
 #include "CmptSysMngr.h"
+#include "RuntimeCmptTraits.h "
 
 #include <MyTemplate/Concept.h>
 
@@ -39,7 +39,7 @@ void CmptRegistrar::RegisterOne() {
     Cmpt::OnRegister();
 
   CmptSysMngr::Instance().Register<Cmpt>();
-  CmptLifecycleMngr::Instance().Register<Cmpt>();
+  RuntimeCmptTraits::Instance().Register<Cmpt>();
 
   registeredCmpts.insert(TypeID<Cmpt>);
 }

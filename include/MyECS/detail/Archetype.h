@@ -13,7 +13,6 @@
 #include <MyTemplate/Typelist.h>
 
 #include <map>
-#include <set>
 
 namespace My {
 class ArchetypeMngr;
@@ -34,7 +33,7 @@ class Archetype {
   template <typename... Cmpts>
   const std::vector<std::tuple<Cmpts*...>> Locate() const;
 
-  void* At(size_t cmptID, size_t idx) const;
+  std::tuple<void*, size_t> At(size_t cmptID, size_t idx) const;
 
   template <typename Cmpt>
   Cmpt* At(size_t idx) const;
