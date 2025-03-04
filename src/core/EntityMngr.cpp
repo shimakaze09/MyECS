@@ -8,14 +8,8 @@ using namespace My;
 using namespace std;
 
 EntityMngr::~EntityMngr() {
-  for (auto p : id2a)
+  for (auto p : h2a)
     delete p.second;
-}
-
-Archetype* EntityMngr::GetArchetypeOf(const CmptIDSet& archetypeID) const {
-  auto target = id2a.find(archetypeID);
-  assert(target != id2a.end());
-  return target->second;
 }
 
 void EntityMngr::Release(EntityData* e) {
@@ -26,7 +20,7 @@ void EntityMngr::Release(EntityData* e) {
   auto movedEntityIdx = archetype->Erase(idx);
 
   if (movedEntityIdx != static_cast<size_t>(-1)) {
-    auto target = ai2e.find({archetype, movedEntityIdx});
+    auto target = ai2e.find({ archetype, movedEntityIdx });
     EntityData* movedEntity = target->second;
     ai2e.erase(target);
     movedEntity->idx = idx;
@@ -34,8 +28,7 @@ void EntityMngr::Release(EntityData* e) {
   }
 
   // if (archetype->Size() == 0 && archetype->CmptNum() != 0) {
-  //   ids.erase(archetype->id);
-  //   id2a.erase(archetype->id);
+  //   h2a.erase(archetype->id);
   //   delete archetype;
   // }
 

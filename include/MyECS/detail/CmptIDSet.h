@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "Util.h"
+
 #include <MyTemplate/TemplateList.h>
 #include <MyTemplate/TypeID.h>
 
@@ -17,6 +19,18 @@ class CmptIDSet : std::set<size_t> {
 
   template <typename... Cmpts>
   CmptIDSet(TypeList<Cmpts...>) : std::set<size_t>{TypeID<Cmpts>...} {}
+
+  template <typename... Cmpts>
+  static constexpr size_t Hash() {
+    return Hash(QuickSort_t<TypeList<Cmpts...>, TypeID_Less>{});
+  }
+
+  size_t Hash() const {
+    size_t rst = TypeID<CmptIDSet>;
+    for (size_t id : *this)
+      rst = hash_combine(rst, id);
+    return rst;
+  }
 
   template <typename... Cmpts>
   void Add() {
@@ -126,6 +140,14 @@ class CmptIDSet : std::set<size_t> {
   friend bool operator==(const CmptIDSet& x, const CmptIDSet& y) {
     return static_cast<const std::set<size_t>&>(x) ==
            static_cast<const std::set<size_t>&>(y);
+  }
+
+ private:
+  template <typename... Cmpts>
+  static constexpr size_t Hash(TypeList<Cmpts...>) {
+    size_t seed = TypeID<CmptIDSet>;
+    ((seed = hash_combine(seed, TypeID<Cmpts>)), ...);
+    return seed;
   }
 };
 }  // namespace My

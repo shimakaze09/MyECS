@@ -23,8 +23,6 @@ class EntityMngr {
 
   World* World() const noexcept { return w; }
 
-  inline Archetype* GetArchetypeOf(const CmptIDSet& archetypeID) const;
-
   template <typename... Cmpts>
   inline Archetype* GetOrCreateArchetypeOf();
 
@@ -68,8 +66,7 @@ class EntityMngr {
   std::map<std::tuple<Archetype*, size_t>, EntityData*>
       ai2e;  // (archetype, idx) -> entity
 
-  std::set<CmptIDSet> ids;
-  std::map<CmptIDSet, Archetype*> id2a;  // id to archetype
+  std::unordered_map<size_t, Archetype*> h2a;  // CmptIDSet's hash to archetype
 
   // Query Cache
   // TypeID<AllList, AnyList, NoneList, LocateList> to archetype set

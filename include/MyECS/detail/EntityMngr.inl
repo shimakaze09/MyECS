@@ -22,22 +22,22 @@ inline Archetype* EntityMngr::GetOrCreateArchetypeOf() {
       "EntityMngr::GetOrCreateArchetypeOf: <Cmpts> must be different");
 
   auto id = CmptIDSet(TypeList<Cmpts...>{});
-  auto target = id2a.find(id);
-  if (target == id2a.end()) {
-    auto archetype = new Archetype(this, TypeList<Cmpts...>{});
-    id2a[id] = archetype;
-    ids.insert(id);
-    for (auto& [queryHash, archetypes] : queryCache) {
-      const auto& query = id2query.find(queryHash)->second;
-      if (id.IsContain(query.allCmptIDs) && id.IsContainAny(query.anyCmptIDs) &&
-          id.IsNotContain(query.noneCmptIDs) &&
-          id.IsContain(query.locateCmptIDs)) {
-        archetypes.insert(archetype);
-      }
-    }
-    return archetype;
-  } else
+  constexpr size_t idHash = CmptIDSet::Hash<Cmpts...>();
+  auto target = h2a.find(idHash);
+  if (target != h2a.end())
     return target->second;
+
+  auto archetype = new Archetype(this, TypeList<Cmpts...>{});
+  h2a[idHash] = archetype;
+  for (auto& [queryHash, archetypes] : queryCache) {
+    const auto& query = id2query.find(queryHash)->second;
+    if (id.IsContain(query.allCmptIDs) && id.IsContainAny(query.anyCmptIDs) &&
+        id.IsNotContain(query.noneCmptIDs) &&
+        id.IsContain(query.locateCmptIDs)) {
+      archetypes.insert(archetype);
+    }
+  }
+  return archetype;
 }
 
 template <typename... Cmpts>
@@ -73,8 +73,8 @@ const std::set<Archetype*>& EntityMngr::QueryArchetypes() const {
                                     TypeListToIDVec(SortedNoneList{}),
                                     TypeListToIDVec(SortedLocateList{})});
 
-  for (auto& [id, a] : id2a) {
-    if (id.IsMatch<AllList, AnyList, NoneList, LocateList>()) {
+  for (const auto& [h, a] : h2a) {
+    if (a->ID().IsMatch<AllList, AnyList, NoneList, LocateList>()) {
       rst.insert(a);
     }
   }
@@ -96,15 +96,15 @@ const std::tuple<Cmpts*...> EntityMngr::EntityAttachWithoutInit(EntityData* e) {
   auto& srcID = srcArchetype->ID();
   auto dstID = srcID;
   dstID.Add<Cmpts...>();
+  size_t dstIDHash = dstID.Hash();
 
   // get dstArchetype
   Archetype* dstArchetype;
-  auto target = id2a.find(dstID);
-  if (target == id2a.end()) {
+  auto target = h2a.find(dstIDHash);
+  if (target == h2a.end()) {
     dstArchetype = Archetype::Add<Cmpts...>(srcArchetype);
     assert(dstID == dstArchetype->ID());
-    id2a[dstID] = dstArchetype;
-    ids.insert(dstID);
+    h2a[dstIDHash] = dstArchetype;
     for (auto& [queryHash, archetypes] : queryCache) {
       const auto& query = id2query.find(queryHash)->second;
       if (dstID.IsContain(query.allCmptIDs) &&
@@ -143,11 +143,10 @@ const std::tuple<Cmpts*...> EntityMngr::EntityAttachWithoutInit(EntityData* e) {
   e->archetype = dstArchetype;
   e->idx = dstIdx;
 
-  /*if (srcArchetype->Size() == 0 && srcArchetype->CmptNum() != 0) {
-			ids.erase(srcArchetype->id);
-			id2a.erase(srcArchetype->id);
-			delete srcArchetype;
-		}*/
+  // if (srcArchetype->Size() == 0 && srcArchetype->CmptNum() != 0) {
+  //   h2a.erase(srcArchetype->id);
+  //   delete srcArchetype;
+  // }
 
   return {dstArchetype->At<Cmpts>(dstIdx)...};
 }
@@ -186,15 +185,15 @@ void EntityMngr::EntityDetach(EntityData* e) {
   auto& srcID = srcArchetype->ID();
   auto dstID = srcID;
   dstID.Remove<Cmpts...>();
+  size_t dstIDHash = dstID.Hash();
 
   // get dstArchetype
   Archetype* dstArchetype;
-  auto target = id2a.find(dstID);
-  if (target == id2a.end()) {
+  auto target = h2a.find(dstIDHash);
+  if (target == h2a.end()) {
     dstArchetype = Archetype::Remove<Cmpts...>(srcArchetype);
     assert(dstID == dstArchetype->ID());
-    id2a[dstID] = dstArchetype;
-    ids.insert(dstID);
+    h2a[dstIDHash] = dstArchetype;
     for (auto& [queryHash, archetypes] : queryCache) {
       const auto& query = id2query.find(queryHash)->second;
       if (dstID.IsContain(query.allCmptIDs) &&
@@ -235,8 +234,7 @@ void EntityMngr::EntityDetach(EntityData* e) {
   e->idx = dstIdx;
 
   // if (srcArchetype->Size() == 0) {
-  //   ids.erase(srcArchetype->id);
-  //   id2a.erase(srcArchetype->id);
+  //   h2a.erase(srcArchetype->id);
   //   delete srcArchetype;
   // }
 }
@@ -266,7 +264,7 @@ struct GenJob<TypeList<Args...>, TypeList<TagedCmpts...>,
   using AllList = CmptTag::ConcatedAllList_t<TypeList<Args...>>;
   using AnyList = CmptTag::ConcatedAnyList_t<TypeList<Args...>>;
   using NoneList = CmptTag::ConcatedNoneList_t<TypeList<Args...>>;
-  static_assert(IsSet_v<CmptList>, "Components must be different");
+  static_assert(IsSet_v<CmptList>, "Componnents must be different");
 
   template <typename Sys>
   static void run(Job* job, const EntityMngr* mngr, Sys&& s) {
