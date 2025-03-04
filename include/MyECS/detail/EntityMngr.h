@@ -39,15 +39,15 @@ class EntityMngr {
   const std::tuple<Cmpts*...> EntityAttach(EntityData* e);
 
   template <typename Cmpt, typename... Args>
-  Cmpt* EntityAssignAttach(EntityData* e, Args... args);
+  Cmpt* EntityAssignAttach(EntityData* e, Args&&... args);
 
   template <typename... Cmpts>
   void EntityDetach(EntityData* e);
 
   void Release(EntityData* e);
 
-  /*template<typename Sys>
-  void GenJob(Job* job, Sys&& sys) const;*/
+  // template <typename Sys>
+  // void GenJob(Job* job, Sys&& sys) const;
   void GenJob(Job* job, SystemFunc* sys) const;
 
   void AddCommand(const std::function<void()>& command);

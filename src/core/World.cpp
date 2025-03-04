@@ -11,9 +11,10 @@ World::World() : entityMngr{this} {}
 
 void World::Update() {
   schedule.Clear();
-  jobGraph.clear();
   for (auto job : jobs)
     jobPool.Recycle(job);
+  jobs.clear();
+  jobGraph.clear();
 
   for (const auto& [id, lifecycle] : systemMngr.lifecycleMap)
     lifecycle.OnUpdate(schedule);

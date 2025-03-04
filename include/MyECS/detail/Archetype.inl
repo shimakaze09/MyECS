@@ -79,7 +79,8 @@ static Archetype* Archetype::Remove(Archetype* from) noexcept {
 template <typename Cmpt>
 Cmpt* Archetype::At(size_t idx) const {
   auto [ptr, size] = At(CmptType::Of<Cmpt>(), idx);
-  assert(ptr != nullptr);
+  if (ptr == nullptr)
+    return nullptr;
   assert(size == sizeof(Cmpt));
   return reinterpret_cast<Cmpt*>(ptr);
 }
