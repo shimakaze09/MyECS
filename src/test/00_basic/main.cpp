@@ -33,8 +33,6 @@ struct MoverSystem {
 };
 
 int main() {
-  std::is_constructible_v<Position, float>;
-
   CmptRegistrar::Instance().Register<Position, Velocity>();
 
   World w;
