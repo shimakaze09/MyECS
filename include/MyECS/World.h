@@ -14,7 +14,7 @@ class World : public SystemMngr {
   World();
 
   template <typename... Cmpts>
-  std::tuple<Entity*, Cmpts*...> CreateEntity();
+  std::tuple<EntityPtr, Cmpts*...> CreateEntity();
 
   // static OnStartSchedule
   // parallel OnStart

@@ -51,11 +51,11 @@ void World::ParallelEach(Sys&& s) const {
 }
 
 template <typename... Cmpts>
-std::tuple<Entity*, Cmpts*...> World::CreateEntity() {
+std::tuple<EntityPtr, Cmpts*...> World::CreateEntity() {
   assert("World::CreateEntity: <Cmpts> are unregistered" &&
          CmptRegistrar::Instance().template IsRegistered<Cmpts...>());
   auto rst = entityMngr.CreateEntity<Cmpts...>();
-  return {reinterpret_cast<Entity*>(std::get<0>(rst)),
+  return {EntityPtr{reinterpret_cast<Entity*>(std::get<0>(rst))},
           std::get<1 + Find_v<TypeList<Cmpts...>, Cmpts>>(rst)...};
 }
 }  // namespace My

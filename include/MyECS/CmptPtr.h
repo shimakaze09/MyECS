@@ -9,9 +9,8 @@
 #include <cassert>
 
 namespace My {
-struct CmptPtr {
-  const size_t id;
-
+class CmptPtr {
+ public:
   CmptPtr(size_t id, void* p) : id{id}, p{p} {}
 
   template <typename Cmpt>
@@ -23,16 +22,34 @@ struct CmptPtr {
     return reinterpret_cast<Cmpt*>(p);
   }
 
+  size_t ID() const noexcept { return id; }
+
+  void* Ptr() const noexcept { return p; }
+
+ private:
+  size_t id;
+  void* p;
+};
+
+class CmptCPtr {
+ public:
+  CmptCPtr(size_t id, const void* p) : id{id}, p{p} {}
+
+  template <typename Cmpt>
+  CmptCPtr(const Cmpt* p) : id{TypeID<Cmpt>}, p{p} {}
+
   template <typename Cmpt>
   const Cmpt* As() const noexcept {
-    return const_cast<CmptPtr*>(this)->As<Cmpt>();
+    assert(id == TypeID<Cmpt>);
+    return reinterpret_cast<const Cmpt*>(p);
   }
 
-  void* Ptr() noexcept { return p; }
+  size_t ID() const noexcept { return id; }
 
   const void* Ptr() const noexcept { return p; }
 
  private:
-  void* const p;
+  size_t id;
+  const void* p;
 };
 }  // namespace My

@@ -11,9 +11,9 @@ A custom Entity-Component-System framework for game development.
   assembled into a comprehensive task
 - **ScheduleRegistrar**: Interface through which users register systems for the current frame
 
-## TODO
+## TODOs
 
-- [ ] EntityBase -> Entity
+- [x] EntityData: version
 - [ ] EntityQuery
 - [ ] Query Entity
 - [ ] SystemMngr += ScheduleRegistrar
