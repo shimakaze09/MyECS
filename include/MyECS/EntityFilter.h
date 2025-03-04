@@ -12,19 +12,28 @@
 
 namespace My {
 class EntityFilter {
-public:
+ public:
   EntityFilter();
 
-  template<typename... AllCmpts, typename... AnyCmpts, typename... NoneCmpts>
-  EntityFilter(TypeList<AllCmpts...>, TypeList<AnyCmpts...>, TypeList<NoneCmpts...>);
+  template <typename... AllCmpts, typename... AnyCmpts, typename... NoneCmpts>
+  EntityFilter(TypeList<AllCmpts...> allList, TypeList<AnyCmpts...> anyList,
+               TypeList<NoneCmpts...> noneList);
 
   size_t HashCode() const noexcept { return combinedHashCode; }
 
-  const std::set<CmptType>& AllCmptTypes() const noexcept { return allCmptTypes; }
-  const std::set<CmptType>& AnyCmptTypes() const noexcept { return anyCmptTypes; }
-  const std::set<CmptType>& NoneCmptTypes() const noexcept { return noneCmptTypes; }
+  const std::set<CmptType>& AllCmptTypes() const noexcept {
+    return allCmptTypes;
+  }
 
-private:
+  const std::set<CmptType>& AnyCmptTypes() const noexcept {
+    return anyCmptTypes;
+  }
+
+  const std::set<CmptType>& NoneCmptTypes() const noexcept {
+    return noneCmptTypes;
+  }
+
+ private:
   size_t GenAllHashCode() const noexcept;
   size_t GenAnyHashCode() const noexcept;
   size_t GenNoneHashCode() const noexcept;
@@ -39,6 +48,6 @@ private:
 
   size_t combinedHashCode;
 };
-}
+}  // namespace My
 
 #include "detail/EntityFilter.inl"
