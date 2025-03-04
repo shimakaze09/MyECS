@@ -6,6 +6,7 @@
 #include <iostream>
 
 using namespace My;
+using namespace std;
 
 struct velocity {
   float value{0.f};
@@ -29,10 +30,10 @@ int main() {
 
   w.Each([deltaT](velocity* v, position* p) { p->value += v->value * deltaT; });
 
-  w.Each([](position* p) { std::cout << p->value << std::endl; });
+  w.Each([](position* p) { cout << p->value << endl; });
 
   w.Each([](position* p) -> bool {
-    std::cout << "stop each" << std::endl;
+    cout << "stop each" << endl;
     return false;
   });
 

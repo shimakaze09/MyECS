@@ -15,6 +15,8 @@ A custom Entity-Component-System framework for game development.
 
 - [x] EntityData: version
 - [x] CmptIDSet hash
+- [x] CmptType
 - [ ] EntityQuery
 - [ ] Query Entity
 - [x] SystemMngr += ScheduleRegistrar
+- [ ] System Override (dynamic not)

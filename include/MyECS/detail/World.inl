@@ -75,7 +75,7 @@ struct Each<TypeList<Args...>, TypeList<Cmpts*...>, TypeList<OtherArgs...>> {
     for (const Archetype* archetype :
          mngr.QueryArchetypes<AllList, AnyList, NoneList, CmptList>()) {
       auto cmptsTupleVec = archetype->Locate<std::remove_const_t<Cmpts>...>();
-      size_t num = archetype->Size();
+      size_t num = archetype->EntityNum();
       size_t chunkNum = archetype->ChunkNum();
       size_t chunkCapacity = archetype->ChunkCapacity();
 
