@@ -21,7 +21,7 @@ IF (NOT MyCMake_FOUND)
 ENDIF ()
 
 ADD_DEP(MyContainer 0.0.1)
-ADD_DEP(MyDP 0.4.3)
+ADD_DEP(MyTemplate 0.4.0)
 
 ADD_SUB_DIRS_REC(include)
 ADD_SUB_DIRS_REC(src)

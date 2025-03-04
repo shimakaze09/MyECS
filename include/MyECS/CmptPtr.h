@@ -4,14 +4,13 @@
 
 #pragma once
 
-#include <MyDP/Basic/Read.h>
 #include <MyTemplate/TypeID.h>
 
 #include <cassert>
 
 namespace My {
 struct CmptPtr {
-  Read<CmptPtr, size_t> id;
+  const size_t id;
 
   CmptPtr(size_t id, void* p) : id{id}, p{p} {}
 
@@ -34,6 +33,6 @@ struct CmptPtr {
   const void* Ptr() const noexcept { return p; }
 
  private:
-  void* p;
+  void* const p;
 };
 }  // namespace My

@@ -7,8 +7,6 @@
 #include "CmptLifecycleMngr.h"
 #include "CmptSysMngr.h"
 
-#include <MyDP/Reflection/Reflection.h>
-
 #include <MyTemplate/Concept.h>
 
 namespace My::detail::CmptRegistrar_ {
@@ -29,7 +27,7 @@ bool CmptRegistrar::IsRegistered() const noexcept {
 
 template <typename Cmpt>
 bool CmptRegistrar::IsRegisteredOne() const noexcept {
-  return registedCmpts.find(TypeID<Cmpt>) != registedCmpts.end();
+  return registeredCmpts.find(TypeID<Cmpt>) != registeredCmpts.end();
 }
 
 template <typename Cmpt>
@@ -42,8 +40,7 @@ void CmptRegistrar::RegisterOne() {
 
   CmptSysMngr::Instance().Register<Cmpt>();
   CmptLifecycleMngr::Instance().Register<Cmpt>();
-  Reflection<Cmpt>::Init();
 
-  registedCmpts.insert(TypeID<Cmpt>);
+  registeredCmpts.insert(TypeID<Cmpt>);
 }
 }  // namespace My

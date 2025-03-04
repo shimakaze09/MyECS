@@ -22,7 +22,7 @@ template <typename... Cmpts>
 std::tuple<Cmpts*...> Entity::Attach() {
   static_assert(sizeof...(Cmpts) > 0);
   static_assert(IsSet_v<TypeList<Cmpts...>>, "Components must be different");
-  assert("[ERROR] hasn't registed <Cmpts>" &&
+  assert("[ERROR] hasn't registered <Cmpts>" &&
          CmptRegistrar::Instance().template IsRegistered<Cmpts...>());
   assert(IsAlive());
   return archetype->mngr->EntityAttach<Cmpts...>(this);
