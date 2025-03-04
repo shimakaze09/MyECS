@@ -1,12 +1,12 @@
 # MyECS
 
-My Entity-Component-System
+A custom Entity-Component-System framework for game development.
 
-## concept
+## Concepts
 
-- `System`: function, needs to be associated with an ID (string)
-- `Job`: parameterless executable function obtained after preparing data for the system, internally parallel or
-  serial
-- `Schedule`: stores all tasks and the constraints between tasks. After completing all declarations, a large
-  task can be assembled
-- `ScheduleRegistrar`: users use it to register the system of the frame
+- **System**: Functions that are identified by a unique string ID
+- **Job**: Parameter-less executable functions created after preparing data for a system, which can run either in
+  parallel or sequentially
+- **Schedule**: Stores all jobs and their dependency relationships; once all declarations are complete, it can be
+  assembled into a comprehensive task
+- **ScheduleRegistrar**: Interface through which users register systems for the current frame

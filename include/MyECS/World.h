@@ -8,13 +8,6 @@
 #include "ScheduleRegistrar.h"
 #include "detail/SystemMngr.h"
 
-namespace My::detail::World_ {
-template <typename ArgList, typename CmptList, typename OtherArgList>
-struct Each;
-template <typename CmptList>
-struct ParallelEach;
-}  // namespace My::detail::World_
-
 namespace My {
 class World : public SystemMngr {
  public:
@@ -48,7 +41,7 @@ class World : public SystemMngr {
   void Each(Sys&& s);
 
   // if Sys's return type is bool, Each stop when return false
-  // run commands later
+  // **not** run commands
   template <typename Sys>
   void Each(Sys&& s) const;
 
@@ -56,7 +49,7 @@ class World : public SystemMngr {
   template <typename Sys>
   void ParallelEach(Sys&& s);
 
-  // run commands later
+  // **not** run commands
   template <typename Sys>
   void ParallelEach(Sys&& s) const;
 
@@ -73,12 +66,7 @@ class World : public SystemMngr {
   Job updateJobGraph;
   Job stopJobGraph;
 
-  JobExecutor executor;
-
-  template <typename ArgList, typename CmptList, typename OtherArgList>
-  friend struct detail::World_::Each;
-  template <typename CmptList>
-  friend struct detail::World_::ParallelEach;
+  mutable JobExecutor executor;
 };
 }  // namespace My
 
