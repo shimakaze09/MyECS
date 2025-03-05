@@ -19,14 +19,14 @@ class World;
 class EntityMngr {
  public:
   template <typename... Cmpts>
-  const std::tuple<Entity, Cmpts*...> CreateEntity();
+  std::tuple<Entity, Cmpts*...> CreateEntity();
 
   Entity Instantiate(Entity e);
 
   // TODO: CreateEntities
 
   template <typename... Cmpts>
-  const std::tuple<Cmpts*...> Attach(Entity e);
+  std::tuple<Cmpts*...> Attach(Entity e);
 
   template <typename Cmpt, typename... Args>
   Cmpt* Emplace(Entity e, Args&&... args);
@@ -34,14 +34,17 @@ class EntityMngr {
   template <typename... Cmpts>
   void Detach(Entity e);
 
-  void Destroy(Entity e);
+  template <typename Cmpt>
+  bool Have(Entity e) const;
+
+  template <typename Cmpt>
+  Cmpt* Get(Entity e) const;
+
+  std::vector<CmptPtr> Components(Entity e) const;
 
   bool Exist(Entity e) const;
 
-  template <typename Cmpt>
-  bool Have(Entity e) const;
-  template <typename Cmpt>
-  Cmpt* Get(Entity e) const;
+  void Destroy(Entity e);
 
   size_t EntityNum(const EntityQuery& query) const;
 
