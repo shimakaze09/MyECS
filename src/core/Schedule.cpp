@@ -167,7 +167,7 @@ vector<Schedule::NoneGroup> Schedule::GenSortNoneGroup(
     auto& gi = rst[i];
     for (size_t j = i + 1; j < rst.size(); j++) {
       const auto& gj = rst[j];
-      if (SetIntersection(gi.noneTypes, gj.allTypes).empty() &&
+      if (SetIntersection(gj.allTypes, gi.noneTypes).empty() &&
           SetIntersection(gi.allTypes, gj.noneTypes).empty())
         continue;
 
@@ -241,9 +241,11 @@ SysFuncGraph Schedule::GenSysFuncGraph() const {
   // [gen graph]
   SysFuncGraph graph;
 
+  // [gen graph] - vertex
   for (const auto& [hashcode, sysFunc] : sysFuncs)
     graph.AddVertex(sysFunc);
 
+  // [gen graph] - edge - order
   for (const auto& [x, y] : sysFuncOrder) {
     auto target_x = sysFuncs.find(x);
     if (target_x == sysFuncs.end())
@@ -257,12 +259,13 @@ SysFuncGraph Schedule::GenSysFuncGraph() const {
     graph.AddEdge(sysFunc_x, sysFunc_y);
   }
 
+  // [gen graph] - edge - time point
   for (const auto& [type, cmptSysFuncs] : cmptSysFuncsMap) {
     SetPrePostEdge(graph, cmptSysFuncs.lastFrameSysFuncs,
                    cmptSysFuncs.writeSysFuncs, cmptSysFuncs.latestSysFuncs);
   }
 
-  // [order]
+  // [gen graph] - edge - none group
   for (const auto& [type, cmptSysFuncs] : cmptSysFuncsMap) {
     if (cmptSysFuncs.writeSysFuncs.empty())
       continue;

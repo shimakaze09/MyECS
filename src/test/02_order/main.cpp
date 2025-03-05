@@ -9,46 +9,31 @@
 using namespace My;
 using namespace std;
 
-struct A {};
+struct Data1 {};
 
-struct B {};
+struct Data2 {};
 
-struct C {};
-
-struct MySystem {
+struct DataSystem {
   static void OnUpdate(Schedule& schedule) {
-    schedule.Request(
-        [w = schedule.GetWorld()](Entity e, const A* a, const B* b) {
-          w->AddCommand([e, w]() {
-            if (!w->entityMngr.Have<C>(e)) {
-              cout << "Attach C" << endl;
-              w->entityMngr.Attach<C>(e);
-            }
-          });
-        },
-        "AB");
-    schedule.Request(
-        [w = schedule.GetWorld()](Entity e, const A* a, const B* b,
-                                  const C* c) {
-          w->AddCommand([e, w]() {
-            if (w->entityMngr.Have<C>(e)) {
-              cout << "Dettach C" << endl;
-              w->entityMngr.Detach<C>(e);
-            }
-          });
-        },
-        "ABC");
+    schedule
+        .Request([](Data1* d1, Data2* d2) { cout << "writer_sys0" << endl; },
+                 "writer_sys0")
+        .Request([](Data1* d) { cout << "writer_sys1" << endl; }, "writer_sys1")
+        .Request([](Data2* d2) { cout << "writer_sys2" << endl; },
+                 "writer_sys2")
+        .Request([](Data1* d, Data2* d2) { cout << "writer_sys3" << endl; },
+                 "writer_sys3")
+        .Order("writer_sys0", "writer_sys1")
+        .Order("writer_sys1", "writer_sys3");
   }
 };
 
 int main() {
   World w;
-  w.systemMngr.Register<MySystem>();
+  w.systemMngr.Register<DataSystem>();
 
-  w.entityMngr.CreateEntity<A, B>();
+  w.entityMngr.CreateEntity<Data1, Data2>();
 
-  w.Update();
-  w.Update();
   w.Update();
 
   cout << w.DumpUpdateJobGraph() << endl;
