@@ -104,7 +104,7 @@ size_t Archetype::Erase(size_t idx) {
       byte* dst = dstBuffer + offset + dstIdxInChunk * size;
       byte* src = srcBuffer + offset + srcIdxInChunk * size;
 
-      if (type == CmptType::Of<Entity>())
+      if (type.Is<Entity>())
         movedIdx = reinterpret_cast<Entity*>(dst)->Idx();
 
       cmptTraits.Destruct(type, dst);
@@ -134,7 +134,7 @@ vector<CmptPtr> Archetype::Components(size_t idx) const {
   vector<CmptPtr> rst;
 
   for (const auto& type : types) {
-    if (type == CmptType::Of<Entity>())
+    if (type.Is<Entity>())
       continue;
     auto [cmpt, size] = At(type, idx);
     rst.emplace_back(type, cmpt);

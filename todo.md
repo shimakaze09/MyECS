@@ -2,6 +2,8 @@
 
 ## core
 
+### important
+
 - [x] ~~EntityData: version~~
 - [x] CmptIDSet hash
 - [x] CmptType
@@ -18,19 +20,22 @@
 - [ ] Shared Component
 - [ ] system group
 
-## non-core
+### unimportant
 
 - [ ] exception
 - [ ] return
 - [ ] copy
 - [ ] batch create
 
-## detial
-
-- [x] remove `EntityMngr::ai2ei`
-- [x] Archetype share `Pool<Chunk>`
-- [ ] simplify schedule
-
 ## tool
 
 - [ ] SysFuncGraph dump
+- [ ] serialize
+
+## detail
+
+- [x] remove `EntityMngr::ai2ei`
+- [x] Archetype share `Pool<Chunk>`
+- [ ] simplify `Schedule`
+- [ ] parallel `Schedule`
+- [ ] `constexpr SystemFunc::HashCode()` 

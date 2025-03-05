@@ -23,6 +23,7 @@ class SystemFunc {
 
   const std::string& Name() const noexcept { return name; }
 
+  // TODO: constexpr
   static size_t HashCode(std::string_view name) {
     return std::hash<std::string_view>{}(name);
   }
