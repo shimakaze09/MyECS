@@ -12,14 +12,6 @@ EntityQuery::EntityQuery(TypeList<AllCmpts...>, TypeList<AnyCmpts...>,
     : filter{TypeList<AllCmpts...>{}, TypeList<AnyCmpts...>{},
              TypeList<NoneCmpts...>{}},
       locator{TypeList<Cmpts...>{}} {}
-
-inline bool operator<(const EntityQuery& x, const EntityQuery& y) noexcept {
-  return x.HashCode() < y.HashCode();
-}
-
-inline bool operator==(const EntityQuery& x, const EntityQuery& y) noexcept {
-  return x.HashCode() == y.HashCode();
-}
 }  // namespace My
 
 namespace std {

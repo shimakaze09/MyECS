@@ -24,6 +24,10 @@ class EntityQuery {
   size_t HashCode() const noexcept {
     return hash_combine(filter.HashCode(), locator.HashCode());
   }
+
+  bool operator==(const EntityQuery& query) const noexcept {
+    return filter == query.filter && locator == query.locator;
+  }
 };
 }  // namespace My
 

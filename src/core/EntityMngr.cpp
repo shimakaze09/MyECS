@@ -8,8 +8,8 @@ using namespace My;
 using namespace std;
 
 EntityMngr::~EntityMngr() {
-  for (auto p : h2a)
-    delete p.second;
+  for (auto [h, a] : h2a)
+    delete a;
 }
 
 size_t EntityMngr::RequestEntityFreeEntry() {

@@ -12,21 +12,34 @@
 
 namespace My {
 class EntityLocator {
-public:
-  template<typename TaggedCmptList>
+ public:
+  template <typename TaggedCmptList>
   EntityLocator(TaggedCmptList);
 
-  template<typename... LastFrameCmpts, typename... WriteCmpts, typename... LatestCmpts>
-  EntityLocator(TypeList<LastFrameCmpts...>, TypeList<WriteCmpts...>, TypeList<LatestCmpts...>);
+  template <typename... LastFrameCmpts, typename... WriteCmpts,
+            typename... LatestCmpts>
+  EntityLocator(TypeList<LastFrameCmpts...>, TypeList<WriteCmpts...>,
+                TypeList<LatestCmpts...>);
 
   size_t HashCode() const noexcept { return hashCode; }
 
-  const std::set<CmptType>& LastFrameCmptTypes() const noexcept { return lastFrameCmptTypes; }
-  const std::set<CmptType>& WriteCmptTypes() const noexcept { return writeCmptTypes; }
-  const std::set<CmptType>& LatestCmptTypes() const noexcept { return latestCmptTypes; }
+  const std::set<CmptType>& LastFrameCmptTypes() const noexcept {
+    return lastFrameCmptTypes;
+  }
+
+  const std::set<CmptType>& WriteCmptTypes() const noexcept {
+    return writeCmptTypes;
+  }
+
+  const std::set<CmptType>& LatestCmptTypes() const noexcept {
+    return latestCmptTypes;
+  }
+
   const std::set<CmptType>& CmptTypes() const noexcept { return cmptTypes; }
 
-private:
+  bool operator==(const EntityLocator& locator) const noexcept;
+
+ private:
   size_t GenHashCode() const noexcept;
 
   std::set<CmptType> lastFrameCmptTypes;
@@ -36,6 +49,6 @@ private:
 
   size_t hashCode;
 };
-}
+}  // namespace My
 
 #include "detail/EntityLocator.inl"
