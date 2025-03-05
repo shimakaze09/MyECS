@@ -35,19 +35,19 @@ void EntityMngr::RecycleEntityEntry(Entity e) {
   entityTableFreeEntry.push_back(e.Idx());
 }
 
-bool EntityMngr::Exist(Entity e) {
+bool EntityMngr::Exist(Entity e) const {
   return e.Idx() < entityTable.size() &&
          e.Version() == entityTable[e.Idx()].version;
 }
 
-const std::set<Archetype*>& EntityMngr::QueryArchetypes(
+const set<Archetype*>& EntityMngr::QueryArchetypes(
     const EntityQuery& query) const {
   auto target = queryCache.find(query);
   if (target != queryCache.end())
     return target->second;
 
   // queryCache is **mutable**
-  std::set<Archetype*>& archetypes = queryCache[query];
+  set<Archetype*>& archetypes = queryCache[query];
   for (const auto& [h, a] : h2a) {
     if (a->GetCmptTypeSet().IsMatch(query))
       archetypes.insert(a);
@@ -89,11 +89,11 @@ void EntityMngr::GenJob(Job* job, SystemFunc* sys) const {
 
     for (size_t i = 0; i < chunkNum; i++) {
       job->emplace([=, sizes = sizes, entities = chunkEntity[i],
-                    cmpts = std::move(chunkCmpts[i])]() mutable {
+                    cmpts = move(chunkCmpts[i])]() mutable {
         size_t idxOffsetInChunk = i * chunkCapacity;
         size_t indexOffsetInQueryChunk = indexOffsetInQuery + idxOffsetInChunk;
 
-        size_t J = std::min(chunkCapacity, num - idxOffsetInChunk);
+        size_t J = min(chunkCapacity, num - idxOffsetInChunk);
         for (size_t j = 0; j < J; j++) {
           (*sys)(entities[j], indexOffsetInQueryChunk + j, cmpts.data());
           for (size_t k = 0; k < cmpts.size(); k++) {

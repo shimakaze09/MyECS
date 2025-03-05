@@ -25,19 +25,19 @@ class EntityMngr {
   const std::tuple<Cmpts*...> Attach(Entity e);
 
   template <typename Cmpt, typename... Args>
-  Cmpt* AssignAttach(Entity e, Args&&... args);
+  Cmpt* Emplace(Entity e, Args&&... args);
 
   template <typename... Cmpts>
   void Detach(Entity e);
 
   void Destroy(Entity e);
 
-  bool Exist(Entity e);
+  bool Exist(Entity e) const;
 
   template <typename Cmpt>
-  bool Have(Entity e);
+  bool Have(Entity e) const;
   template <typename Cmpt>
-  Cmpt* Get(Entity e);
+  Cmpt* Get(Entity e) const;
 
   size_t EntityNum(const EntityQuery& query) const;
 
@@ -52,7 +52,8 @@ class EntityMngr {
   Archetype* GetOrCreateArchetypeOf();
 
   template <typename... Cmpts>
-  const std::tuple<Cmpts*...> AttachWithoutInit(Entity e);
+  std::tuple<std::array<bool, sizeof...(Cmpts)>, std::tuple<Cmpts*...>>
+  AttachWithoutInit(Entity e);
 
   void GenJob(Job* job, SystemFunc* sys) const;
 

@@ -34,12 +34,12 @@ class CmptTypeSet : std::set<CmptType> {
   }
 
   template <typename... Cmpts>
-  void Add() {
+  void Insert() {
     (insert(CmptType::Of<Cmpts>()), ...);
   }
 
   template <typename... Cmpts>
-  void Remove() noexcept {
+  void Erase() noexcept {
     (erase(CmptType::Of<Cmpts>()), ...);
   }
 
