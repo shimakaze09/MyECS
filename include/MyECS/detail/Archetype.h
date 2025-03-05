@@ -16,6 +16,8 @@
 #include <MyTemplate/TypeID.h>
 #include <MyTemplate/Typelist.h>
 
+#include <MyContainer/Pool.h>
+
 #include <map>
 
 namespace My {
@@ -112,6 +114,8 @@ class Archetype {
   std::vector<Chunk*> chunks;
 
   size_t entityNum{0};  // number of entities
+
+  inline static Pool<Chunk> sharedChunkPool;  // no lock
 };
 }  // namespace My
 
