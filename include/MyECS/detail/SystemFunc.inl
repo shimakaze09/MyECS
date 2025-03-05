@@ -25,7 +25,8 @@ SystemFunc::SystemFunc(Func&& func, std::string name, EntityFilter filter)
 template <typename Func, typename ArgList>
 SystemFunc::SystemFunc(Func&& func, std::string name, EntityFilter filter,
                        ArgList)
-    : func{detail::System_::Pack(std::forward<Func>(func))},
+    : isJob{IsEmpty_v<ArgList>},
+      func{detail::System_::Pack(std::forward<Func>(func))},
       name{std::move(name)},
       hashCode{HashCode(this->name)},
       query{std::move(filter),
@@ -42,9 +43,11 @@ struct Packer<TypeList<DecayedArgs...>, TypeList<Cmpts...>> {
 
   template <typename Func>
   static auto run(Func&& func) noexcept {
-    return [func = std::forward<Func>(func)](Entity e, void** cmpt_arr) {
+    return [func = std::forward<Func>(func)](
+               Entity e, size_t entityIndexInQuery, void** cmpt_arr) {
       auto unsorted_arg_tuple = std::make_tuple(
-          reinterpret_cast<Cmpts*>(cmpt_arr[Find_v<CmptList, Cmpts>])..., e);
+          reinterpret_cast<Cmpts*>(cmpt_arr[Find_v<CmptList, Cmpts>])..., e,
+          entityIndexInQuery);
       func(std::get<DecayedArgs>(unsorted_arg_tuple)...);
     };
   }

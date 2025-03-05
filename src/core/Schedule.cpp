@@ -6,12 +6,23 @@
 
 #include <MyContainer/Algorithm.h>
 
+#include <MyECS/World.h>
+
 using namespace My;
 using namespace std;
 
 Schedule& Schedule::Order(string_view x, string_view y) {
   sysFuncOrder.emplace(SystemFunc::HashCode(x), SystemFunc::HashCode(y));
   return *this;
+}
+
+size_t Schedule::EntityNumInQuery(std::string_view sys) const {
+  size_t hashcode = SystemFunc::HashCode(sys);
+  auto target = sysFuncs.find(hashcode);
+  if (target == sysFuncs.end())
+    return static_cast<size_t>(-1);
+  auto func = target->second;
+  return world->entityMngr.EntityNum(func->query);
 }
 
 Schedule& Schedule::InsertAll(string_view sys, CmptType type) {

@@ -16,7 +16,10 @@
 - [x] `None` Parallel
 - [x] System Override (dynamic `None`)
 - [x] Archetype += RuntimeCmptTraits
-- [ ] index in Query
+- [x] empty argument `SystemFunc` as job
+- [x] index in Query
+    - [x] SystemFunc support
+    - [x] get entity num of query
 - [ ] Shared Component
 - [ ] system group
 
@@ -38,4 +41,6 @@
 - [x] Archetype share `Pool<Chunk>`
 - [ ] simplify `Schedule`
 - [ ] parallel `Schedule`
-- [ ] `constexpr SystemFunc::HashCode()` 
+- [ ] `constexpr SystemFunc::HashCode()`
+- [ ] `unordered_set` for hashable object
+- [ ] store `EntityMngr` instead `World` in `Schedule` 
