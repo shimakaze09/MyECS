@@ -17,7 +17,8 @@ int main() {
 
   World w;
   auto [e] = w.entityMngr.CreateEntity();
-  auto [cmpt] = w.entityMngr.Attach(e, type);
+  w.entityMngr.Attach(e, type);
+  w.entityMngr.Detach(e, type);
 
   return 0;
 }

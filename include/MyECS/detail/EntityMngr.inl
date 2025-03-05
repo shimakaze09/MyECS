@@ -202,7 +202,7 @@ Cmpt* EntityMngr::Emplace(Entity e, Args&&... args) {
                 "EntityMngr::Emplace: <Cmpt> isn't constructible/aggregatable "
                 "with <Args...>");
   if (!Exist(e))
-    throw std::invalid_argument("Entity is invalid");
+    throw std::invalid_argument("EntityMngr::Emplace: Entity is invalid");
 
   bool needAttach =
       entityTable[e.Idx()].archetype->GetCmptTypeSet().IsNotContain<Cmpt>();
@@ -223,8 +223,14 @@ void EntityMngr::Detach(Entity e) {
                 "EntityMngr::Detach: sizeof...(<Cmpts>) > 0");
   static_assert(IsSet_v<TypeList<Entity, Cmpts...>>,
                 "EntityMngr::Detach: <Cmpts> must be different");
+  Detach(e, CmptType::Of<Cmpts>()...);
+}
+
+template <typename... CmptTypes>
+void EntityMngr::Detach(Entity e, CmptTypes... types) {
+  static_assert((std::is_same_v<CmptTypes, CmptType> && ...));
   if (!Exist(e))
-    throw std::invalid_argument("Entity is invalid");
+    throw std::invalid_argument("EntityMngr::Detach: Entity is invalid");
 
   auto& info = entityTable[e.Idx()];
   Archetype* srcArchetype = info.archetype;
@@ -232,14 +238,14 @@ void EntityMngr::Detach(Entity e) {
 
   const auto& srcCmptTypeSet = srcArchetype->GetCmptTypeSet();
   auto dstCmptTypeSet = srcCmptTypeSet;
-  dstCmptTypeSet.Erase<Cmpts...>();
+  dstCmptTypeSet.Erase(types...);
   size_t dstCmptTypeSetHashCode = dstCmptTypeSet.HashCode();
 
   // get dstArchetype
   Archetype* dstArchetype;
   auto target = h2a.find(dstCmptTypeSetHashCode);
   if (target == h2a.end()) {
-    dstArchetype = Archetype::Remove<Cmpts...>(srcArchetype);
+    dstArchetype = Archetype::Remove(srcArchetype, types...);
     assert(dstCmptTypeSet == dstArchetype->GetCmptTypeSet());
     h2a[dstCmptTypeSetHashCode] = dstArchetype;
     for (auto& [query, archetypes] : queryCache) {
@@ -278,9 +284,13 @@ template <typename Cmpt>
 bool EntityMngr::Have(Entity e) const {
   static_assert(!std::is_same_v<Cmpt, Entity>,
                 "EntityMngr::Have: <Cmpt> != Entity");
+  return Have(e, CmptType::Of<Cmpt>());
+}
+
+inline bool EntityMngr::Have(Entity e, CmptType type) const {
   if (!Exist(e))
-    throw std::invalid_argument("Entity is invalid");
-  return entityTable[e.Idx()].archetype->GetCmptTypeSet().IsContain<Cmpt>();
+    throw std::invalid_argument("EntityMngr::Have: Entity is invalid");
+  return entityTable[e.Idx()].archetype->GetCmptTypeSet().IsContain(type);
 }
 
 template <typename Cmpt>
@@ -288,8 +298,15 @@ Cmpt* EntityMngr::Get(Entity e) const {
   static_assert(!std::is_same_v<Cmpt, Entity>,
                 "EntityMngr::Get: <Cmpt> != Entity");
   if (!Exist(e))
-    throw std::invalid_argument("Entity is invalid");
+    throw std::invalid_argument("EntityMngr::Get: Entity is invalid");
   const auto& info = entityTable[e.Idx()];
   return info.archetype->At<Cmpt>(info.idxInArchetype);
+}
+
+inline CmptPtr EntityMngr::Get(Entity e, CmptType type) const {
+  if (!Exist(e))
+    throw std::invalid_argument("EntityMngr::Get: Entity is invalid");
+  const auto& info = entityTable[e.Idx()];
+  return {type, std::get<void*>(info.archetype->At(type, info.idxInArchetype))};
 }
 }  // namespace My
