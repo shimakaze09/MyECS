@@ -16,9 +16,13 @@ A custom Entity-Component-System framework for game development.
 - [x] `Entity` alias table: `Entity::idx -> (Archetype, idx)`
 - [x] `Entity` as special `Component` stored in `Chunk`
 - [x] `None` Parallel
-- [ ] System Override (dynamic `None`)
+- [x] System Override (dynamic `None`)
 - [x] Archetype += RuntimeCmptTraits
+
+### non-core
+
 - [ ] exception
+- [ ] return
 
 ### Tool
 

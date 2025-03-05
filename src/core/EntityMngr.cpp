@@ -79,7 +79,7 @@ void EntityMngr::Destroy(Entity e) {
 void EntityMngr::GenJob(Job* job, SystemFunc* sys) const {
   for (Archetype* archetype : QueryArchetypes(sys->query)) {
     auto [chunkEntity, chunkCmpts, sizes] =
-        archetype->Locate(sys->query.Locator().CmptTypes());
+        archetype->Locate(sys->query.locator.CmptTypes());
 
     size_t num = archetype->EntityNum();
     size_t chunkNum = archetype->ChunkNum();

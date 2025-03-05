@@ -9,22 +9,22 @@
 
 namespace My {
 class EntityQuery {
-public:
-  template<typename... AllCmpts, typename... AnyCmpts, typename... NoneCmpts, typename... Cmpts>
-  EntityQuery(TypeList<AllCmpts...>, TypeList<AnyCmpts...>, TypeList<NoneCmpts...>, TypeList<Cmpts...>);
-
-  EntityQuery(EntityFilter filter, EntityLocator locator);
-
-  size_t HashCode() const noexcept { return hashCode; }
-
-  const EntityFilter& Filter() const noexcept { return filter; }
-
-  const EntityLocator& Locator() const noexcept { return locator; }
-private:
+ public:
   EntityFilter filter;
   EntityLocator locator;
-  size_t hashCode;
+
+  template <typename... AllCmpts, typename... AnyCmpts, typename... NoneCmpts,
+            typename... Cmpts>
+  EntityQuery(TypeList<AllCmpts...>, TypeList<AnyCmpts...>,
+              TypeList<NoneCmpts...>, TypeList<Cmpts...>);
+
+  EntityQuery(EntityFilter filter, EntityLocator locator)
+      : filter{std::move(filter)}, locator{std::move(locator)} {}
+
+  size_t HashCode() const noexcept {
+    return hash_combine(filter.HashCode(), locator.HashCode());
+  }
 };
-}
+}  // namespace My
 
 #include "detail/EntityQuery.inl"

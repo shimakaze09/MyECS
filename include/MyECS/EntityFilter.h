@@ -33,10 +33,24 @@ class EntityFilter {
     return noneCmptTypes;
   }
 
+  template <typename Container>
+  void InsertAll(const Container&);
+  template <typename Container>
+  void InsertAny(const Container&);
+  template <typename Container>
+  void InsertNone(const Container&);
+  template <typename Container>
+  void EraseAll(const Container&);
+  template <typename Container>
+  void EraseAny(const Container&);
+  template <typename Container>
+  void EraseNone(const Container&);
+
  private:
   size_t GenAllHashCode() const noexcept;
   size_t GenAnyHashCode() const noexcept;
   size_t GenNoneHashCode() const noexcept;
+  size_t GenCombinedHashCode() const noexcept;
 
   std::set<CmptType> allCmptTypes;
   std::set<CmptType> anyCmptTypes;
@@ -46,7 +60,7 @@ class EntityFilter {
   size_t anyHashCode;
   size_t noneHashCode;
 
-  size_t combinedHashCode;
+  size_t combinedHashCode;  // after allHashCode, anyHashCode, noneHashCode
 };
 }  // namespace My
 

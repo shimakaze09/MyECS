@@ -128,7 +128,7 @@ class CmptTypeSet : std::set<CmptType> {
   }
 
   bool IsMatch(const EntityQuery& query) const {
-    return IsMatch(query.Filter()) && IsMatch(query.Locator());
+    return IsMatch(query.filter) && IsMatch(query.locator);
   }
 
   template <typename... Cmpts>

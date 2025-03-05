@@ -11,8 +11,7 @@ EntityQuery::EntityQuery(TypeList<AllCmpts...>, TypeList<AnyCmpts...>,
                          TypeList<NoneCmpts...>, TypeList<Cmpts...>)
     : filter{TypeList<AllCmpts...>{}, TypeList<AnyCmpts...>{},
              TypeList<NoneCmpts...>{}},
-      locator{TypeList<Cmpts...>{}},
-      hashCode{hash_combine(filter.HashCode(), locator.HashCode())} {}
+      locator{TypeList<Cmpts...>{}} {}
 
 inline bool operator<(const EntityQuery& x, const EntityQuery& y) noexcept {
   return x.HashCode() < y.HashCode();
