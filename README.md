@@ -2,6 +2,12 @@
 
 A custom Entity-Component-System framework for game development.
 
+## Compare with Unity ECS [->](compare.md)
+
+MyECS's primary reference object is Unity's ECS.
+
+Read [compare.md](compare.md) for details
+
 ## TODOs
 
 ### Core
@@ -18,11 +24,17 @@ A custom Entity-Component-System framework for game development.
 - [x] `None` Parallel
 - [x] System Override (dynamic `None`)
 - [x] Archetype += RuntimeCmptTraits
+- [ ] index in Query
+- [ ] Shared Component
+- [ ] system group
 
 ### non-core
 
 - [ ] exception
 - [ ] return
+- [ ] remove `EntityMngr::ai2ei`
+- [ ] copy
+- [ ] batch create
 
 ### Tool
 
