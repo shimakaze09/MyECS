@@ -44,7 +44,6 @@ const std::tuple<Entity, Cmpts*...> EntityMngr::CreateEntity() {
   info.archetype = archetype;
   auto [idxInArchetype, cmpts] = archetype->CreateEntity<Cmpts...>(e);
   info.idxInArchetype = idxInArchetype;
-  ai2ei[{archetype, idxInArchetype}] = entityIndex;
   return {e, std::get<Cmpts*>(cmpts)...};
 }
 
@@ -93,18 +92,9 @@ const std::tuple<Cmpts*...> EntityMngr::AttachWithoutInit(Entity e) {
   }
 
   // erase
-  auto srcMovedIdxInArchetype = srcArchetype->Erase(srcIdxInArchetype);
-  if (srcMovedIdxInArchetype != static_cast<size_t>(-1)) {
-    auto srcMovedEntityIndexTarget =
-        ai2ei.find({srcArchetype, srcMovedIdxInArchetype});
-    auto srcMovedEntityIndex = srcMovedEntityIndexTarget->second;
-    ai2ei.erase(srcMovedEntityIndexTarget);
-    ai2ei[{srcArchetype, srcIdxInArchetype}] = srcMovedEntityIndex;
+  auto srcMovedEntityIndex = srcArchetype->Erase(srcIdxInArchetype);
+  if (srcMovedEntityIndex != Entity::npos)
     entityTable[srcMovedEntityIndex].idxInArchetype = srcIdxInArchetype;
-  } else
-    ai2ei.erase({srcArchetype, srcIdxInArchetype});
-
-  ai2ei[{dstArchetype, dstIdxInArchetype}] = e.Idx();
 
   info.archetype = dstArchetype;
   info.idxInArchetype = dstIdxInArchetype;
@@ -178,18 +168,9 @@ void EntityMngr::Detach(Entity e) {
   }
 
   // erase
-  auto srcMovedIdxInArchetype = srcArchetype->Erase(srcIdxInArchetype);
-  if (srcMovedIdxInArchetype != Archetype::npos) {
-    auto srcMovedEntityIndexTarget =
-        ai2ei.find({srcArchetype, srcMovedIdxInArchetype});
-    auto srcMovedEntityIndex = srcMovedEntityIndexTarget->second;
-    ai2ei.erase(srcMovedEntityIndexTarget);
-    ai2ei[{srcArchetype, srcIdxInArchetype}] = srcMovedEntityIndex;
-    entityTable[e.Idx()].idxInArchetype = srcIdxInArchetype;
-  } else
-    ai2ei.erase({srcArchetype, srcIdxInArchetype});
-
-  ai2ei[{dstArchetype, dstIdxInArchetype}] = e.Idx();
+  auto srcMovedEntityIndex = srcArchetype->Erase(srcIdxInArchetype);
+  if (srcMovedEntityIndex != Entity::npos)
+    entityTable[srcMovedEntityIndex].idxInArchetype = srcIdxInArchetype;
 
   info.archetype = dstArchetype;
   info.idxInArchetype = dstIdxInArchetype;

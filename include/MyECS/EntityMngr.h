@@ -62,7 +62,6 @@ class EntityMngr {
 
   std::vector<EntityInfo> entityTable;
   std::vector<size_t> entityTableFreeEntry;
-  std::map<std::tuple<Archetype*, size_t>, size_t> ai2ei;
   size_t RequestEntityFreeEntry();
   void RecycleEntityEntry(Entity e);
 

@@ -30,17 +30,17 @@ int main() {
 }
 ```
 
-## Compare with Unity ECS [->](compare.md)
+## Compare with Unity ECS
 
-MyECS's primary reference object is Unity's ECS.
+MyECS's primary reference project is Unity's ECS.
 
-Read [compare.md](compare.md) for details
+Read [compare.md](compare.md) for details.
 
 ## TODOs
 
 ### Core
 
-- [x] EntityData: version
+- [x] ~~EntityData: version~~
 - [x] CmptIDSet hash
 - [x] CmptType
 - [x] EntityQuery
@@ -60,9 +60,10 @@ Read [compare.md](compare.md) for details
 
 - [ ] exception
 - [ ] return
-- [ ] remove `EntityMngr::ai2ei`
+- [x] remove `EntityMngr::ai2ei`
 - [ ] copy
 - [ ] batch create
+- [ ] Archetype share `Pool<Chunk>`
 
 ### Tool
 
