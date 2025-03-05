@@ -7,17 +7,6 @@
 using namespace My;
 using namespace std;
 
-Archetype::Archetype(CmptTypeSet types_) noexcept : types{move(types_)} {
-  types.Insert<Entity>();
-  for (auto type : types) {
-    if (type.Is<Entity>())
-      cmptTraits.Register<Entity>();
-    else
-      cmptTraits.Register(type);
-  }
-  SetLayout();
-}
-
 void Archetype::SetLayout() {
   vector<size_t> alignments;
   vector<size_t> sizes;

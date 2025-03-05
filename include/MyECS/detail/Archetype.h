@@ -27,20 +27,22 @@ class Archetype {
   // argument TypeList<Cmpts...> is for type deduction
   // auto add Entity
   template <typename... Cmpts>
-  Archetype(TypeList<Cmpts...>) noexcept;
+  Archetype(TypeList<Cmpts...>);
+
   // auto add Entity, use RTDCmptTraits
-  Archetype(CmptTypeSet types) noexcept;
+  template <typename... CmptTypes>
+  static Archetype* New(CmptTypes...);
 
   // auto add Entity
   template <typename... Cmpts>
-  static Archetype* Add(const Archetype* from) noexcept;
+  static Archetype* Add(const Archetype* from);
   template <typename... CmptTypes>
-  static Archetype* Add(const Archetype* from, CmptTypes...) noexcept;
+  static Archetype* Add(const Archetype* from, CmptTypes...);
   // auto add Entity
   template <typename... Cmpts>
-  static Archetype* Remove(const Archetype* from) noexcept;
+  static Archetype* Remove(const Archetype* from);
   template <typename... CmptTypes>
-  static Archetype* Remove(const Archetype* from, CmptTypes...) noexcept;
+  static Archetype* Remove(const Archetype* from, CmptTypes...);
 
   ~Archetype();
 
@@ -91,6 +93,11 @@ class Archetype {
   template <typename... Cmpts>
   static constexpr size_t HashCode() noexcept {
     return CmptTypeSet::HashCodeOf<Entity, Cmpts...>();
+  }
+
+  template <typename... CmptTypes>
+  static size_t HashCode(CmptTypes... types) noexcept {
+    return CmptTypeSet{CmptType::Of<Entity>(), types...}.HashCode();
   }
 
  private:

@@ -8,8 +8,7 @@
 
 namespace My {
 template <typename... Cmpts>
-Archetype::Archetype(TypeList<Cmpts...>) noexcept
-    : types(TypeList<Entity, Cmpts...>{}) {
+Archetype::Archetype(TypeList<Cmpts...>) : types(TypeList<Entity, Cmpts...>{}) {
   static_assert(IsSet_v<TypeList<Entity, Cmpts...>>,
                 "Archetype::Archetype: <Cmpts> must be different");
   cmptTraits.Register<Entity>();
@@ -17,8 +16,19 @@ Archetype::Archetype(TypeList<Cmpts...>) noexcept
   SetLayout();
 }
 
+template <typename... CmptTypes>
+static Archetype* Archetype::New(CmptTypes... types) {
+  auto rst = new Archetype;
+  rst->types = {CmptType::Of<Entity>(), types...};
+  cmptTraits.Register<Entity>();
+  for (const auto& type : types)
+    cmptTraits.Register(type);
+  SetLayout();
+  return rst;
+}
+
 template <typename... Cmpts>
-Archetype* Archetype::Add(const Archetype* from) noexcept {
+Archetype* Archetype::Add(const Archetype* from) {
   assert((from->types.IsNotContain<Cmpts>() && ...));
 
   Archetype* rst = new Archetype;
@@ -34,7 +44,7 @@ Archetype* Archetype::Add(const Archetype* from) noexcept {
 }
 
 template <typename... CmptTypes>
-Archetype* Archetype::Add(const Archetype* from, CmptTypes... types) noexcept {
+Archetype* Archetype::Add(const Archetype* from, CmptTypes... types) {
   static_assert((std::is_same_v<CmptTypes, CmptType> && ...));
   assert((from->types.IsNotContain(types) && ...));
 
@@ -51,7 +61,7 @@ Archetype* Archetype::Add(const Archetype* from, CmptTypes... types) noexcept {
 }
 
 template <typename... Cmpts>
-Archetype* Archetype::Remove(const Archetype* from) noexcept {
+Archetype* Archetype::Remove(const Archetype* from) {
   assert((from->types.IsContain<Cmpts>() && ...));
 
   Archetype* rst = new Archetype;
@@ -67,8 +77,7 @@ Archetype* Archetype::Remove(const Archetype* from) noexcept {
 }
 
 template <typename... CmptTypes>
-Archetype* Archetype::Remove(const Archetype* from,
-                             CmptTypes... types) noexcept {
+Archetype* Archetype::Remove(const Archetype* from, CmptTypes... types) {
   static_assert((std::is_same_v<CmptTypes, CmptType> && ...));
   assert((from->types.IsContain(types) && ...));
 
