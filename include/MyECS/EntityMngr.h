@@ -21,6 +21,8 @@ class EntityMngr {
   template <typename... Cmpts>
   const std::tuple<Entity, Cmpts*...> CreateEntity();
 
+  Entity Instantiate(Entity e);
+
   // TODO: CreateEntities
 
   template <typename... Cmpts>
@@ -63,7 +65,7 @@ class EntityMngr {
 
   struct EntityInfo {
     Archetype* archetype{nullptr};
-    size_t idxInArchetype{Archetype::npos};
+    size_t idxInArchetype{size_t_invalid};
     size_t version{0};  // version
   };
 

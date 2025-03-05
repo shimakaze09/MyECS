@@ -14,7 +14,7 @@ auto Pack(Func&& func) noexcept;
 namespace My {
 template <typename Func>
 SystemFunc::SystemFunc(Func&& func, EntityFilter filter)
-    : SystemFunc{std::string(nameof::nameof_type<Func>()),
+    : SystemFunc{std::string(nameof::nameof_type<Func>().data()),
                  std::forward<Func>(func), std::move(filter)} {}
 
 template <typename Func>
