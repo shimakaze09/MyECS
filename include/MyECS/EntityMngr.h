@@ -21,7 +21,12 @@ class EntityMngr {
   template <typename... Cmpts>
   std::tuple<Entity, Cmpts*...> CreateEntity();
   // use RTDCmptTraits
-  template <typename... CmptTypes>
+  Entity CreateEntity(const CmptType* types, size_t num);
+  // call CreateEntity(const CmptType*, size_t)
+  template <
+      typename... CmptTypes,
+      // for function overload
+      typename = std::enable_if_t<(std::is_same_v<CmptTypes, CmptType> && ...)>>
   Entity CreateEntity(CmptTypes...);
 
   Entity Instantiate(Entity);
@@ -31,7 +36,11 @@ class EntityMngr {
   template <typename... Cmpts>
   std::tuple<Cmpts*...> Attach(Entity);
   // use RTDCmptTraits
-  template <typename... CmptTypes>
+  void Attach(Entity, const CmptType* types, size_t num);
+  template <
+      typename... CmptTypes,
+      // for function overload
+      typename = std::enable_if_t<(std::is_same_v<CmptTypes, CmptType> && ...)>>
   std::array<CmptPtr, sizeof...(CmptTypes)> Attach(Entity, CmptTypes...);
 
   template <typename Cmpt, typename... Args>
@@ -40,7 +49,12 @@ class EntityMngr {
   template <typename... Cmpts>
   void Detach(Entity);
   // use RTDCmptTraits
-  template <typename... CmptTypes>
+  void Detach(Entity, const CmptType* types, size_t num);
+  // call Detach(Entity, const CmptType*, size_t);
+  template <
+      typename... CmptTypes,
+      // for function overload
+      typename = std::enable_if_t<(std::is_same_v<CmptTypes, CmptType> && ...)>>
   void Detach(Entity, CmptTypes...);
 
   template <typename Cmpt>
@@ -70,11 +84,21 @@ class EntityMngr {
 
   template <typename... Cmpts>
   Archetype* GetOrCreateArchetypeOf();
-  template <typename... CmptTypes>
-  Archetype* GetOrCreateArchetypeOf(CmptTypes... types);
+  Archetype* GetOrCreateArchetypeOf(const CmptType* types, size_t num);
+  // call GetOrCreateArchetypeOf(const CmptType*, size_t)
+  template <
+      typename... CmptTypes,
+      // for function overload
+      typename = std::enable_if_t<(std::is_same_v<CmptTypes, CmptType> && ...)>>
+  Archetype* GetOrCreateArchetypeOf(CmptTypes...);
 
-  template <typename... CmptTypes>  // <CmptTypes> == CmptType
-  void AttachWithoutInit(Entity e, CmptTypes... types);
+  void AttachWithoutInit(Entity, const CmptType* types, size_t num);
+  // call AttachWithoutInit(Entity, const CmptType*, size_t)
+  template <
+      typename... CmptTypes,
+      // for function overload
+      typename = std::enable_if_t<(std::is_same_v<CmptTypes, CmptType> && ...)>>
+  void AttachWithoutInit(Entity, CmptTypes...);
 
   void GenJob(Job* job, SystemFunc* sys) const;
 

@@ -20,8 +20,11 @@
     - [x] SystemFunc support
     - [x] get entity num of query
 - [x] instantiate
-- [ ] string/CmptType-driven API
-    - [ ] RTDCmptTraits : **R**un-**T**ime **D**ynamic **C**omponent **T**raits
+- [x] string/CmptType-driven API
+    - [x] RTDCmptTraits : **R**un-**T**ime **D**ynamic **C**omponent **T**raits
+    - [x] run-time dynamic `SystemFunc`
+    - [x] C-style API
+- [ ] ChunkJob
 
 ### unimportant
 
@@ -39,6 +42,7 @@
 
 - [ ] SysFuncGraph dump
 - [ ] serialize
+- [ ] doc
 
 ## detail
 
