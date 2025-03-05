@@ -10,8 +10,6 @@
 #include <MyTemplate/Func.h>
 #include <MyTemplate/Typelist.h>
 
-#include <stdexcept>
-
 namespace My::detail::EntityMngr_ {
 template <typename Cmpt, typename... Ts>
 Concept(IsAggregatableHelper, Cmpt{std::declval<Ts>()...});

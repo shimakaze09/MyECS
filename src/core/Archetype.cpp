@@ -4,14 +4,23 @@
 
 #include <MyECS/detail/Archetype.h>
 
-#include <cstdlib>
-
-using namespace std;
 using namespace My;
+using namespace std;
+
+Archetype::Archetype(CmptTypeSet types_) noexcept : types{move(types_)} {
+  types.Insert<Entity>();
+  for (auto type : types) {
+    if (type.Is<Entity>())
+      cmptTraits.Register<Entity>();
+    else
+      cmptTraits.Register(type);
+  }
+  SetLayout();
+}
 
 void Archetype::SetLayout() {
-  std::vector<size_t> alignments;
-  std::vector<size_t> sizes;
+  vector<size_t> alignments;
+  vector<size_t> sizes;
 
   for (const auto& type : types) {
     alignments.push_back(cmptTraits.Alignof(type));
@@ -24,6 +33,31 @@ void Archetype::SetLayout() {
   size_t i = 0;
   for (const auto& type : types)
     type2offset[type] = layout.offsets[i++];
+}
+
+size_t Archetype::CreateEntity(Entity e) {
+  size_t idx = RequestBuffer();
+  size_t idxInChunk = idx % chunkCapacity;
+  byte* buffer = chunks[idx / chunkCapacity]->Data();
+
+  const auto& rtdct = RTDCmptTraits::Instance();
+  for (auto type : types) {
+    if (type.Is<Entity>()) {
+      constexpr size_t size = sizeof(Entity);
+      size_t offset = Offsetof(type);
+      memcpy(buffer + offset + idxInChunk * size, &e, size);
+    } else {
+      auto target = rtdct.default_constructors.find(type);
+      if (target != rtdct.default_constructors.end()) {
+        size_t size = cmptTraits.Sizeof(type);
+        size_t offset = Offsetof(type);
+        byte* dst = buffer + offset + idxInChunk * size;
+        target->second(dst);
+      }
+    }
+  }
+
+  return idx;
 }
 
 Archetype::~Archetype() {
@@ -89,7 +123,7 @@ size_t Archetype::Instantiate(Entity e, size_t srcIdx) {
 }
 
 tuple<vector<Entity*>, vector<vector<void*>>, vector<size_t>> Archetype::Locate(
-    const std::set<CmptType>& cmptTypes) const {
+    const set<CmptType>& cmptTypes) const {
   assert(types.IsContain(cmptTypes));
   vector<vector<void*>> chunkCmpts(chunks.size());
   vector<Entity*> chunkEntity;

@@ -21,7 +21,7 @@
     - [x] get entity num of query
 - [x] instantiate
 - [ ] string/CmptType-driven API
-  - [ ] RumtimeCustomCmptTraits
+    - [ ] RTDCmptTraits : **R**un-**T**ime **D**ynamic **C**omponent **T**raits
 
 ### unimportant
 
@@ -48,4 +48,5 @@
 - [ ] parallel `Schedule`
 - [x] `constexpr SystemFunc::HashCode()`
 - [x] cache `CmptIDSet`'s hashcode
-- [x] store `EntityMngr` and `SystemMngr` instead `World` in `Schedule` 
+- [x] store `EntityMngr` and `SystemMngr` instead `World` in `Schedule`
+- [ ] simplify `template Cmpt` and `CmptType` API

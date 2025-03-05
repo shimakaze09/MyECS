@@ -59,8 +59,12 @@ inline void RTSCmptTraits::Register(CmptType type) {
     throw std::logic_error(
         "RTSCmptTraits::Register: RTDCmptTraits hasn't registered <CmptType>");
   sizeofs[type] = size_target->second;
-  assert(rtdct.alignments.find(type) != rtdct.alignments.end());
-  alignments[type] = rtdct.alignments.find(type)->second;
+
+  auto alignment_target = rtdct.alignments.find(type);
+  if (alignment_target == rtdct.alignments.end())
+    alignments[type] = RTDCmptTraits::default_alignment;
+  else
+    alignments[type] = alignment_target->second;
 
   auto destructor_target = rtdct.destructors.find(type);
   auto copy_constructor_target = rtdct.copy_constructors.find(type);

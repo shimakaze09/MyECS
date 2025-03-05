@@ -4,13 +4,11 @@
 
 #pragma once
 
-#include "../Entity.h"
-
 #include "../CmptPtr.h"
+#include "../Entity.h"
 
 #include "Chunk.h"
 #include "CmptTypeSet.h"
-
 #include "RTSCmptTraits.h"
 
 #include <MyTemplate/TypeID.h>
@@ -30,6 +28,8 @@ class Archetype {
   // auto add Entity
   template <typename... Cmpts>
   Archetype(TypeList<Cmpts...>) noexcept;
+  // auto add Entity, use RTDCmptTraits
+  Archetype(CmptTypeSet types) noexcept;
 
   // auto add Entity
   template <typename... Cmpts>
@@ -39,9 +39,6 @@ class Archetype {
   static Archetype* Remove(Archetype* from) noexcept;
 
   ~Archetype();
-
-  template <typename... Cmpts>
-  const std::vector<std::tuple<Entity*, Cmpts*...>> Locate() const;
 
   // Entity + Components
   std::tuple<std::vector<Entity*>, std::vector<std::vector<void*>>,
@@ -60,8 +57,10 @@ class Archetype {
   size_t RequestBuffer();
 
   // init cmpts, set Entity
+  // size_t: index in archetype
   template <typename... Cmpts>
-  const std::tuple<size_t, std::tuple<Cmpts*...>> CreateEntity(Entity e);
+  std::tuple<size_t, std::tuple<Cmpts*...>> CreateEntity(Entity e);
+  size_t CreateEntity(Entity e);
 
   // return index in archetype
   size_t Instantiate(Entity e, size_t srcIdx);
