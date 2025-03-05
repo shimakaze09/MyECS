@@ -33,10 +33,14 @@ class Archetype {
 
   // auto add Entity
   template <typename... Cmpts>
-  static Archetype* Add(Archetype* from) noexcept;
+  static Archetype* Add(const Archetype* from) noexcept;
+  template <typename... CmptTypes>
+  static Archetype* Add(const Archetype* from, CmptTypes...) noexcept;
   // auto add Entity
   template <typename... Cmpts>
-  static Archetype* Remove(Archetype* from) noexcept;
+  static Archetype* Remove(const Archetype* from) noexcept;
+  template <typename... CmptTypes>
+  static Archetype* Remove(const Archetype* from, CmptTypes...) noexcept;
 
   ~Archetype();
 

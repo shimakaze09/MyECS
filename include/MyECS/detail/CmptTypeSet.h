@@ -21,7 +21,8 @@ class CmptTypeSet : std::set<CmptType> {
   CmptTypeSet(TypeList<Cmpts...>);
 
   template <typename... CmptTypes>
-  CmptTypeSet(CmptTypes... types) : std::set<CmptType>{types...} {
+  CmptTypeSet(CmptTypes... types)
+      : std::set<CmptType>{types...}, hashcode{HashCodeOf(*this)} {
     static_assert((std::is_same_v<CmptTypes, CmptType> && ...));
   }
 
@@ -32,9 +33,13 @@ class CmptTypeSet : std::set<CmptType> {
 
   template <typename... Cmpts>
   void Insert();
+  template <typename... CmptTypes>
+  void Insert(CmptTypes...);
 
   template <typename... Cmpts>
   void Erase() noexcept;
+  template <typename... CmptTypes>
+  void Erase(CmptTypes...) noexcept;
 
   template <typename... Cmpts>
   constexpr bool IsContain() const;

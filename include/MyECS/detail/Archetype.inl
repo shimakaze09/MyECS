@@ -18,16 +18,14 @@ Archetype::Archetype(TypeList<Cmpts...>) noexcept
 }
 
 template <typename... Cmpts>
-static Archetype* Archetype::Add(Archetype* from) noexcept {
-  using CmptList = TypeList<Cmpts...>;
+Archetype* Archetype::Add(const Archetype* from) noexcept {
   assert((from->types.IsNotContain<Cmpts>() && ...));
 
   Archetype* rst = new Archetype;
 
   rst->types = from->types;
-  rst->cmptTraits = from->cmptTraits;
-
   rst->types.Insert<Cmpts...>();
+  rst->cmptTraits = from->cmptTraits;
   (rst->cmptTraits.Register<Cmpts>(), ...);
 
   rst->SetLayout();
@@ -35,18 +33,51 @@ static Archetype* Archetype::Add(Archetype* from) noexcept {
   return rst;
 }
 
+template <typename... CmptTypes>
+Archetype* Archetype::Add(const Archetype* from, CmptTypes... types) noexcept {
+  static_assert((std::is_same_v<CmptTypes, CmptType> && ...));
+  assert((from->types.IsNotContain(types) && ...));
+
+  Archetype* rst = new Archetype;
+
+  rst->types = from->types;
+  rst->types.Insert(types...);
+  rst->cmptTraits = from->cmptTraits;
+  (rst->cmptTraits.Register(types), ...);
+
+  rst->SetLayout();
+
+  return rst;
+}
+
 template <typename... Cmpts>
-static Archetype* Archetype::Remove(Archetype* from) noexcept {
-  using CmptList = TypeList<Cmpts...>;
+Archetype* Archetype::Remove(const Archetype* from) noexcept {
   assert((from->types.IsContain<Cmpts>() && ...));
 
   Archetype* rst = new Archetype;
 
   rst->types = from->types;
-  rst->cmptTraits = from->cmptTraits;
-
   rst->types.Erase<Cmpts...>();
+  rst->cmptTraits = from->cmptTraits;
   (rst->cmptTraits.Deregister<Cmpts>(), ...);
+
+  rst->SetLayout();
+
+  return rst;
+}
+
+template <typename... CmptTypes>
+Archetype* Archetype::Remove(const Archetype* from,
+                             CmptTypes... types) noexcept {
+  static_assert((std::is_same_v<CmptTypes, CmptType> && ...));
+  assert((from->types.IsContain(types) && ...));
+
+  Archetype* rst = new Archetype;
+
+  rst->types = from->types;
+  rst->types.Erase(types...);
+  rst->cmptTraits = from->cmptTraits;
+  (rst->cmptTraits.Deregister(types), ...);
 
   rst->SetLayout();
 

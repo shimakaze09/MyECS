@@ -28,6 +28,8 @@ class EntityMngr {
 
   template <typename... Cmpts>
   std::tuple<Cmpts*...> Attach(Entity e);
+  template <typename... CmptTypes>
+  std::array<CmptPtr, sizeof...(CmptTypes)> Attach(Entity e, CmptTypes...);
 
   template <typename Cmpt, typename... Args>
   Cmpt* Emplace(Entity e, Args&&... args);
@@ -62,9 +64,8 @@ class EntityMngr {
   Archetype* GetOrCreateArchetypeOf();
   Archetype* GetOrCreateArchetypeOf(CmptTypeSet types);
 
-  template <typename... Cmpts>
-  std::tuple<std::array<bool, sizeof...(Cmpts)>, std::tuple<Cmpts*...>>
-  AttachWithoutInit(Entity e);
+  template <typename... CmptTypes>  // <CmptTypes> == CmptType
+  void AttachWithoutInit(Entity e, CmptTypes... types);
 
   void GenJob(Job* job, SystemFunc* sys) const;
 
