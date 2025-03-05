@@ -4,6 +4,8 @@
 
 #include <MyECS/detail/Chunk.h>
 
+#include <algorithm>
+
 using namespace My;
 using namespace std;
 

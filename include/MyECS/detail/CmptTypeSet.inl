@@ -141,8 +141,8 @@ static constexpr size_t CmptTypeSet::HashCodeOf(const Container& cmpts) {
 
 namespace std {
 template <>
-struct hash<Ubpa::CmptTypeSet> {
-  size_t operator()(const Ubpa::CmptTypeSet& types) const noexcept {
+struct hash<My::CmptTypeSet> {
+  size_t operator()(const My::CmptTypeSet& types) const noexcept {
     return types.HashCode();
   }
 };
