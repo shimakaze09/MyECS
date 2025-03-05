@@ -37,8 +37,6 @@ template <typename... Cmpts>
 const std::tuple<Entity, Cmpts*...> EntityMngr::CreateEntity() {
   static_assert(IsSet_v<TypeList<Entity, Cmpts...>>,
                 "EntityMngr::CreateEntity: <Cmpts> must be different");
-  assert("EntityMngr::CreateEntity: <Cmpts> are unregistered" &&
-         CmptRegistrar::Instance().IsRegistered<Cmpts...>());
   Archetype* archetype = GetOrCreateArchetypeOf<Cmpts...>();
   size_t entityIndex = RequestEntityFreeEntry();
   EntityInfo& info = entityTable[entityIndex];
@@ -56,8 +54,6 @@ const std::tuple<Cmpts*...> EntityMngr::AttachWithoutInit(Entity e) {
                 "EntityMngr::AttachWithoutInit: sizeof...(<Cmpts>) > 0");
   static_assert(IsSet_v<TypeList<Entity, Cmpts...>>,
                 "EntityMngr::AttachWithoutInit: <Cmpts> must be different");
-  assert("EntityMngr::AttachWithoutInit: <Cmpts> are unregistered" &&
-         CmptRegistrar::Instance().IsRegistered<Cmpts...>());
   assert("EntityMngr::AttachWithoutInit: e is invalid" && Exist(e));
 
   auto& info = entityTable[e.Idx()];
@@ -88,12 +84,12 @@ const std::tuple<Cmpts*...> EntityMngr::AttachWithoutInit(Entity e) {
   // move src to dst
   size_t dstIdxInArchetype = dstArchetype->RequestBuffer();
 
+  auto srcCmptTraits = srcArchetype->GetRuntimeCmptTraits();
   for (auto type : srcCmptTypeSet) {
     auto [srcCmpt, srcSize] = srcArchetype->At(type, srcIdxInArchetype);
     auto [dstCmpt, dstSize] = dstArchetype->At(type, dstIdxInArchetype);
     assert(srcSize == dstSize);
-    RuntimeCmptTraits::Instance().MoveConstruct(type, srcSize, dstCmpt,
-                                                srcCmpt);
+    srcCmptTraits.MoveConstruct(type, dstCmpt, srcCmpt);
   }
 
   // erase
@@ -170,19 +166,20 @@ void EntityMngr::Detach(Entity e) {
 
   // move src to dst
   size_t dstIdxInArchetype = dstArchetype->RequestBuffer();
+  auto srcCmptTraits = srcArchetype->GetRuntimeCmptTraits();
   for (auto type : srcCmptTypeSet) {
+    auto [srcCmpt, srcSize] = srcArchetype->At(type, srcIdxInArchetype);
     if (dstCmptTypeSet.IsContain(type)) {
-      auto [srcCmpt, srcSize] = srcArchetype->At(type, srcIdxInArchetype);
       auto [dstCmpt, dstSize] = dstArchetype->At(type, dstIdxInArchetype);
       assert(srcSize == dstSize);
-      RuntimeCmptTraits::Instance().MoveConstruct(type, srcSize, dstCmpt,
-                                                  srcCmpt);
-    }
+      srcCmptTraits.MoveConstruct(type, dstCmpt, srcCmpt);
+    } else
+      srcCmptTraits.Destruct(type, srcCmpt);
   }
 
   // erase
   auto srcMovedIdxInArchetype = srcArchetype->Erase(srcIdxInArchetype);
-  if (srcMovedIdxInArchetype != static_cast<size_t>(-1)) {
+  if (srcMovedIdxInArchetype != Archetype::npos) {
     auto srcMovedEntityIndexTarget =
         ai2ei.find({srcArchetype, srcMovedIdxInArchetype});
     auto srcMovedEntityIndex = srcMovedEntityIndexTarget->second;

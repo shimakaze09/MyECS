@@ -19,7 +19,7 @@ A custom Entity-Component-System framework for game development.
     - [ ] start, stop
     - [ ] creat, destroy
 - [ ] System Override (dynamic `None`)
-- [ ] CmptRegistrar -> Archetype
+- [x] Archetype += RuntimeCmptTraits
 - [ ] exception
 
 ### Tool

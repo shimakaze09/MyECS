@@ -42,8 +42,6 @@ struct MySystem {
 };
 
 int main() {
-  CmptRegistrar::Instance().Register<A, B, C>();
-
   World w;
   w.systemMngr.Register<MySystem>();
 

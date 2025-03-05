@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "CmptRegistrar.h"
 #include "EntityQuery.h"
 #include "SystemFunc.h"
 #include "detail/Archetype.h"

@@ -11,6 +11,8 @@
 #include "Chunk.h"
 #include "CmptTypeSet.h"
 
+#include "RuntimeCmptTraits.h"
+
 #include <MyTemplate/TypeID.h>
 #include <MyTemplate/Typelist.h>
 
@@ -70,6 +72,10 @@ class Archetype {
   // Components + Entity
   const CmptTypeSet& GetCmptTypeSet() const noexcept { return types; }
 
+  const RuntimeCmptTraits& GetRuntimeCmptTraits() const noexcept {
+    return cmptTraits;
+  }
+
   // no Entity
   size_t CmptNum() const noexcept { return types.size() - 1; }
 
@@ -91,20 +97,16 @@ class Archetype {
   // call after setting type2size and type2offset
   void SetLayout();
 
-  size_t Sizeof(CmptType type) const { return type2size.find(type)->second; }
-
   size_t Offsetof(CmptType type) const {
     return type2offset.find(type)->second;
   }
 
   friend class EntityMngr;
 
-  CmptTypeSet types;                     // Entity + Components
-  std::map<CmptType, size_t> type2size;  // CmptType to size (include Entity)
+  CmptTypeSet types;  // Entity + Components
+  RuntimeCmptTraits cmptTraits;
   std::map<CmptType, size_t>
       type2offset;  // CmptType to offset in chunk (include Entity)
-  std::map<CmptType, size_t>
-      type2alignment;  // CmptType to alignment (include Entity)
 
   size_t chunkCapacity{static_cast<size_t>(-1)};
   std::vector<Chunk*> chunks;
