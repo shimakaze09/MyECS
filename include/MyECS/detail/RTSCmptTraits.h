@@ -10,7 +10,8 @@
 #include <unordered_map>
 
 namespace My {
-class RuntimeCmptTraits {
+// run-time static component traits
+class RTSCmptTraits {
  public:
   size_t Sizeof(CmptType type) const {
     assert(sizeofs.find(type) != sizeofs.end());
@@ -20,12 +21,6 @@ class RuntimeCmptTraits {
   size_t Alignof(CmptType type) const {
     assert(alignments.find(type) != alignments.end());
     return alignments.find(type)->second;
-  }
-
-  void Destruct(CmptType type, void* cmpt) const {
-    auto target = destructors.find(type);
-    if (target != destructors.end())
-      target->second(cmpt);
   }
 
   void CopyConstruct(CmptType type, void* dst, void* src) const {
@@ -46,20 +41,29 @@ class RuntimeCmptTraits {
       memcpy(dst, src, Sizeof(type));
   }
 
+  void Destruct(CmptType type, void* cmpt) const {
+    auto target = destructors.find(type);
+    if (target != destructors.end())
+      target->second(cmpt);
+  }
+
   template <typename Cmpt>
   void Register();
+  inline void Register(CmptType type);
+
   template <typename Cmpt>
   void Deregister();
+  inline void Deregister(CmptType type);
 
  private:
   std::unordered_map<CmptType, size_t> sizeofs;
   std::unordered_map<CmptType, size_t> alignments;
-  std::unordered_map<CmptType, std::function<void(void*)>> destructors;
   std::unordered_map<CmptType, std::function<void(void*, void*)>>
       copy_constructors;  // dst <- src
   std::unordered_map<CmptType, std::function<void(void*, void*)>>
       move_constructors;  // dst <- src
+  std::unordered_map<CmptType, std::function<void(void*)>> destructors;
 };
 }  // namespace My
 
-#include "RuntimeCmptTraits.inl"
+#include "RTSCmptTraits.inl"

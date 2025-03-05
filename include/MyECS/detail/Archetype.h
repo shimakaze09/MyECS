@@ -11,7 +11,7 @@
 #include "Chunk.h"
 #include "CmptTypeSet.h"
 
-#include "RuntimeCmptTraits.h"
+#include "RTSCmptTraits.h"
 
 #include <MyTemplate/TypeID.h>
 #include <MyTemplate/Typelist.h>
@@ -74,9 +74,7 @@ class Archetype {
   // Components + Entity
   const CmptTypeSet& GetCmptTypeSet() const noexcept { return types; }
 
-  const RuntimeCmptTraits& GetRuntimeCmptTraits() const noexcept {
-    return cmptTraits;
-  }
+  const RTSCmptTraits& GetRTSCmptTraits() const noexcept { return cmptTraits; }
 
   // no Entity
   size_t CmptNum() const noexcept { return types.size() - 1; }
@@ -106,7 +104,7 @@ class Archetype {
   friend class EntityMngr;
 
   CmptTypeSet types;  // Entity + Components
-  RuntimeCmptTraits cmptTraits;
+  RTSCmptTraits cmptTraits;
   std::unordered_map<CmptType, size_t>
       type2offset;  // CmptType to offset in chunk (include Entity)
 

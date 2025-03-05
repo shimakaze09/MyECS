@@ -10,6 +10,8 @@
 #include <MyTemplate/Func.h>
 #include <MyTemplate/Typelist.h>
 
+#include <stdexcept>
+
 namespace My::detail::EntityMngr_ {
 template <typename Cmpt, typename... Ts>
 Concept(IsAggregatableHelper, Cmpt{std::declval<Ts>()...});
@@ -22,8 +24,6 @@ struct IsAggregatable
 template <typename Cmpt, typename... Ts>
 static constexpr bool IsAggregatable_v = IsAggregatable<Cmpt, Ts...>::value;
 }  // namespace My::detail::EntityMngr_
-
-#include <stdexcept>
 
 namespace My {
 template <typename... Cmpts>
@@ -101,7 +101,7 @@ EntityMngr::AttachWithoutInit(Entity e) {
   // move src to dst
   size_t dstIdxInArchetype = dstArchetype->RequestBuffer();
 
-  auto srcCmptTraits = srcArchetype->GetRuntimeCmptTraits();
+  auto srcCmptTraits = srcArchetype->GetRTSCmptTraits();
   for (auto type : srcCmptTypeSet) {
     auto [srcCmpt, srcSize] = srcArchetype->At(type, srcIdxInArchetype);
     auto [dstCmpt, dstSize] = dstArchetype->At(type, dstIdxInArchetype);
@@ -182,7 +182,7 @@ void EntityMngr::Detach(Entity e) {
 
   // move src to dst
   size_t dstIdxInArchetype = dstArchetype->RequestBuffer();
-  auto srcCmptTraits = srcArchetype->GetRuntimeCmptTraits();
+  auto srcCmptTraits = srcArchetype->GetRTSCmptTraits();
   for (auto type : srcCmptTypeSet) {
     auto [srcCmpt, srcSize] = srcArchetype->At(type, srcIdxInArchetype);
     if (dstCmptTypeSet.IsContain(type)) {
