@@ -7,6 +7,18 @@
 #include <MyECS/detail/Util.h>
 
 using namespace My;
+using namespace std;
+
+EntityLocator::EntityLocator(set<CmptType> lastFrameCmpts,
+                             set<CmptType> writeFrameCmpts,
+                             set<CmptType> latestCmpts)
+    : lastFrameCmptTypes{move(lastFrameCmpts)},
+      writeCmptTypes{move(writeFrameCmpts)},
+      latestCmptTypes{move(latestCmpts)} {
+  cmptTypes = SetUnion(lastFrameCmptTypes, writeCmptTypes);
+  cmptTypes = SetUnion(cmptTypes, latestCmptTypes);
+  hashCode = GenHashCode();
+}
 
 size_t EntityLocator::GenHashCode() const noexcept {
   size_t rst = TypeID<EntityLocator>;

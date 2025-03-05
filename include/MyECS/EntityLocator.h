@@ -21,6 +21,10 @@ class EntityLocator {
   EntityLocator(TypeList<LastFrameCmpts...>, TypeList<WriteCmpts...>,
                 TypeList<LatestCmpts...>);
 
+  EntityLocator(std::set<CmptType> lastFrameCmpts = {},
+                std::set<CmptType> writeFrameCmpts = {},
+                std::set<CmptType> latestCmpts = {});
+
   size_t HashCode() const noexcept { return hashCode; }
 
   const std::set<CmptType>& LastFrameCmptTypes() const noexcept {
@@ -36,6 +40,11 @@ class EntityLocator {
   }
 
   const std::set<CmptType>& CmptTypes() const noexcept { return cmptTypes; }
+
+  static const EntityLocator& InvalidInstance() noexcept {
+    static EntityLocator invalid_instance{TypeList{}, TypeList{}, TypeList{}};
+    return invalid_instance;
+  }
 
   bool operator==(const EntityLocator& locator) const noexcept;
 

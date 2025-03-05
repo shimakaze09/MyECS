@@ -27,7 +27,8 @@ void World::Update() {
       entityMngr.GenJob(job, func);
     else
       job->emplace([func = func]() {
-        (*func)(Entity::Invalid(), static_cast<size_t>(-1), nullptr);
+        (*func)(Entity::Invalid(), size_t_invalid,
+                &EntityLocator::InvalidInstance(), nullptr);
       });
     table[func] = jobGraph.composed_of(*job);
   }

@@ -4,8 +4,11 @@
 
 #pragma once
 
-#include <MyTemplate/Func.h>
 #include "CmptTag.inl"
+
+#include <MyContainer/Algorithm.h>
+
+#include <MyTemplate/Func.h>
 
 namespace My {
 template <typename TaggedCmptList>
