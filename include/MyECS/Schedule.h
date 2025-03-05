@@ -5,26 +5,32 @@
 #pragma once
 
 #include "SystemFunc.h"
-#include "detail/SysFuncGraph.h"
 #include "detail/Job.h"
+#include "detail/SysFuncGraph.h"
 
 #include <MyContainer/Pool.h>
 
 namespace My {
+class World;
+
 class Schedule {
-public:
+ public:
   Schedule& Order(size_t x, size_t y);
   Schedule& Order(std::string_view x, std::string_view y);
   Schedule& Order(SystemFunc* x, SystemFunc* y);
 
-  template<typename... Args>
+  template <typename... Args>
   SystemFunc* Request(Args&&... args) {
     SystemFunc* sysFunc = sysFuncPool.Request(std::forward<Args>(args)...);
     sysFuncs.emplace(sysFunc->HashCode(), sysFunc);
     return sysFunc;
   }
 
-private:
+  World* GetWorld() const noexcept { return world; }
+
+ private:
+  Schedule(World* world) : world{world} {}
+
   void Clear();
   SysFuncGraph GenSysFuncGraph() const;
 
@@ -36,7 +42,7 @@ private:
   std::unordered_map<size_t, size_t> sysFuncOrder;
 
   Pool<SystemFunc> sysFuncPool;
-
+  World* world;
   friend class World;
 };
-}
+}  // namespace My

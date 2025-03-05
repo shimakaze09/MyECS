@@ -16,24 +16,13 @@ static_assert(sizeof(byte) == 1);
 struct alignas(128) Chunk {
   static constexpr size_t size = 16 * 1024;
 
-  template <size_t N>
-  struct Info {
-    constexpr Info(size_t capacity, std::array<size_t, N> sizes,
-                   std::array<size_t, N> offsets)
-        : capacity(capacity), sizes(sizes), offsets(offsets) {}
-
+  struct Layout {
     size_t capacity;
-    std::array<size_t, N> sizes;
-    std::array<size_t, N> offsets;
+    std::vector<size_t> offsets;
   };
 
-  // return Info<max(1,sizeof...(Cmpts))>
-  template <typename... Cmpts>
-  static constexpr auto StaticInfo() noexcept;
-
-  // capacity, offsets
-  static const std::tuple<size_t, std::vector<size_t>> CO(
-      const std::vector<size_t>& sizes) noexcept;
+  static Layout GenLayout(const std::vector<size_t>& alignments,
+                          const std::vector<size_t>& sizes) noexcept;
 
   byte* Data() noexcept { return buffer.data(); }
 
@@ -43,5 +32,3 @@ struct alignas(128) Chunk {
 
 static_assert(sizeof(Chunk) == Chunk::size);
 }  // namespace My
-
-#include "Chunk.inl"

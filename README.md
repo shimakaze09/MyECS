@@ -12,10 +12,15 @@ A custom Entity-Component-System framework for game development.
 - [x] EntityQuery
 - [x] Query Entity
 - [x]  ~~SystemMngr += ScheduleRegistrar~~
+- [x] alignment
+- [x] `Entity` alias table: `Entity::idx -> (Archetype, idx)`
+- [x] `Entity` as special `Component` stored in `Chunk`
 - [ ] System lifecycle
     - [ ] start, stop
     - [ ] creat, destroy
 - [ ] System Override (dynamic `None`)
+- [ ] CmptRegistrar -> Archetype
+- [ ] exception
 
 ### Tool
 
