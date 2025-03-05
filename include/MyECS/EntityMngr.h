@@ -11,6 +11,8 @@
 
 #include <MyContainer/Pool.h>
 
+#include <mutex>
+
 namespace My {
 class World;
 
@@ -40,6 +42,8 @@ class EntityMngr {
   Cmpt* Get(Entity e) const;
 
   size_t EntityNum(const EntityQuery& query) const;
+
+  void AddCommand(const std::function<void()>& command);
 
  private:
   friend class World;
@@ -72,6 +76,11 @@ class EntityMngr {
       h2a;  // archetype's hashcode to archetype
 
   mutable std::unordered_map<EntityQuery, std::set<Archetype*>> queryCache;
+
+  // command
+  std::vector<std::function<void()>> commandBuffer;
+  std::mutex commandBufferMutex;
+  void RunCommands();
 };
 }  // namespace My
 

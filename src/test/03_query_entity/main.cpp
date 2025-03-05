@@ -18,21 +18,22 @@ struct C {};
 struct MySystem {
   static void OnUpdate(Schedule& schedule) {
     schedule.Request(
-        [](Entity* e, const A* a, const B* b) {
-          e->AddCommand([e]() {
-            if (!e->Get<C>()) {
+        [em = schedule.GetEntityMngr()](Entity e, const A* a, const B* b) {
+          em->AddCommand([e, em]() {
+            if (!em->Have<C>(e)) {
               cout << "Attach C" << endl;
-              e->Attach<C>();
+              em->Attach<C>(e);
             }
           });
         },
         "AB");
     schedule.Request(
-        [](Entity* e, const A* a, const B* b, const C* c) {
-          e->AddCommand([e]() {
-            if (e->Get<C>()) {
+        [em = schedule.GetEntityMngr()](Entity e, const A* a, const B* b,
+                                        const C* c) {
+          em->AddCommand([e, em]() {
+            if (em->Have<C>(e)) {
               cout << "Dettach C" << endl;
-              e->Detach<C>();
+              em->Detach<C>(e);
             }
           });
         },

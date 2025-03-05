@@ -107,7 +107,7 @@ class Archetype {
 
   CmptTypeSet types;  // Entity + Components
   RuntimeCmptTraits cmptTraits;
-  std::map<CmptType, size_t>
+  std::unordered_map<CmptType, size_t>
       type2offset;  // CmptType to offset in chunk (include Entity)
 
   size_t chunkCapacity{static_cast<size_t>(-1)};

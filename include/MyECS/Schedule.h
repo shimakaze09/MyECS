@@ -13,7 +13,8 @@
 #include <map>
 
 namespace My {
-class World;
+class EntityMngr;
+class SystemMngr;
 
 class Schedule {
  public:
@@ -27,7 +28,9 @@ class Schedule {
   // if sys is not register, return static_cast<size_t>(-1)
   size_t EntityNumInQuery(std::string_view sys) const;
 
-  World* GetWorld() const noexcept { return world; }
+  EntityMngr* GetEntityMngr() const noexcept { return entityMngr; }
+
+  SystemMngr* GetSystemMngr() const noexcept { return systemMngr; }
 
   Schedule& Order(std::string_view x, std::string_view y);
 
@@ -69,7 +72,8 @@ class Schedule {
   }
 
  private:
-  Schedule(World* world) : world{world} {}
+  Schedule(EntityMngr* entityMngr, SystemMngr* systemMngr)
+      : entityMngr{entityMngr}, systemMngr{systemMngr} {}
 
   void Clear();
   SysFuncGraph GenSysFuncGraph() const;
@@ -112,7 +116,8 @@ class Schedule {
   std::unordered_map<size_t, FilterChange> sysFilterChange;
 
   Pool<SystemFunc> sysFuncPool;
-  World* world;
+  EntityMngr* entityMngr;
+  SystemMngr* systemMngr;
   friend class World;
 };
 }  // namespace My
