@@ -22,7 +22,7 @@
 
 support
 
-- `Entities.ForEach`: use `schedule.Register([](<Component-Tag>...){...})` 
+- `Entities.ForEach`: use `schedule.Register([](<Component-Tag>...){...})`
 - `Job.WithCode`: use `schedule.Register([](){...})`(empty argument)
 
 only support "ForEach"
@@ -73,7 +73,8 @@ needless, you can use any type (e.g. `std::vector`) in Component
 
 ## 3. Systems
 
-no instantiation, just use static function `OnUpdate(Schedule&)`，you can register `SystemFunc`，set update order, dynamic change filter, etc.
+no instantiation, just use static function `OnUpdate(Schedule&)`，you can register `SystemFunc`，set update order, dynamic
+change filter, etc.
 
 ### 3.1 Creating systems
 
@@ -85,7 +86,8 @@ lifecycle: only support `OnUpdate`, because of no instantiation
 
 **Components**
 
-use `CmptTag::LastFrame<Cmpt> (like const <Cmpt>*)`, `CmptTag::Write<Cmpt> == <Cmpt> *`, `CmptTag::Lastest<Cmpt> == const <Cmpt>* ` to differentiate read/write and timepoint
+use `CmptTag::LastFrame<Cmpt> (like const <Cmpt>*)`, `CmptTag::Write<Cmpt> == <Cmpt> *`,
+`CmptTag::Lastest<Cmpt> == const <Cmpt>* ` to differentiate read/write and timepoint
 
 - `SystemFunc` with `LastFrame<Cmpt>` run before any `SystemFunc` with `CmptTag::Write<Cmpt>`
 
@@ -96,14 +98,13 @@ use `CmptTag::LastFrame<Cmpt> (like const <Cmpt>*)`, `CmptTag::Write<Cmpt> == <C
 - `[const] Entity`
 - `size_t entityInQueryIndex`
 - (not-support) `size_t nativeThreadIndex`
-- `const EntityLocator* locator` 
-- `void** cmpts` 
+- `RTDCmptViewer`
 
 **System kind**
 
 - components (optional: + `Entity`, `size_t entityInQueryIndex`) : system for each entity
 - empty : job
-- `const EntityLocator* locator` + `void** cmpts`: run-time dynamic system function
+- `RTDCmptViewer`: run-time dynamic system function
 
 ### 3.2 System update order
 

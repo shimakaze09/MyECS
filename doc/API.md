@@ -246,9 +246,7 @@ query
 ### Methods
 
 - `template<typename Func> SystemFunc(Func&& func, std::string name, EntityFilter filter = EntityFilter{})`
--
-`template<typename Func> SystemFunc(Func&& func, std::string name, EntityLocator locator, EntityFilter filter = EntityFilter{})`:
-run-time dynamic function
+- `template<typename Func> SystemFunc(Func&& func, std::string name, EntityLocator locator, EntityFilter filter = EntityFilter{})`: run-time dynamic function
 - `const std::string& Name() const`
 - `static constexpr size_t HashCode(std::string_view name)`
 - `size_t HashCode() const`
@@ -269,8 +267,7 @@ schedule will be clear at the beginning of the **next** `World::Update()`
 #### Methods
 
 - `template<typename Func> Schedule& Register(Func&& func, std::string name, EntityFilter filter = EntityFilter{})`
--
-`template<typename Func> Schedule& Register(Func&& func, std::string name, EntityLocator locator, EntityFilter filter = EntityFilter{})`
+- `template<typename Func> Schedule& Register(Func&& func, std::string name, EntityLocator locator, EntityFilter filter = EntityFilter{})`
 - `Schedule& LockFilter(std::string_view sys)`
 - `size_t EntityNumInQuery(std::string_view sys) const`
 - `EntityMngr* GetEntityMngr() const`
@@ -320,3 +317,17 @@ manage entities
 - `void Update()`: schedule -> gen job graph -> run job graph in worker threads -> run commands in main thread
 
 - `std::string DumpUpdateJobGraph() const`: after `Update()`, you can use graphviz to visualize the graph
+
+## `RTDCmptViewer`
+
+use `RTDCmptViewer::Iterator` to read CmptPtr
+
+no read/write control
+
+### Methods
+
+- `RTDCmptViewer(EntityLocator* locator, void** cmpts)`
+- `Iterator begin() const`
+- `Iterator end() const`
+- `const std::set<CmptType>& CmptTypes() const`
+- `void* const* Components()` 
