@@ -9,6 +9,7 @@
 #include "SystemMngr.h"
 
 namespace My {
+// SystemMngr + EntityMngr
 class World {
  public:
   World() : schedule{&entityMngr, &systemMngr} {}

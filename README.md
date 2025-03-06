@@ -33,8 +33,8 @@ int main() {
 - system function with [`Entity`](src/test/03_query_entity/main.cpp), [`indexInQuery`](src/test/09_idx_in_query/main.cpp) 
 - [job function](src/test/08_job/main.cpp) 
 - [chunk layout optimization with alignment](src/test/05_alignment/main.cpp) 
-- [parrallel with `None` filter](src/test/06_none_parallel/main.cpp) 
-- [system **overload** / **write group**](src/test/07_overload/main.cpp) 
+- [parallel with `None` filter](src/test/06_none_parallel/main.cpp) 
+- [system **overload**](src/test/07_overload/main.cpp) 
 - [runtime dynamic component and system](src/test/11_runtime_cmpt/main.cpp) 
 
 ## Compare with Unity ECS

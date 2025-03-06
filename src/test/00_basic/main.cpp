@@ -15,13 +15,13 @@ struct Velocity {
 struct MoverSystem {
   static void OnUpdate(My::Schedule& schedule) {
     schedule.Register([](const Velocity* v, Position* p) { p->val += v->val; },
-                     "MoverSystem");
+                      "MoverSystem");
   }
 };
 
 int main() {
   My::World w;
   w.systemMngr.Register<MoverSystem>();
-  w.entityMngr.CreateEntity<Position, Velocity>();
+  w.entityMngr.Create<Position, Velocity>();
   w.Update();
 }

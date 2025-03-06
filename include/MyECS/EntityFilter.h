@@ -11,6 +11,7 @@
 #include <set>
 
 namespace My {
+// filter Archetype with All, Any and None
 class EntityFilter {
  public:
   EntityFilter();
@@ -51,6 +52,12 @@ class EntityFilter {
   const std::set<CmptType>& NoneCmptTypes() const noexcept {
     return noneCmptTypes;
   }
+
+  // [API]
+  // <Mode><Type>(Container|CmptTypes...|CmptType*, num)
+  // - <Mode>: Insert | Erase
+  // - <Type>: All | Any | None
+  // - side effect: update hashcode
 
   void InsertAll(const CmptType* types, size_t num);
   void InsertAny(const CmptType* types, size_t num);

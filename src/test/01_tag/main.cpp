@@ -9,6 +9,8 @@
 using namespace My;
 using namespace std;
 
+struct Data {};
+
 struct DataSystem {
   static void OnUpdate(Schedule& schedule) {
     schedule
@@ -36,7 +38,7 @@ int main() {
   World w;
   w.systemMngr.Register<DataSystem>();
 
-  w.entityMngr.CreateEntity<Data>();
+  w.entityMngr.Create<Data>();
 
   w.Update();
 

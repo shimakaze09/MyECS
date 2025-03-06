@@ -68,13 +68,13 @@ Cmpt* Archetype::At(size_t idx) const {
 }
 
 template <typename... Cmpts>
-std::tuple<size_t, std::tuple<Cmpts*...>> Archetype::CreateEntity(Entity e) {
+std::tuple<size_t, std::tuple<Cmpts*...>> Archetype::Create(Entity e) {
   assert((types.IsContain<Cmpts>() && ...) &&
          types.size() == 1 + sizeof...(Cmpts));
   static_assert((std::is_constructible_v<Cmpts> && ...),
-                "Archetype::CreateEntity: <Cmpts> isn't constructible");
+                "Archetype::Create: <Cmpts> isn't constructible");
   static_assert(IsSet_v<TypeList<Entity, Cmpts...>>,
-                "Archetype::CreateEntity: <Cmpts> must be different");
+                "Archetype::Create: <Cmpts> must be different");
 
   size_t idx = RequestBuffer();
   size_t idxInChunk = idx % chunkCapacity;

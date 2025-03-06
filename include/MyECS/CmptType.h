@@ -7,6 +7,8 @@
 #include <MyTemplate/TypeID.h>
 
 namespace My {
+// Component Type
+// use a hashcode to distinguish different type
 class CmptType {
  public:
   explicit constexpr CmptType(size_t id) : hashcode{id} {}

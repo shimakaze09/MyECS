@@ -8,6 +8,7 @@
 #include "EntityLocator.h"
 
 namespace My {
+// EntityFilter + EntityLocator
 class EntityQuery {
  public:
   EntityFilter filter;

@@ -16,6 +16,13 @@ namespace My {
 class EntityMngr;
 class SystemMngr;
 
+// [description]
+// system information record
+// - SystemFunc container
+// - orders
+// - dynamic filter changes
+// [detail]
+// schedule will be clear at the beginning of the next World::Update()
 class Schedule {
  public:
   template <typename Func>

@@ -53,23 +53,73 @@ Archetype* EntityMngr::GetOrCreateArchetypeOf(CmptTypes... types) {
 }
 
 template <typename... Cmpts>
-std::tuple<Entity, Cmpts*...> EntityMngr::CreateEntity() {
+std::tuple<Entity, Cmpts*...> EntityMngr::Create() {
   static_assert(IsSet_v<TypeList<Entity, Cmpts...>>,
-                "EntityMngr::CreateEntity: <Cmpts> must be different");
+                "EntityMngr::Create: <Cmpts> must be different");
   Archetype* archetype = GetOrCreateArchetypeOf<Cmpts...>();
   size_t entityIndex = RequestEntityFreeEntry();
   EntityInfo& info = entityTable[entityIndex];
   Entity e{entityIndex, info.version};
   info.archetype = archetype;
-  auto [idxInArchetype, cmpts] = archetype->CreateEntity<Cmpts...>(e);
+  auto [idxInArchetype, cmpts] = archetype->Create<Cmpts...>(e);
   info.idxInArchetype = idxInArchetype;
   return {e, std::get<Cmpts*>(cmpts)...};
 }
 
 template <typename... CmptTypes, typename>
-Entity EntityMngr::CreateEntity(CmptTypes... types) {
+Entity EntityMngr::Create(CmptTypes... types) {
   const std::array<CmptType, sizeof...(CmptTypes)> typeArr{types...};
-  return CreateEntity(typeArr.data(), typeArr.size());
+  return Create(typeArr.data(), typeArr.size());
+}
+
+template <typename... Cmpts>
+void EntityMngr::AttachWithoutInit(Entity e) {
+  assert(Exist(e));
+
+  auto& info = entityTable[e.Idx()];
+  Archetype* srcArchetype = info.archetype;
+  size_t srcIdxInArchetype = info.idxInArchetype;
+
+  const auto& srcCmptTypeSet = srcArchetype->GetCmptTypeSet();
+  auto dstCmptTypeSet = srcCmptTypeSet;
+  dstCmptTypeSet.Insert<Cmpts...>();
+  size_t dstCmptTypeSetHashCode = dstCmptTypeSet.HashCode();
+
+  // get dstArchetype
+  Archetype* dstArchetype;
+  auto target = h2a.find(dstCmptTypeSetHashCode);
+  if (target == h2a.end()) {
+    dstArchetype = Archetype::Add<Cmpts...>(srcArchetype);
+    assert(dstCmptTypeSet == dstArchetype->GetCmptTypeSet());
+    h2a[dstCmptTypeSetHashCode] = dstArchetype;
+    for (auto& [query, archetypes] : queryCache) {
+      if (dstCmptTypeSet.IsMatch(query))
+        archetypes.insert(dstArchetype);
+    }
+  } else
+    dstArchetype = target->second;
+
+  if (dstArchetype == srcArchetype)
+    return;
+
+  // move src to dst
+  size_t dstIdxInArchetype = dstArchetype->RequestBuffer();
+
+  auto srcCmptTraits = srcArchetype->GetRTSCmptTraits();
+  for (auto type : srcCmptTypeSet) {
+    auto [srcCmpt, srcSize] = srcArchetype->At(type, srcIdxInArchetype);
+    auto [dstCmpt, dstSize] = dstArchetype->At(type, dstIdxInArchetype);
+    assert(srcSize == dstSize);
+    srcCmptTraits.MoveConstruct(type, dstCmpt, srcCmpt);
+  }
+
+  // erase
+  auto srcMovedEntityIndex = srcArchetype->Erase(srcIdxInArchetype);
+  if (srcMovedEntityIndex != size_t_invalid)
+    entityTable[srcMovedEntityIndex].idxInArchetype = srcIdxInArchetype;
+
+  info.archetype = dstArchetype;
+  info.idxInArchetype = dstIdxInArchetype;
 }
 
 template <typename... CmptTypes, typename>
@@ -92,7 +142,7 @@ std::tuple<Cmpts*...> EntityMngr::Attach(Entity e) {
       entityTable[e.Idx()]
           .archetype->GetCmptTypeSet()
           .IsNotContain<Cmpts>()...};
-  AttachWithoutInit(e, CmptType::Of<Cmpts>()...);
+  AttachWithoutInit<Cmpts...>(e);
   const auto& new_info = entityTable[e.Idx()];
   std::tuple<Cmpts*...> cmpts{
       new_info.archetype->At<Cmpts>(new_info.idxInArchetype)...};
@@ -146,7 +196,7 @@ Cmpt* EntityMngr::Emplace(Entity e, Args&&... args) {
   bool needAttach =
       entityTable[e.Idx()].archetype->GetCmptTypeSet().IsNotContain<Cmpt>();
   if (needAttach) {
-    AttachWithoutInit(e, CmptType::Of<Cmpt>());
+    AttachWithoutInit<Cmpt>(e);
     const auto& info = entityTable[e.Idx()];
     Cmpt* cmpt = info.archetype->At<Cmpt>(info.idxInArchetype);
     return new (cmpt) Cmpt{std::forward<Args>(args)...};

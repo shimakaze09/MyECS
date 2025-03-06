@@ -22,6 +22,7 @@ namespace My {
 class EntityMngr;
 
 // Entity is a special Component
+// type of Entity + Components is Archetype's type
 class Archetype {
  public:
   // argument TypeList<Cmpts...> is for type deduction
@@ -80,8 +81,8 @@ class Archetype {
   // init cmpts, set Entity
   // size_t: index in archetype
   template <typename... Cmpts>
-  std::tuple<size_t, std::tuple<Cmpts*...>> CreateEntity(Entity e);
-  size_t CreateEntity(Entity e);
+  std::tuple<size_t, std::tuple<Cmpts*...>> Create(Entity e);
+  size_t Create(Entity e);
 
   // return index in archetype
   size_t Instantiate(Entity e, size_t srcIdx);

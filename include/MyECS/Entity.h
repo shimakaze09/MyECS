@@ -7,7 +7,8 @@
 #include "detail/Util.h"
 
 namespace My {
-class Entity final {
+// index + version
+class Entity {
  public:
   size_t Idx() const noexcept { return idx; }
 
