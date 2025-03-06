@@ -689,3 +689,6 @@ FodyWeavers.xsd
 
 # Dependencies
 _deps/
+
+# Resources
+resources/

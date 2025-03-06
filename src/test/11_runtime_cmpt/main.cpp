@@ -15,7 +15,7 @@ struct RTDSystem {
                           {},                     // write
                           {}                      // read: lastest
     );
-    schedule.Request(
+    schedule.Register(
         [](const EntityLocator* locator, void** cmpts) {
           for (auto type : locator->CmptTypes())
             cout << type.HashCode() << endl;
@@ -38,7 +38,7 @@ int main() {
   auto [e] = w.entityMngr.CreateEntity();
   w.entityMngr.Attach(e, type);
   // C-style API
-  //w.entityMngr.Attach(e, &type, 1);
+  // w.entityMngr.Attach(e, &type, 1);
 
   w.Update();
 

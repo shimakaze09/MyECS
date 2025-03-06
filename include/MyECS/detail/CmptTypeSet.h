@@ -103,7 +103,7 @@ class CmptTypeSet : std::set<CmptType> {
   static constexpr size_t HashCodeOf(TypeList<Cmpts...>) noexcept;
 
   template <typename Container>
-  static constexpr size_t HashCodeOf(const Container& cmpts);
+  static constexpr size_t HashCodeOf(const Container& cmpts) noexcept;
 
   size_t hashcode;
 };

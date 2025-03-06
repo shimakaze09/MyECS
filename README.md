@@ -1,38 +1,12 @@
 # MyECS
 
-A custom Entity-Component-System framework in Unity-style
+A custom Entity-Component-System framework for game development.
 
-## Example
+## Concepts
 
-```c++
-#include <MyECS/World.h>
-
-struct Position { float val; };
-struct Velocity { float val; };
-
-struct MoverSystem {
-    static void OnUpdate(My::Schedule& schedule) {
-        schedule.Request(
-            [](const Velocity* v, Position* p) {
-                p->val += v->val;
-            }, "MoverSystem");
-    }
-};
-
-int main() {
-    My::World w;
-    w.systemMngr.Register<MoverSystem>();
-    w.entityMngr.CreateEntity<Position, Velocity>();
-    w.Update();
-}
-```
-
-## Compare with Unity ECS
-
-MyECS's primary reference project is Unity's ECS.
-
-Read [compare.md](compare.md) for details.
-
-## TODOs
-
-Read [todo.md](todo.md) for details.
+- **System**: Functions that are identified by a unique string ID
+- **Job**: Parameter-less executable functions created after preparing data for a system, which can run either in
+  parallel or sequentially
+- **Schedule**: Stores all jobs and their dependency relationships; once all declarations are complete, it can be
+  assembled into a comprehensive task
+- **ScheduleRegistrar**: Interface through which users register systems for the current frame

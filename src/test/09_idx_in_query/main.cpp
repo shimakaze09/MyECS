@@ -10,20 +10,18 @@ using namespace My;
 using namespace std;
 
 struct A {};
-
 struct B {};
 
 struct MySystem {
   static void OnUpdate(Schedule& schedule) {
     auto flags = std::make_shared<std::vector<bool>>();
     schedule
-        .Request([flags](Entity e, size_t indexInQuery,
-                         const A*) { flags->at(indexInQuery) = true; },
-                 "set flag")
-        .Request(
+        .Register([flags](Entity e, size_t indexInQuery,
+                          const A*) { flags->at(indexInQuery) = true; },
+                  "set flag")
+        .Register(
             [flags]() {
-              for (auto flag : *flags)
-                cout << flag << endl;
+              for (auto flag : *flags) cout << flag << endl;
             },
             "print flag")
         .Order("set flag", "print flag");

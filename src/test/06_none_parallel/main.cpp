@@ -10,7 +10,6 @@ using namespace My;
 using namespace std;
 
 struct A {};
-
 struct B {};
 
 struct MySystem {
@@ -23,8 +22,8 @@ struct MySystem {
                            TypeList<>{},   // any
                            TypeList<>{}    // none
     );
-    schedule.Request([](B*) {}, "need B, none A", filter_w0)
-        .Request([](B*) {}, "need A, B", filter_w1);
+    schedule.Register([](B*) {}, "need B, none A", filter_w0)
+        .Register([](B*) {}, "need A, B", filter_w1);
   }
 };
 

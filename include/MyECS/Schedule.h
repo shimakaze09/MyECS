@@ -18,14 +18,28 @@ class SystemMngr;
 
 class Schedule {
  public:
-  template <typename... Args>
-  Schedule& Request(Args&&... args) {
-    SystemFunc* sysFunc = sysFuncPool.Request(std::forward<Args>(args)...);
-    sysFuncs.emplace(sysFunc->HashCode(), sysFunc);
+  template <typename Func>
+  Schedule& Register(Func&& func, std::string name,
+                     EntityFilter filter = EntityFilter{}) {
+    return Request(std::forward<Func>(func), std::move(name),
+                   std::move(filter));
+  }
+
+  // run-time dynamic function
+  template <typename Func>
+  Schedule& Register(Func&& func, std::string name, EntityLocator locator,
+                     EntityFilter filter = EntityFilter{}) {
+    return Request(std::forward<Func>(func), std::move(name),
+                   std::move(locator), std::move(filter));
+  }
+
+  Schedule& LockFilter(std::string_view sys) {
+    sysLockFilter.insert(SystemFunc::HashCode(sys));
     return *this;
   }
 
-  // if sys is not register, return static_cast<size_t>(-1)
+  // if sys is unregistered, return size_t_invalid
+  // call LockFilterChange(std::string_view)
   size_t EntityNumInQuery(std::string_view sys) const;
 
   EntityMngr* GetEntityMngr() const noexcept { return entityMngr; }
@@ -72,6 +86,13 @@ class Schedule {
   }
 
  private:
+  template <typename... Args>
+  Schedule& Request(Args&&... args) {
+    SystemFunc* sysFunc = sysFuncPool.Request(std::forward<Args>(args)...);
+    sysFuncs.emplace(sysFunc->HashCode(), sysFunc);
+    return *this;
+  }
+
   Schedule(EntityMngr* entityMngr, SystemMngr* systemMngr)
       : entityMngr{entityMngr}, systemMngr{systemMngr} {}
 
@@ -95,6 +116,7 @@ class Schedule {
   };
 
   std::unordered_map<size_t, FilterChange> sysFilterChange;
+  std::unordered_set<size_t> sysLockFilter;
 
   Pool<SystemFunc> sysFuncPool;
   EntityMngr* entityMngr;

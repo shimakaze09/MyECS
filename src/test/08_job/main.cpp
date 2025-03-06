@@ -10,23 +10,20 @@ using namespace My;
 using namespace std;
 
 struct A {};
-
 struct B {};
 
 struct MySystem {
   static void OnUpdate(Schedule& schedule) {
     auto buffer = std::make_shared<std::vector<size_t>>();
     schedule
-        .Request(
+        .Register(
             [buffer]() {
-              for (size_t i = 0; i < 10; i++)
-                buffer->push_back(i);
+              for (size_t i = 0; i < 10; i++) buffer->push_back(i);
             },
             "job0")
-        .Request(
+        .Register(
             [buffer]() {
-              for (size_t i : *buffer)
-                cout << i << endl;
+              for (size_t i : *buffer) cout << i << endl;
             },
             "job1")
         .Order("job0", "job1");

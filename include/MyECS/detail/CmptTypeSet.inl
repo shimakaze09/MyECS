@@ -143,7 +143,8 @@ static constexpr size_t CmptTypeSet::HashCodeOf(TypeList<Cmpts...>) noexcept {
 }
 
 template <typename Container>
-static constexpr size_t CmptTypeSet::HashCodeOf(const Container& cmpts) {
+static constexpr size_t CmptTypeSet::HashCodeOf(
+    const Container& cmpts) noexcept {
   size_t seed = TypeID<CmptTypeSet>;
   for (const CmptType& cmpt : cmpts)
     seed = hash_combine(seed, cmpt.HashCode());

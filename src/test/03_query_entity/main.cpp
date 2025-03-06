@@ -10,14 +10,12 @@ using namespace My;
 using namespace std;
 
 struct A {};
-
 struct B {};
-
 struct C {};
 
 struct MySystem {
   static void OnUpdate(Schedule& schedule) {
-    schedule.Request(
+    schedule.Register(
         [em = schedule.GetEntityMngr()](Entity e, const A* a, const B* b) {
           em->AddCommand([e, em]() {
             if (!em->Have<C>(e)) {
@@ -27,7 +25,7 @@ struct MySystem {
           });
         },
         "AB");
-    schedule.Request(
+    schedule.Register(
         [em = schedule.GetEntityMngr()](Entity e, const A* a, const B* b,
                                         const C* c) {
           em->AddCommand([e, em]() {

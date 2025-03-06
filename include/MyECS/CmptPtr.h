@@ -22,11 +22,7 @@ class CmptPtr {
     return reinterpret_cast<Cmpt*>(p);
   }
 
-  CmptType& Type() noexcept { return type; }
-
   CmptType Type() const noexcept { return type; }
-
-  void*& Ptr() noexcept { return p; }
 
   void* Ptr() const noexcept { return p; }
 
@@ -48,11 +44,7 @@ class CmptCPtr {
     return reinterpret_cast<Cmpt*>(p);
   }
 
-  CmptType& Type() noexcept { return type; }
-
   CmptType Type() const noexcept { return type; }
-
-  const void*& Ptr() noexcept { return p; }
 
   const void* Ptr() const noexcept { return p; }
 

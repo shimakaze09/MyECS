@@ -18,6 +18,7 @@ EntityFilter::EntityFilter(TypeList<AllCmpts...>, TypeList<AnyCmpts...>,
       noneHashCode{GenNoneHashCode()},
       combinedHashCode{GenCombinedHashCode()} {
   static_assert(sizeof...(AnyCmpts) != 1);
+  static_assert(IsSet_v<TypeList<AllCmpts..., AnyCmpts..., NoneCmpts...>>);
 }
 
 template <typename Container>
@@ -78,6 +79,48 @@ void EntityFilter::EraseNone(const Container& c) {
     noneCmptTypes.erase(type);
   noneHashCode = GenNoneHashCode();
   combinedHashCode = GenCombinedHashCode();
+}
+
+template <typename... CmptTypes, typename>
+void EntityFilter::InsertAll(CmptTypes... types) {
+  static_assert(sizeof...(CmptTypes) > 0);
+  const std::array<CmptType, sizeof...(CmptTypes)> typeArr;
+  InsertAll(typeArr.data(), typeArr.size());
+}
+
+template <typename... CmptTypes, typename>
+void EntityFilter::InsertAny(CmptTypes... types) {
+  static_assert(sizeof...(CmptTypes) > 0);
+  const std::array<CmptType, sizeof...(CmptTypes)> typeArr;
+  InsertAny(typeArr.data(), typeArr.size());
+}
+
+template <typename... CmptTypes, typename>
+void EntityFilter::InsertNone(CmptTypes... types) {
+  static_assert(sizeof...(CmptTypes) > 0);
+  const std::array<CmptType, sizeof...(CmptTypes)> typeArr;
+  InsertNone(typeArr.data(), typeArr.size());
+}
+
+template <typename... CmptTypes, typename>
+void EntityFilter::EraseAll(CmptTypes... types) {
+  static_assert(sizeof...(CmptTypes) > 0);
+  const std::array<CmptType, sizeof...(CmptTypes)> typeArr;
+  EraseAll(typeArr.data(), typeArr.size());
+}
+
+template <typename... CmptTypes, typename>
+void EntityFilter::EraseAny(CmptTypes... types) {
+  static_assert(sizeof...(CmptTypes) > 0);
+  const std::array<CmptType, sizeof...(CmptTypes)> typeArr;
+  EraseAny(typeArr.data(), typeArr.size());
+}
+
+template <typename... CmptTypes, typename>
+void EntityFilter::EraseNone(CmptTypes... types) {
+  static_assert(sizeof...(CmptTypes) > 0);
+  const std::array<CmptType, sizeof...(CmptTypes)> typeArr;
+  EraseNone(typeArr.data(), typeArr.size());
 }
 }  // namespace My
 

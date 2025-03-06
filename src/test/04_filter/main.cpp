@@ -10,16 +10,11 @@ using namespace My;
 using namespace std;
 
 struct A {};
-
 struct B {};
-
 struct C {};
-
 struct D {};
-
 struct E {
   E(float f) : val{f} {}
-
   float val;
 };
 
@@ -29,8 +24,8 @@ struct MySystem {
                         TypeList<B, C>{},  // any
                         TypeList<D>{}      // none
     );
-    schedule.Request([](const E* e) { cout << e->val << endl; }, "test filter",
-                     filter);
+    schedule.Register([](const E* e) { cout << e->val << endl; }, "test filter",
+                      filter);
   }
 };
 
