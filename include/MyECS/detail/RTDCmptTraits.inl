@@ -12,7 +12,7 @@ inline RTDCmptTraits& RTDCmptTraits::Instance() noexcept {
   return instance;
 }
 
-// neccessary
+// necessary
 inline RTDCmptTraits& RTDCmptTraits::RegisterSize(CmptType type, size_t size) {
   sizeofs[type] = size;
   return *this;
@@ -55,6 +55,8 @@ inline RTDCmptTraits& RTDCmptTraits::RegisterDestructor(
 
 template <typename Cmpt>
 void RTDCmptTraits::Register() {
+  static_assert(std::is_default_constructible_v<Cmpt>,
+                "<Cmpt> must be default-constructible");
   static_assert(std::is_copy_constructible_v<Cmpt>,
                 "<Cmpt> must be copy-constructible");
   static_assert(std::is_move_constructible_v<Cmpt>,
@@ -66,6 +68,11 @@ void RTDCmptTraits::Register() {
   sizeofs[type] = sizeof(Cmpt);
   alignments[type] = alignof(Cmpt);
 
+  if constexpr (!std::is_trivially_default_constructible_v<Cmpt>) {
+    default_constructors[type] = [](void* cmpt) {
+      new (cmpt) Cmpt;
+    };
+  }
   if constexpr (!std::is_trivially_destructible_v<Cmpt>) {
     destructors[type] = [](void* cmpt) {
       reinterpret_cast<Cmpt*>(cmpt)->~Cmpt();
@@ -90,6 +97,8 @@ void RTDCmptTraits::Deregister() {
   sizeofs.erase(type);
   alignments.erase(type);
 
+  if constexpr (!std::is_trivially_constructible_v<Cmpt>)
+    default_constructors.erase(type);
   if constexpr (!std::is_trivially_destructible_v<Cmpt>)
     destructors.erase(type);
   if constexpr (!std::is_trivially_move_constructible_v<Cmpt>)

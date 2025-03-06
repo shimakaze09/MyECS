@@ -119,7 +119,7 @@ void EntityMngr::AttachWithoutInit(Entity e, CmptTypes... types) {
 template <typename... Cmpts>
 std::tuple<Cmpts*...> EntityMngr::Attach(Entity e) {
   static_assert((std::is_constructible_v<Cmpts> && ...),
-                "EntityMngr::Attach: <Cmpts> isn't default constructable");
+                "EntityMngr::Attach: <Cmpts> isn't default constructible");
   if (!Exist(e))
     throw std::invalid_argument("Entity is invalid");
 
