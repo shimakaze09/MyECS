@@ -1,6 +1,6 @@
 # MyECS
 
-**My** **E**ntity-**C**omponent-**S**ystem in Unity-style
+**My** **E**ntity-**C**omponent-**S**ystem in Unity3D-style
 
 ## Environment
 
