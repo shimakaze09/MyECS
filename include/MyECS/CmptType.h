@@ -28,6 +28,10 @@ class CmptType {
     return TypeID<Cmpt>;
   }
 
+  static constexpr CmptType Invalid() noexcept {
+    return CmptType{static_cast<size_t>(-1)};
+  }
+
   template <typename Cmpt>
   bool Is() const noexcept {
     return hashcode == HashCodeOf<Cmpt>();

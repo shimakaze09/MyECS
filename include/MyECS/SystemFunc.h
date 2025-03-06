@@ -6,6 +6,7 @@
 
 #include "Entity.h"
 #include "EntityQuery.h"
+#include "RTDCmptViewer.h"
 
 #include <functional>
 
@@ -41,9 +42,8 @@ class SystemFunc {
 
   size_t HashCode() const noexcept { return hashCode; }
 
-  void operator()(Entity e, size_t entityIndexInQuery,
-                  const EntityLocator* locator, void** cmptArr) {
-    return func(e, entityIndexInQuery, locator, cmptArr);
+  void operator()(Entity e, size_t entityIndexInQuery, RTDCmptViewer rtdcmpts) {
+    return func(e, entityIndexInQuery, rtdcmpts);
   }
 
   // no arguments <Func>
@@ -57,7 +57,7 @@ class SystemFunc {
   template <typename Func, typename ArgList>
   SystemFunc(Func&& func, std::string name, EntityFilter filter, ArgList);
 
-  std::function<void(Entity, size_t, const EntityLocator*, void**)> func;
+  std::function<void(Entity, size_t, RTDCmptViewer)> func;
 
   std::string name;
   bool isJob;

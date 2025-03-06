@@ -22,9 +22,8 @@ SystemFunc::SystemFunc(Func&& func, std::string name, EntityLocator locator,
       query{std::move(filter), std::move(locator)} {
   using ArgList = FuncTraits_ArgList<Func>;
 
-  static_assert(
-      ContainTs_v<ArgList, const EntityLocator*, void**>,
-      "<Func>'s argument must contain const EntityLocator* and void**");
+  static_assert(ContainTs_v<ArgList, RTDCmptViewer>,
+                "<Func>'s argument must contain RTDCmptViewer");
 }
 
 template <typename Func>
@@ -54,11 +53,11 @@ struct Packer<TypeList<DecayedArgs...>, TypeList<Cmpts...>> {
   template <typename Func>
   static auto run(Func&& func) noexcept {
     return [func = std::forward<Func>(func)](
-               Entity e, size_t entityIndexInQuery,
-               const EntityLocator* locator, void** cmpt_arr) {
+               Entity e, size_t entityIndexInQuery, RTDCmptViewer rtdcmpts) {
       auto unsorted_arg_tuple = std::make_tuple(
-          e, entityIndexInQuery, locator, cmpt_arr,
-          reinterpret_cast<Cmpts*>(cmpt_arr[Find_v<CmptList, Cmpts>])...);
+          e, entityIndexInQuery, rtdcmpts,
+          reinterpret_cast<Cmpts*>(
+              rtdcmpts.Components()[Find_v<CmptList, Cmpts>])...);
       func(std::get<DecayedArgs>(unsorted_arg_tuple)...);
     };
   }
