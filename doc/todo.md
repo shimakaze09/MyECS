@@ -17,13 +17,13 @@
 - [x] `Archetype` += `RuntimeCmptTraits`
 - [x] empty argument `SystemFunc` as job
 - [x] index in `Query`
-  - [x] `SystemFunc` support
-  - [x] get entity num of query
+    - [x] `SystemFunc` support
+    - [x] get entity num of query
 - [x] instantiate
 - [x] string/`CmptType`-driven API
-  - [x] `RTDCmptTraits` : **R**un-**T**ime **D**ynamic **C**omponent **T**raits
-  - [x] run-time dynamic `SystemFunc`
-  - [x] C-style API
+    - [x] `RTDCmptTraits` : **R**un-**T**ime **D**ynamic **C**omponent **T**raits
+    - [x] run-time dynamic `SystemFunc`
+    - [x] C-style API
 
 ### unimportant
 
@@ -31,6 +31,7 @@
 - [ ] batch create/instantiate (need benchmark)
 - [x] lock `FilterChange`
 - [ ] `EntityMngr` `Query`-driven API
+- [ ] `RTDCmpts` = `const EntityLocator* locator + void** cmpts`
 
 ### maybe deprecate
 

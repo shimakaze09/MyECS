@@ -7,7 +7,7 @@
 namespace My {
 template <typename System>
 void SystemMngr::RegisterOne() {
-  lifecycleMap.emplace(TypeID<System>, SystemLifecycle{&System::OnUpdate});
+  Register(std::string{nameof::nameof_type<System>()}, &System::OnUpdate);
 }
 
 template <typename... Systems>
@@ -17,11 +17,16 @@ void SystemMngr::Register() {
 
 template <typename System>
 bool SystemMngr::IsRegistered() const {
-  return lifecycleMap.find(TypeID<System>) != lifecycleMap.end();
+  return IsRegistered(nameof::nameof_type<System>());
 }
 
 template <typename System>
+void DeregisterOne() {
+  Deregister(std::string{nameof::nameof_type<System>()});
+}
+
+template <typename... Systems>
 void SystemMngr::Deregister() noexcept {
-  lifecycleMap.erase(TypeID<System>);
+  (DeregisterOne<Systems>(), ...);
 }
 }  // namespace My
