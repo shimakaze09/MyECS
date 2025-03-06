@@ -8,9 +8,11 @@
 - C++ 17
 - CMake 16.3 +
 
-## Document
+## Documentation
 
-> TODO
+- [API](doc/API.md) 
+- [Comparison with Unity3D ECS](doc/comparison.md) 
+- [TODO](doc/todo.md) 
 
 ## Example
 
@@ -48,13 +50,3 @@ int main() {
 - [parallel with `None` filter](src/test/06_none_parallel/main.cpp)
 - [system **overload**](src/test/07_overload/main.cpp)
 - [runtime dynamic component and system](src/test/11_runtime_cmpt/main.cpp)
-
-## Comparison with Unity ECS
-
-MyECS's primary reference project is Unity3D's ECS -- Entities.
-
-Read [comparison.md](comparison.md) for details.
-
-## TODO
-
-Read [todo.md](todo.md) for details.
