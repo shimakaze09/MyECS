@@ -18,7 +18,7 @@ class SystemMngr;
 
 // [description]
 // system information record
-// - SystemFunc container
+// - SystemFunc
 // - orders
 // - dynamic filter changes
 // [detail]
