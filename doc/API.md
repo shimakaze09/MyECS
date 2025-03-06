@@ -1,10 +1,12 @@
-# `Entity`
+# API
+
+## `Entity`
 
 Entity = `index` + `version`
 
-## Fields
+### Fields
 
-### `size_t index`
+#### `size_t index`
 
 The ID of an entity.
 
@@ -12,7 +14,7 @@ Entity indexes are recycled when an entity is destroyed. When an entity is destr
 version identifier. To represent the same entity, both the Index and the Version fields of the Entity object must match.
 If the Index is the same, but the Version is different, then the entity has been recycled.
 
-`version`
+#### `version`
 
 The generational version of the entity.
 
@@ -20,22 +22,22 @@ The Version number can, theoretically, overflow and wrap around within the lifet
 you cannot assume that an Entity instance with a larger Version is a more recent incarnation of the entity than one with
 a smaller Version (and the same Index).
 
-## Methods
+### Methods
 
 - `size_t Idx() const`: entity's index.
 - `size_t Version() const`: entity's version.
 
-# `CmptType`
+## `CmptType`
 
 an ID to identify component's type, use `TypeID<Component>`(a **compile-time** hash code of `Component`) as default.
 
-## Fields
+### Fields
 
-### `size_t hashcode`
+#### `size_t hashcode`
 
 ID, it's unique in global.
 
-## Methods
+### Methods
 
 - `constexpr CmptType(size_t id)`: custom ID
 - `constexpr CmptType(std::string_view)`: use `RuntimeTypeID(std::string_view)` (
@@ -46,21 +48,21 @@ ID, it's unique in global.
   `CmptType::Of<Cmpt>().HashCode()`
 - `template<typename Cmpt> bool Is() const`: if ID is same with `TypeID<Cmpt>`, return `true`, else return `false`
 
-# `CmptPtr`
+## `CmptPtr`
 
 `CmptPtr` = `CmptType` + `void*`
 
-## Fields
+### Fields
 
-### `CmptType type`
+#### `CmptType type`
 
 `CmptType` use to identify `void*` pointer's actual type.
 
-### `void* ptr`
+#### `void* ptr`
 
 a no-type pointer of a component.
 
-## Methods
+### Methods
 
 - `CmptPtr(CmptType, void*)`: constructor
 - `template<typename Cmpt> CmptPtr(Cmpt*)`: use `CmptType::Of<Cmpt>` as `type`
@@ -68,7 +70,7 @@ a no-type pointer of a component.
 - `void* Ptr() const`: get `ptr`
 - `template<typename Cmpt> Cmpt* As() const:`: reinterpret `ptr`
 
-# `RTDCmptTraits`
+## `RTDCmptTraits`
 
 runtime component traits for dynamic type
 
@@ -76,14 +78,14 @@ it's a singleton class
 
 you can register a dynamic class with
 
-- size: neccessary, must `> 0`
+- size: necessary, must `> 0`
 - alignment: optional, `alignof(std::max_align_t)` as default, 8 / 16 in most cases
 - default constructor: optional, do nothing as default
 - copy constructor: optional, `memcpy` as default
 - move constructor: optional, `memcpy` as default
 - destructor: optional, do nothing as default
 
-## Methods
+### Methods
 
 - `static RTDCmptTraits& Instance()`: get the instance of `RTDCmptTraits`
 - `RTDCmptTraits& RegisterSize(CmptType type, size_t size)`
@@ -94,15 +96,15 @@ you can register a dynamic class with
 - `RTDCmptTraits& RegisterDestructor(CmptType type, std::function<void(void*)> f)`
 - `RTDCmptTraits& Deregister(CmptType type)`: deregister size, alignment, default/copy/move constructor and destructor.
 
-# `EntityMngr`
+## `EntityMngr`
 
 The `EntityMngr` manages entities and components in a `World`.
 
-## Fields
+### Fields
 
-### `private: std::vector<EntityInfo> entityTable`
+#### `private: std::vector<EntityInfo> entityTable`
 
-an array to store entities's infomation.
+an array to store entities' information.
 
 > ```c++
 > struct EntityInfo {
@@ -112,11 +114,11 @@ an array to store entities's infomation.
 > };
 > ```
 
-### `private: std::vector<std::function<void()>> commandBuffer`
+#### `private: std::vector<std::function<void()>> commandBuffer`
 
 a buffer to store commands added in `World::Update()` for methods which can not run in worker threads.
 
-## Methods
+### Methods
 
 **Entity**
 
@@ -155,9 +157,9 @@ if `e` is invalid, throw `std::invalid_argument`.
 
 - `void Attach(Entity, const CmptType* types, size_t num)`: adds components `types`(length `num`) to the entity.
 
-  > construct: call `RTDCmptTraits`' default constructor if user has registered customed default constructor.
+  > construct: call `RTDCmptTraits`' default constructor if user has registered customized default constructor.
   >
-  > move: call `RTDCmptTraits`' move constructor or memcpy if user hasn't registered customed move constructor.
+  > move: call `RTDCmptTraits`' move constructor or memcpy if user hasn't registered customized move constructor.
 
 - `template<typename... CmptTypes> std::array<CmptPtr, sizeof...(CmptTypes)> Attach(Entity, CmptTypes...)`: a convenient
   interface for `void Attach(Entity, const CmptType* types, size_t num)`.
@@ -173,9 +175,9 @@ if `e` is invalid, throw `std::invalid_argument`.
 
 - `void Attach(Entity, const CmptType* types, size_t num)`: removes components `types`(length `num`) to the entity.
 
-  > destruct: call `RTDCmptTraits`' destructor if user has registered customed destructor.
+  > destruct: call `RTDCmptTraits`' destructor if user has registered customized destructor.
   >
-  > move: call `RTDCmptTraits`' move constructor or memcpy if user hasn't registered customed move constructor.
+  > move: call `RTDCmptTraits`' move constructor or memcpy if user hasn't registered customized move constructor.
 
 - `template<typename... CmptTypes> std::array<CmptPtr, sizeof...(CmptTypes)> Attach(Entity, CmptTypes...)`: a convenient
   interface for `void Attach(Entity, const CmptType* types, size_t num)`.
@@ -198,27 +200,27 @@ if `e` is invalid, throw `std::invalid_argument`.
 - `void AddCommand(const std::function<void()>& command)`: add a command in updating and run at the end of
   `World::Update` in the main thread.
 
-# `CmptTag`
+## `CmptTag`
 
-use tag to dstinguish write, read before write and read after write
+use tag to distinguish write, read before write and read after write
 
 - `CmptTag::LastFrame<Component>`: read before write
 - `CmptTag::Write<Component>`: write, equal to `<Component> *`
 - `CmptTag::Latest<Component>`: read after write, equal to `const <Component> *`
 
-# `EntityLocator`
+## `EntityLocator`
 
 locate components in function's argument list for Archetype
 
-# `EntityFilter`
+## `EntityFilter`
 
 filter Archetype with All, Any and None
 
-# `EntityQuery`
+## `EntityQuery`
 
 `EntityLocator` + `EntityFilter`
 
-# `SystemFunc`
+## `SystemFunc`
 
 system function registered by Schedule in `<System>::OnUpdate(Schedule&)`
 
@@ -235,20 +237,18 @@ query.filter can be change dynamically by other `<System>` with Schedule
 - job: empty argument list
 - runtime dynamic function: `const EntityLocator* locator, void** cmpts`
 
-## Fields
+### Fields
 
-### `EntityQuery query`
+#### `EntityQuery query`
 
 query
 
-## Methods
+### Methods
 
 - `template<typename Func> SystemFunc(Func&& func, std::string name, EntityFilter filter = EntityFilter{})`
 -
-
 `template<typename Func> SystemFunc(Func&& func, std::string name, EntityLocator locator, EntityFilter filter = EntityFilter{})`:
 run-time dynamic function
-
 - `const std::string& Name() const`
 - `static constexpr size_t HashCode(std::string_view name)`
 - `size_t HashCode() const`
@@ -256,9 +256,9 @@ run-time dynamic function
 - `bool IsJob() const`
 - `bool operator==(const SystemFunc& func) const`
 
-# `Schedule`
+## `Schedule`
 
-system infomation record
+system information record
 
 - `SystemFunc`
 - orders
@@ -266,13 +266,11 @@ system infomation record
 
 schedule will be clear at the beginning of the **next** `World::Update()`
 
-### Methods
+#### Methods
 
 - `template<typename Func> Schedule& Register(Func&& func, std::string name, EntityFilter filter = EntityFilter{})`
 -
-
 `template<typename Func> Schedule& Register(Func&& func, std::string name, EntityLocator locator, EntityFilter filter = EntityFilter{})`
-
 - `Schedule& LockFilter(std::string_view sys)`
 - `size_t EntityNumInQuery(std::string_view sys) const`
 - `EntityMngr* GetEntityMngr() const`
@@ -291,34 +289,34 @@ schedule will be clear at the beginning of the **next** `World::Update()`
 - `template<typename Cmpt> Schedule& EraseAny(std::string_view sys)`
 - `template<typename Cmpt> Schedule& EraseNone(std::string_view sys)`
 
-# `SystemMngr`
+## `SystemMngr`
 
 System is a struct with specific function
 
 signature: static void OnUpdate(Schedule&)
 
-### Methods
+#### Methods
 
 - `template<typename... Systems> void Register()`
 - `template<typename System> bool IsRegistered() const`
 - `template<typename System> void Deregister()`
 
-# `World`
+## `World`
 
 `World` = `EntityMngr` + `SystemMngr`
 
-## Fields
+### Fields
 
-### `SystemMngr systemMngr`
+#### `SystemMngr systemMngr`
 
 manage systems
 
-### `EntityMngr entityMngr`
+#### `EntityMngr entityMngr`
 
 manage entities
 
-## Methods
+### Methods
 
 - `void Update()`: schedule -> gen job graph -> run job graph in worker threads -> run commands in main thread
 
-- `std::string DumpUpdateJobGraph() const`: after `Update()`, you can use graphviz to vistualize the graph
+- `std::string DumpUpdateJobGraph() const`: after `Update()`, you can use graphviz to visualize the graph
