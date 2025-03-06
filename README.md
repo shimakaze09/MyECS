@@ -1,5 +1,16 @@
 # MyECS
+
 **My** **E**ntity-**C**omponent-**S**ystem in Unity-style
+
+## Environment
+
+- MSVC 16.5.3 +
+- C++ 17
+- CMake 16.3 +
+
+## Document
+
+> TODO
 
 ## Example
 
@@ -14,7 +25,7 @@ struct MoverSystem {
         schedule.Request(
             [](const Velocity* v, Position* p) {
                 p->val += v->val;
-            }, "MoverSystem");
+            }, "Mover");
     }
 };
 
@@ -26,22 +37,23 @@ int main() {
 }
 ```
 
-**other examples** 
+**other examples**
 
-- [read/write tag](src/test/01_tag/main.cpp) 
-- [system update order](src/test/02_order/main.cpp) 
-- system function with [`Entity`](src/test/03_query_entity/main.cpp), [`indexInQuery`](src/test/09_idx_in_query/main.cpp) 
-- [job function](src/test/08_job/main.cpp) 
-- [chunk layout optimization with alignment](src/test/05_alignment/main.cpp) 
-- [parallel with `None` filter](src/test/06_none_parallel/main.cpp) 
-- [system **overload**](src/test/07_overload/main.cpp) 
-- [runtime dynamic component and system](src/test/11_runtime_cmpt/main.cpp) 
+- [read/write tag](src/test/01_tag/main.cpp)
+- [system update order](src/test/02_order/main.cpp)
+- system function with [`Entity`](src/test/03_query_entity/main.cpp), [
+  `indexInQuery`](src/test/09_idx_in_query/main.cpp)
+- [job function](src/test/08_job/main.cpp)
+- [chunk layout optimization with alignment](src/test/05_alignment/main.cpp)
+- [parallel with `None` filter](src/test/06_none_parallel/main.cpp)
+- [system **overload**](src/test/07_overload/main.cpp)
+- [runtime dynamic component and system](src/test/11_runtime_cmpt/main.cpp)
 
-## Compare with Unity ECS
+## Comparison with Unity ECS
 
-MyECS's primary reference project is Unity's ECS.
+MyECS's primary reference project is Unity3D's ECS -- Entities.
 
-Read [compare.md](compare.md) for details.
+Read [comparison.md](comparison.md) for details.
 
 ## TODO
 

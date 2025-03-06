@@ -14,7 +14,6 @@ struct B {};
 struct C {};
 struct D {};
 struct E {
-  E(float f) : val{f} {}
   float val;
 };
 

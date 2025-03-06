@@ -15,7 +15,7 @@ struct Velocity {
 struct MoverSystem {
   static void OnUpdate(My::Schedule& schedule) {
     schedule.Register([](const Velocity* v, Position* p) { p->val += v->val; },
-                      "MoverSystem");
+                      "Mover");
   }
 };
 
