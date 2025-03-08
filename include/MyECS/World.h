@@ -8,6 +8,8 @@
 #include "EntityMngr.h"
 #include "SystemMngr.h"
 
+#include <MyGraphviz/MyGraphviz.h>
+
 namespace My {
 // SystemMngr + EntityMngr
 class World {
@@ -26,6 +28,10 @@ class World {
   // after running Update
   // you can use graphviz to vistualize the graph
   std::string DumpUpdateJobGraph() const;
+
+  // after running Update
+  // use RTDCmptTraits' registered component name
+  Graphviz::Graph GenUpdateFrameGraph() const;
 
  private:
   mutable JobExecutor executor;

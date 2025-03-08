@@ -12,6 +12,10 @@
 
 #include <map>
 
+namespace My::detail::Schedule_ {
+struct Compiler;
+}  // namespace My::detail::Schedule_
+
 namespace My {
 class EntityMngr;
 class SystemMngr;
@@ -85,10 +89,19 @@ class Schedule {
 
  private:
   template <typename... Args>
-  Schedule& Request(Args&&... args);
+  void Request(Args&&... args);
 
   Schedule(EntityMngr* entityMngr, SystemMngr* systemMngr);
   void Clear();
+
+  struct CmptSysFuncs {
+    std::vector<SystemFunc*> lastFrameSysFuncs;
+    std::vector<SystemFunc*> writeSysFuncs;
+    std::vector<SystemFunc*> latestSysFuncs;
+  };
+  friend struct detail::Schedule_::Compiler;
+  std::unordered_map<CmptType, CmptSysFuncs> cmptSysFuncsMap;
+
   SysFuncGraph GenSysFuncGraph() const;
 
   // SystemFunc's hashcode to pointer of SystemFunc

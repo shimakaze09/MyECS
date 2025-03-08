@@ -6,6 +6,8 @@
 
 #include "../RTDCmptTraits.h"
 
+#include <stdexcept>
+
 namespace My {
 inline size_t RTSCmptTraits::Sizeof(CmptType type) const {
   assert(sizeofs.find(type) != sizeofs.end());
