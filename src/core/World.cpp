@@ -138,21 +138,24 @@ Graphviz::Graph World::GenUpdateFrameGraph() const {
     const auto& filter = sysFuncs->query.filter;
     for (const auto& cmptType : filter.AllCmptTypes()) {
       auto cmptIdx = cmptType2idx[cmptType];
-      if (registrar.IsRegisteredEdge(sysIdx, cmptIdx))
+      if (registrar.IsRegisteredEdge(std::to_string(sysIdx),
+                                     std::to_string(cmptIdx)))
         continue;
       auto edgeIdx = registrar.RegisterEdge(sysIdx, cmptType2idx[cmptType]);
       subgraph_all.AddEdge(edgeIdx);
     }
     for (const auto& cmptType : filter.AnyCmptTypes()) {
       auto cmptIdx = cmptType2idx[cmptType];
-      if (registrar.IsRegisteredEdge(sysIdx, cmptIdx))
+      if (registrar.IsRegisteredEdge(std::to_string(sysIdx),
+                                     std::to_string(cmptIdx)))
         continue;
       auto edgeIdx = registrar.RegisterEdge(sysIdx, cmptType2idx[cmptType]);
       subgraph_any.AddEdge(edgeIdx);
     }
     for (const auto& cmptType : filter.NoneCmptTypes()) {
       auto cmptIdx = cmptType2idx[cmptType];
-      if (registrar.IsRegisteredEdge(sysIdx, cmptIdx))
+      if (registrar.IsRegisteredEdge(std::to_string(sysIdx),
+                                     std::to_string(cmptIdx)))
         continue;
       auto edgeIdx = registrar.RegisterEdge(sysIdx, cmptType2idx[cmptType]);
       subgraph_none.AddEdge(edgeIdx);

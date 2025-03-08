@@ -22,17 +22,17 @@ class EntityFilter {
 
   template <typename... AllCmpts>
   static EntityFilter CreateAll() {
-    return {TypeList<AllCmpts...>, TypeList<>{}, TypeList<>{}};
+    return {TypeList<AllCmpts...>{}, TypeList<>{}, TypeList<>{}};
   }
 
   template <typename... AnyCmpts>
   static EntityFilter CreateAny() {
-    return {TypeList<>{}, TypeList<AnyCmpts...>, TypeList<>{}};
+    return {TypeList<>{}, TypeList<AnyCmpts...>{}, TypeList<>{}};
   }
 
   template <typename... NoneCmpts>
   static EntityFilter CreateNone() {
-    return {TypeList<>{}, TypeList<>{}, TypeList<NoneCmpts...>};
+    return {TypeList<>{}, TypeList<>{}, TypeList<NoneCmpts...>{}};
   }
 
   EntityFilter(std::set<CmptType> allCmptTypes,
