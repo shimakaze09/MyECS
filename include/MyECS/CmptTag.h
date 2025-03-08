@@ -10,6 +10,8 @@ namespace My {
 namespace CmptTag {
 // LastFrame -> Write -> Latest
 
+enum class Mode { LAST_FRAME, WRITE, LATEST };
+
 template <typename Cmpt>
 class LastFrame {
  public:

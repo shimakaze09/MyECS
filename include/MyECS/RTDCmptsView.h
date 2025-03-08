@@ -5,6 +5,7 @@
 #pragma once
 
 #include "CmptPtr.h"
+#include "CmptTag.h"
 #include "CmptType.h"
 
 #include <set>
@@ -20,34 +21,32 @@ class RTDCmptsView {
   // for read/write control
   class CmptHandle {
    public:
-    enum class Mode { INVALID, LAST_FRAME, WRITE, LATEST };
-
-    CmptHandle(CmptType type, void* cmpt, Mode mode)
+    CmptHandle(CmptType type, void* cmpt, CmptTag::Mode mode)
         : type{type}, cmpt{cmpt}, mode{mode} {}
 
     CmptType GetCmptType() const noexcept { return type; }
 
-    Mode GetMode() const noexcept { return mode; }
+    CmptTag::Mode GetMode() const noexcept { return mode; }
 
     CmptCPtr AsLastFrame() const noexcept {
-      assert(mode == Mode::LAST_FRAME);
+      assert(mode == CmptTag::Mode::LAST_FRAME);
       return {type, cmpt};
     }
 
     CmptPtr AsWrite() const noexcept {
-      assert(mode == Mode::WRITE);
+      assert(mode == CmptTag::Mode::WRITE);
       return {type, cmpt};
     }
 
     CmptCPtr AsLatest() const noexcept {
-      assert(mode == Mode::LATEST);
+      assert(mode == CmptTag::Mode::LATEST);
       return {type, cmpt};
     }
 
    private:
     CmptType type;
     void* cmpt;
-    Mode mode;
+    CmptTag::Mode mode;
   };
 
   // forward
@@ -74,12 +73,8 @@ class RTDCmptsView {
       return ptr_cmpt != rhs.ptr_cmpt;
     }
 
-    CmptHandle operator*() const { return {*typeIter, *ptr_cmpt, GetMode()}; }
-
-    const CmptHandle* operator->() const noexcept {
-      handle = {*typeIter, *ptr_cmpt, GetMode()};
-      return &handle;
-    }
+    CmptHandle operator*() const;
+    const CmptHandle* operator->() const noexcept;
 
     Iterator& operator++() {
       typeIter++;
@@ -88,13 +83,10 @@ class RTDCmptsView {
     }
 
    private:
-    CmptHandle::Mode GetMode() const;
-
     EntityLocator* locator;
     std::set<CmptType>::iterator typeIter;
     void* const* ptr_cmpt;
-    mutable CmptHandle handle{CmptType::Invalid(), nullptr,
-                              CmptHandle::Mode::INVALID};
+    mutable CmptHandle handle{CmptType::Invalid(), nullptr, CmptTag::Mode{}};
   };
 
   RTDCmptsView(EntityLocator* locator, void** cmpts)

@@ -42,6 +42,8 @@ class EntityLocator {
 
   const std::set<CmptType>& CmptTypes() const noexcept { return cmptTypes; }
 
+  CmptTag::Mode GetCmptTagMode(CmptType type) const;
+
   bool operator==(const EntityLocator& locator) const noexcept;
 
  private:
