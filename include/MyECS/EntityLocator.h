@@ -42,11 +42,6 @@ class EntityLocator {
 
   const std::set<CmptType>& CmptTypes() const noexcept { return cmptTypes; }
 
-  static const EntityLocator& InvalidInstance() noexcept {
-    static EntityLocator invalid_instance{TypeList{}, TypeList{}, TypeList{}};
-    return invalid_instance;
-  }
-
   bool operator==(const EntityLocator& locator) const noexcept;
 
  private:

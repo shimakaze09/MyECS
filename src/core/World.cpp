@@ -28,7 +28,7 @@ void World::Update() {
     else
       job->emplace([func = func]() {
         (*func)(Entity::Invalid(), size_t_invalid,
-                &EntityLocator::InvalidInstance(), nullptr);
+                RTDCmptsView{nullptr, nullptr});
       });
     table[func] = jobGraph.composed_of(*job);
   }
