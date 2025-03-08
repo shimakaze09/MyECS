@@ -4,17 +4,6 @@
 
 #pragma once
 
-namespace My {
-inline constexpr bool operator<(const CmptType& x, const CmptType& y) noexcept {
-  return x.HashCode() < y.HashCode();
-}
-
-inline constexpr bool operator==(const CmptType& x,
-                                 const CmptType& y) noexcept {
-  return x.HashCode() == y.HashCode();
-}
-}  // namespace My
-
 namespace std {
 template <typename T>
 struct hash;

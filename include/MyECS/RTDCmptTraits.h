@@ -11,7 +11,7 @@
 
 namespace My {
 // run-time dynamic component traits, singleton
-// size (> 0) is necessary
+// size (> 0) is neccessary
 // optional
 // - alignment: alignof(std::max_align_t) as default, 8 / 16 in most cases
 // - default constructor: do nothing as default
@@ -24,7 +24,7 @@ class RTDCmptTraits {
 
   inline static RTDCmptTraits& Instance() noexcept;
 
-  // necessary
+  // neccessary
   inline RTDCmptTraits& RegisterSize(CmptType type, size_t size);
 
   // optional

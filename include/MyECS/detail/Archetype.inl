@@ -25,12 +25,12 @@ static Archetype* Archetype::New(CmptTypes... types) {
 
 template <typename... Cmpts>
 Archetype* Archetype::Add(const Archetype* from) {
-  assert((from->types.IsNotContain<Cmpts>() && ...));
+  assert(((!from->types.Contains(CmptType::Of<Cmpts>)) && ...));
 
   Archetype* rst = new Archetype;
 
   rst->types = from->types;
-  rst->types.Insert<Cmpts...>();
+  rst->types.Insert(CmptType::Of<Cmpts>...);
   rst->cmptTraits = from->cmptTraits;
   (rst->cmptTraits.Register<Cmpts>(), ...);
 
@@ -41,35 +41,24 @@ Archetype* Archetype::Add(const Archetype* from) {
 
 template <typename... CmptTypes, typename>
 Archetype* Archetype::Add(const Archetype* from, CmptTypes... types) {
-  static_assert((std::is_same_v<CmptTypes, CmptType> && ...));
   const std::array<CmptType, sizeof...(CmptTypes)> typeArr{types...};
   return Add(typeArr.data(), typeArr.size());
 }
 
-template <typename... Cmpts>
-Archetype* Archetype::Remove(const Archetype* from) {
-  return Remove(from, CmptType::Of<Cmpts>()...);
-}
-
 template <typename... CmptTypes, typename>
 Archetype* Archetype::Remove(const Archetype* from, CmptTypes... types) {
-  static_assert((std::is_same_v<CmptTypes, CmptType> && ...));
   const std::array<CmptType, sizeof...(CmptTypes)> typeArr{types...};
   return Remove(typeArr.data(), typeArr.size());
 }
 
 template <typename Cmpt>
 Cmpt* Archetype::At(size_t idx) const {
-  auto [ptr, size] = At(CmptType::Of<Cmpt>(), idx);
-  if (ptr == nullptr)
-    return nullptr;
-  assert(size == sizeof(Cmpt));
-  return reinterpret_cast<Cmpt*>(ptr);
+  return reinterpret_cast<Cmpt*>(At(CmptType::Of<Cmpt>, idx));
 }
 
 template <typename... Cmpts>
 std::tuple<size_t, std::tuple<Cmpts*...>> Archetype::Create(Entity e) {
-  assert((types.IsContain<Cmpts>() && ...) &&
+  assert((types.Contains(CmptType::Of<Cmpts>) && ...) &&
          types.size() == 1 + sizeof...(Cmpts));
   static_assert((std::is_constructible_v<Cmpts> && ...),
                 "Archetype::Create: <Cmpts> isn't constructible");
@@ -80,10 +69,10 @@ std::tuple<size_t, std::tuple<Cmpts*...>> Archetype::Create(Entity e) {
   size_t idxInChunk = idx % chunkCapacity;
   byte* buffer = chunks[idx / chunkCapacity]->Data();
 
-  new (buffer + Offsetof(CmptType::Of<Entity>()) + idxInChunk * sizeof(Entity))
+  new (buffer + Offsetof(CmptType::Of<Entity>) + idxInChunk * sizeof(Entity))
       Entity(e);
 
-  std::tuple<Cmpts*...> cmpts = {new (buffer + Offsetof(CmptType::Of<Cmpts>()) +
+  std::tuple<Cmpts*...> cmpts = {new (buffer + Offsetof(CmptType::Of<Cmpts>) +
                                       idxInChunk * sizeof(Cmpts)) Cmpts...};
 
   return {idx, cmpts};

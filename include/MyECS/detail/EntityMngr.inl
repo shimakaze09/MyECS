@@ -68,7 +68,7 @@ void EntityMngr::AttachWithoutInit(Entity e) {
 
   const auto& srcCmptTypeSet = srcArchetype->GetCmptTypeSet();
   auto dstCmptTypeSet = srcCmptTypeSet;
-  dstCmptTypeSet.Insert<Cmpts...>();
+  dstCmptTypeSet.Insert(CmptType::Of<Cmpts>...);
   size_t dstCmptTypeSetHashCode = dstCmptTypeSet.HashCode();
 
   // get dstArchetype
@@ -93,9 +93,8 @@ void EntityMngr::AttachWithoutInit(Entity e) {
 
   auto srcCmptTraits = srcArchetype->GetRTSCmptTraits();
   for (auto type : srcCmptTypeSet) {
-    auto [srcCmpt, srcSize] = srcArchetype->At(type, srcIdxInArchetype);
-    auto [dstCmpt, dstSize] = dstArchetype->At(type, dstIdxInArchetype);
-    assert(srcSize == dstSize);
+    auto srcCmpt = srcArchetype->At(type, srcIdxInArchetype);
+    auto dstCmpt = dstArchetype->At(type, dstIdxInArchetype);
     srcCmptTraits.MoveConstruct(type, dstCmpt, srcCmpt);
   }
 
@@ -124,10 +123,9 @@ std::tuple<Cmpts*...> EntityMngr::Attach(Entity e) {
     throw std::invalid_argument("Entity is invalid");
 
   using CmptList = TypeList<Cmpts...>;
+  const auto& cmptTypes = entityTable[e.Idx()].archetype->GetCmptTypeSet();
   std::array<bool, sizeof...(Cmpts)> needAttach = {
-      entityTable[e.Idx()]
-          .archetype->GetCmptTypeSet()
-          .IsNotContain<Cmpts>()...};
+      !cmptTypes.Contains(CmptType::Of<Cmpts>)...};
   AttachWithoutInit<Cmpts...>(e);
   const auto& new_info = entityTable[e.Idx()];
   std::tuple<Cmpts*...> cmpts{
@@ -152,13 +150,12 @@ std::array<CmptPtr, sizeof...(CmptTypes)> EntityMngr::Attach(
   auto srcArchetype = entityTable[e.Idx()].archetype;
   AttachWithoutInit(e, types...);
   const auto& new_info = entityTable[e.Idx()];
-  std::array<CmptPtr, sizeof...(CmptTypes)> cmptPtrArr = {
-      CmptPtr{types, std::get<void*>(new_info.archetype->At(
-                         types, new_info.idxInArchetype))}...};
+  std::array<CmptPtr, sizeof...(CmptTypes)> cmptPtrArr = {CmptPtr{
+      types, new_info.archetype->At(types, new_info.idxInArchetype)}...};
   const auto& rtdct = RTDCmptTraits::Instance();
   for (size_t i = 0; i < N; i++) {
     auto type = typeArr[i];
-    if (srcArchetype->GetCmptTypeSet().IsContain(type))
+    if (srcArchetype->GetCmptTypeSet().Contains(type))
       continue;
     auto target = rtdct.default_constructors.find(type);
     if (target == rtdct.default_constructors.end())
@@ -179,8 +176,8 @@ Cmpt* EntityMngr::Emplace(Entity e, Args&&... args) {
   if (!Exist(e))
     throw std::invalid_argument("EntityMngr::Emplace: Entity is invalid");
 
-  bool needAttach =
-      entityTable[e.Idx()].archetype->GetCmptTypeSet().IsNotContain<Cmpt>();
+  bool needAttach = !entityTable[e.Idx()].archetype->GetCmptTypeSet().Contains(
+      CmptType::Of<Cmpt>);
   if (needAttach) {
     AttachWithoutInit<Cmpt>(e);
     const auto& info = entityTable[e.Idx()];
@@ -198,7 +195,7 @@ void EntityMngr::Detach(Entity e) {
                 "EntityMngr::Detach: sizeof...(<Cmpts>) > 0");
   static_assert(IsSet_v<TypeList<Entity, Cmpts...>>,
                 "EntityMngr::Detach: <Cmpts> must be different");
-  Detach(e, CmptType::Of<Cmpts>()...);
+  Detach(e, CmptType::Of<Cmpts>...);
 }
 
 template <typename... CmptTypes, typename>
@@ -212,13 +209,13 @@ template <typename Cmpt>
 bool EntityMngr::Have(Entity e) const {
   static_assert(!std::is_same_v<Cmpt, Entity>,
                 "EntityMngr::Have: <Cmpt> != Entity");
-  return Have(e, CmptType::Of<Cmpt>());
+  return Have(e, CmptType::Of<Cmpt>);
 }
 
 inline bool EntityMngr::Have(Entity e, CmptType type) const {
   if (!Exist(e))
     throw std::invalid_argument("EntityMngr::Have: Entity is invalid");
-  return entityTable[e.Idx()].archetype->GetCmptTypeSet().IsContain(type);
+  return entityTable[e.Idx()].archetype->GetCmptTypeSet().Contains(type);
 }
 
 template <typename Cmpt>
@@ -235,6 +232,16 @@ inline CmptPtr EntityMngr::Get(Entity e, CmptType type) const {
   if (!Exist(e))
     throw std::invalid_argument("EntityMngr::Get: Entity is invalid");
   const auto& info = entityTable[e.Idx()];
-  return {type, std::get<void*>(info.archetype->At(type, info.idxInArchetype))};
+  return {type, info.archetype->At(type, info.idxInArchetype)};
+}
+
+inline bool EntityMngr::Exist(Entity e) const {
+  return e.Idx() < entityTable.size() &&
+         e.Version() == entityTable[e.Idx()].version;
+}
+
+inline void EntityMngr::AddCommand(const std::function<void()>& command) {
+  std::lock_guard<std::mutex> guard(commandBufferMutex);
+  commandBuffer.push_back(command);
 }
 }  // namespace My

@@ -17,16 +17,9 @@ class CmptType {
       : hashcode{RuntimeTypeID(type_name)} {}
 
   template <typename Cmpt>
-  static constexpr CmptType Of() noexcept {
-    return CmptType{TypeID<Cmpt>};
-  }
+  static constexpr CmptType Of = CmptType{TypeID<Cmpt>};
 
   constexpr size_t HashCode() const noexcept { return hashcode; }
-
-  template <typename Cmpt>
-  static constexpr size_t HashCodeOf() noexcept {
-    return TypeID<Cmpt>;
-  }
 
   static constexpr CmptType Invalid() noexcept {
     return CmptType{static_cast<size_t>(-1)};
@@ -34,7 +27,19 @@ class CmptType {
 
   template <typename Cmpt>
   bool Is() const noexcept {
-    return hashcode == HashCodeOf<Cmpt>();
+    return hashcode == TypeID<Cmpt>;
+  }
+
+  bool operator<(const CmptType& rhs) const noexcept {
+    return hashcode < rhs.hashcode;
+  }
+
+  bool operator==(const CmptType& rhs) const noexcept {
+    return hashcode == rhs.hashcode;
+  }
+
+  bool operator!=(const CmptType& rhs) const noexcept {
+    return hashcode != rhs.hashcode;
   }
 
  private:

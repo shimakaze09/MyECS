@@ -15,7 +15,7 @@ class CmptPtr {
   CmptPtr(CmptType type, void* p) : type{type}, p{p} {}
 
   template <typename Cmpt>
-  CmptPtr(Cmpt* p) : type{CmptType::Of<Cmpt>()}, p{p} {}
+  CmptPtr(Cmpt* p) : type{CmptType::Of<Cmpt>}, p{p} {}
 
   CmptType Type() const noexcept { return type; }
 
@@ -39,7 +39,7 @@ class CmptCPtr {
   CmptCPtr(CmptType type, const void* p) : type{type}, p{p} {}
 
   template <typename Cmpt>
-  CmptCPtr(const Cmpt* p) : type{CmptType::Of<Cmpt>()}, p{p} {}
+  CmptCPtr(const Cmpt* p) : type{CmptType::Of<Cmpt>}, p{p} {}
 
   CmptType Type() const noexcept { return type; }
 

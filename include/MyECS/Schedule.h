@@ -17,7 +17,7 @@ class EntityMngr;
 class SystemMngr;
 
 // [description]
-// system information record
+// system infomation record
 // - SystemFunc
 // - orders
 // - dynamic filter changes
@@ -27,23 +27,14 @@ class Schedule {
  public:
   template <typename Func>
   Schedule& Register(Func&& func, std::string name,
-                     EntityFilter filter = EntityFilter{}) {
-    return Request(std::forward<Func>(func), std::move(name),
-                   std::move(filter));
-  }
+                     EntityFilter filter = EntityFilter{});
 
   // run-time dynamic function
   template <typename Func>
   Schedule& Register(Func&& func, std::string name, EntityLocator locator,
-                     EntityFilter filter = EntityFilter{}) {
-    return Request(std::forward<Func>(func), std::move(name),
-                   std::move(locator), std::move(filter));
-  }
+                     EntityFilter filter = EntityFilter{});
 
-  Schedule& LockFilter(std::string_view sys) {
-    sysLockFilter.insert(SystemFunc::HashCode(sys));
-    return *this;
-  }
+  Schedule& LockFilter(std::string_view sys);
 
   // if sys is unregistered, return size_t_invalid
   // call LockFilterChange(std::string_view)
@@ -64,45 +55,39 @@ class Schedule {
 
   template <typename Cmpt>
   Schedule& InsertAll(std::string_view sys) {
-    return InsertAll(sys, CmptType::Of<Cmpt>());
+    return InsertAll(sys, CmptType::Of<Cmpt>);
   }
 
   template <typename Cmpt>
   Schedule& InsertAny(std::string_view sys) {
-    return InsertAny(sys, CmptType::Of<Cmpt>());
+    return InsertAny(sys, CmptType::Of<Cmpt>);
   }
 
   template <typename Cmpt>
   Schedule& InsertNone(std::string_view sys) {
-    return InsertNone(sys, CmptType::Of<Cmpt>());
+    return InsertNone(sys, CmptType::Of<Cmpt>);
   }
 
   template <typename Cmpt>
   Schedule& EraseAll(std::string_view sys) {
-    return EraseAll(sys, CmptType::Of<Cmpt>());
+    return EraseAll(sys, CmptType::Of<Cmpt>);
   }
 
   template <typename Cmpt>
   Schedule& EraseAny(std::string_view sys) {
-    return EraseAny(sys, CmptType::Of<Cmpt>());
+    return EraseAny(sys, CmptType::Of<Cmpt>);
   }
 
   template <typename Cmpt>
   Schedule& EraseNone(std::string_view sys) {
-    return EraseNone(sys, CmptType::Of<Cmpt>());
+    return EraseNone(sys, CmptType::Of<Cmpt>);
   }
 
  private:
   template <typename... Args>
-  Schedule& Request(Args&&... args) {
-    SystemFunc* sysFunc = sysFuncPool.Request(std::forward<Args>(args)...);
-    sysFuncs.emplace(sysFunc->HashCode(), sysFunc);
-    return *this;
-  }
+  Schedule& Request(Args&&... args);
 
-  Schedule(EntityMngr* entityMngr, SystemMngr* systemMngr)
-      : entityMngr{entityMngr}, systemMngr{systemMngr} {}
-
+  Schedule(EntityMngr* entityMngr, SystemMngr* systemMngr);
   void Clear();
   SysFuncGraph GenSysFuncGraph() const;
 
@@ -131,3 +116,5 @@ class Schedule {
   friend class World;
 };
 }  // namespace My
+
+#include "detail/Schedule.inl"
