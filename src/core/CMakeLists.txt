@@ -7,5 +7,5 @@ ADD_TARGET(
         My::MyContainer_core
         My::MyGraphviz_core
         INC
-        "include"
+        "${PROJECT_SOURCE_DIR}/include"
 )
