@@ -4,6 +4,8 @@
 
 #include <MyECS/EntityMngr.h>
 
+#include <MyECS/IListener.h>
+
 using namespace My;
 using namespace std;
 
@@ -295,4 +297,20 @@ void EntityMngr::RunCommands() {
   for (const auto& command : commandBuffer)
     command();
   commandBuffer.clear();
+}
+
+void EntityMngr::Accept(IListener* listener) const {
+  listener->EnterEntityMngr(this);
+  for (const auto& [h, a] : h2a) {
+    for (size_t i = 0; i < a->EntityNum(); i++) {
+      auto e = a->At<Entity>(i);
+      listener->EnterEntity(e);
+      for (const auto& cmpt : a->Components(i)) {
+        listener->EnterCmptPtr(&cmpt);
+        listener->ExistCmptPtr(&cmpt);
+      }
+      listener->ExistEntity(e);
+    }
+  }
+  listener->ExistEntityMngr(this);
 }

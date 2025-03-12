@@ -11,6 +11,8 @@
 #include <MyGraphviz/MyGraphviz.h>
 
 namespace My {
+class IListener;
+
 // SystemMngr + EntityMngr
 class World {
  public:
@@ -32,6 +34,8 @@ class World {
   // after running Update
   // use RTDCmptTraits' registered component name
   Graphviz::Graph GenUpdateFrameGraph() const;
+
+  void Accept(IListener* listener) const;
 
  private:
   mutable JobExecutor executor;

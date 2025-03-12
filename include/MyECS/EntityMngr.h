@@ -16,6 +16,8 @@
 namespace My {
 class World;
 
+class IListener;
+
 // Entity Manager of World
 // auto maintain Component's lifecycle ({default|copy|move} constructor, destructor)
 // [API]
@@ -83,6 +85,8 @@ class EntityMngr {
   size_t EntityNum(const EntityQuery&) const;
 
   void AddCommand(const std::function<void()>& command);
+
+  void Accept(IListener* listener) const;
 
  private:
   friend class World;

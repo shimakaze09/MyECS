@@ -4,6 +4,8 @@
 
 #include <MyECS/World.h>
 
+#include <MyECS/IListener.h>
+
 using namespace My;
 using namespace std;
 
@@ -163,4 +165,11 @@ Graphviz::Graph World::GenUpdateFrameGraph() const {
   }
 
   return graph;
+}
+
+void World::Accept(IListener* listener) const {
+  listener->EnterWorld(this);
+  systemMngr.Accept(listener);
+  entityMngr.Accept(listener);
+  listener->ExistWorld(this);
 }
