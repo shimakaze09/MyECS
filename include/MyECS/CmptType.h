@@ -26,19 +26,19 @@ class CmptType {
   }
 
   template <typename Cmpt>
-  bool Is() const noexcept {
+  constexpr bool Is() const noexcept {
     return hashcode == TypeID<Cmpt>;
   }
 
-  bool operator<(const CmptType& rhs) const noexcept {
+  constexpr bool operator<(const CmptType& rhs) const noexcept {
     return hashcode < rhs.hashcode;
   }
 
-  bool operator==(const CmptType& rhs) const noexcept {
+  constexpr bool operator==(const CmptType& rhs) const noexcept {
     return hashcode == rhs.hashcode;
   }
 
-  bool operator!=(const CmptType& rhs) const noexcept {
+  constexpr bool operator!=(const CmptType& rhs) const noexcept {
     return hashcode != rhs.hashcode;
   }
 
