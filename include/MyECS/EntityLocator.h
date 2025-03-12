@@ -10,7 +10,7 @@
 
 #include <set>
 
-namespace My {
+namespace My::MyECS {
 // locate components in function's argument list for Archetype
 class EntityLocator {
  public:
@@ -56,6 +56,6 @@ class EntityLocator {
 
   size_t hashCode;
 };
-}  // namespace My
+}  // namespace My::MyECS
 
 #include "detail/EntityLocator.inl"

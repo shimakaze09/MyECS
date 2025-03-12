@@ -6,13 +6,18 @@
 
 #include <iostream>
 
+using namespace My::MyECS;
 using namespace My;
 using namespace std;
 
 struct A {};
+
 struct B {};
+
 struct C {};
+
 struct D {};
+
 struct E {
   float val;
 };

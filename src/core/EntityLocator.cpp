@@ -6,7 +6,7 @@
 
 #include <MyECS/detail/Util.h>
 
-using namespace My;
+using namespace My::MyECS;
 using namespace std;
 
 EntityLocator::EntityLocator(set<CmptType> lastFrameCmpts,

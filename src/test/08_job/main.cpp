@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-using namespace My;
+using namespace My::MyECS;
 using namespace std;
 
 struct Data {
@@ -25,7 +25,8 @@ struct MySystem {
         .Register(
             [buffer]() {
               size_t sum = 0;
-              for (size_t i : *buffer) sum += i;
+              for (size_t i : *buffer)
+                sum += i;
               cout << sum << endl;
             },
             "job")

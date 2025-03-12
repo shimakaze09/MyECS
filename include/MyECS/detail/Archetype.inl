@@ -6,7 +6,7 @@
 
 #include <cassert>
 
-namespace My {
+namespace My::MyECS {
 template <typename... Cmpts>
 Archetype::Archetype(TypeList<Cmpts...>) : types(TypeList<Entity, Cmpts...>{}) {
   static_assert(IsSet_v<TypeList<Entity, Cmpts...>>,
@@ -77,4 +77,4 @@ std::tuple<size_t, std::tuple<Cmpts*...>> Archetype::Create(Entity e) {
 
   return {idx, cmpts};
 }
-}  // namespace My
+}  // namespace My::MyECS

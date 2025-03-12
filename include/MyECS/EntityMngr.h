@@ -13,7 +13,7 @@
 
 #include <mutex>
 
-namespace My {
+namespace My::MyECS {
 class World;
 
 class IListener;
@@ -138,6 +138,6 @@ class EntityMngr {
   std::mutex commandBufferMutex;
   void RunCommands();
 };
-}  // namespace My
+}  // namespace My::MyECS
 
 #include "detail/EntityMngr.inl"

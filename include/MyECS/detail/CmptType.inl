@@ -9,8 +9,8 @@ template <typename T>
 struct hash;
 
 template <>
-struct hash<My::CmptType> {
-  constexpr size_t operator()(const My::CmptType& t) const noexcept {
+struct hash<My::MyECS::CmptType> {
+  constexpr size_t operator()(const My::MyECS::CmptType& t) const noexcept {
     return t.HashCode();
   }
 };

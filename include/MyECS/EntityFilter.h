@@ -10,7 +10,7 @@
 
 #include <set>
 
-namespace My {
+namespace My::MyECS {
 // filter Archetype with All, Any and None
 class EntityFilter {
  public:
@@ -128,6 +128,6 @@ class EntityFilter {
 
   size_t combinedHashCode;
 };
-}  // namespace My
+}  // namespace My::MyECS
 
 #include "detail/EntityFilter.inl"

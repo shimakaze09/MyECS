@@ -6,6 +6,7 @@
 
 #include <iostream>
 
+using namespace My::MyECS;
 using namespace My;
 using namespace std;
 

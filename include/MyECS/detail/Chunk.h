@@ -9,7 +9,7 @@
 #include <tuple>
 #include <vector>
 
-namespace My {
+namespace My::MyECS {
 using byte = uint8_t;
 static_assert(sizeof(byte) == 1);
 
@@ -31,4 +31,4 @@ struct alignas(128) Chunk {
 };
 
 static_assert(sizeof(Chunk) == Chunk::size);
-}  // namespace My
+}  // namespace My::MyECS

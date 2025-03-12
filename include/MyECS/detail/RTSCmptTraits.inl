@@ -8,7 +8,7 @@
 
 #include <stdexcept>
 
-namespace My {
+namespace My::MyECS {
 inline size_t RTSCmptTraits::Sizeof(CmptType type) const {
   assert(sizeofs.find(type) != sizeofs.end());
   return sizeofs.find(type)->second;
@@ -123,4 +123,4 @@ inline void RTSCmptTraits::Deregister(CmptType type) noexcept {
   move_constructors.erase(type);
   destructors.erase(type);
 }
-}  // namespace My
+}  // namespace My::MyECS

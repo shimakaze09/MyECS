@@ -7,7 +7,7 @@
 #include "EntityFilter.h"
 #include "EntityLocator.h"
 
-namespace My {
+namespace My::MyECS {
 // EntityFilter + EntityLocator
 class EntityQuery {
  public:
@@ -30,6 +30,6 @@ class EntityQuery {
     return filter == query.filter && locator == query.locator;
   }
 };
-}  // namespace My
+}  // namespace My::MyECS
 
 #include "detail/EntityQuery.inl"

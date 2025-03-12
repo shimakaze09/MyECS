@@ -8,7 +8,7 @@
 #include <unordered_set>
 #include <vector>
 
-namespace My {
+namespace My::MyECS {
 class SystemFunc;
 
 class SysFuncGraph {
@@ -33,4 +33,4 @@ class SysFuncGraph {
  private:
   std::unordered_map<SystemFunc*, std::unordered_set<SystemFunc*>> adjList;
 };
-}  // namespace My
+}  // namespace My::MyECS

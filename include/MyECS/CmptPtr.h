@@ -8,7 +8,7 @@
 
 #include "CmptType.h"
 
-namespace My {
+namespace My::MyECS {
 // CmptType + void*
 class CmptPtr {
  public:
@@ -56,4 +56,4 @@ class CmptCPtr {
   CmptType type;
   const void* p;
 };
-}  // namespace My
+}  // namespace My::MyECS

@@ -4,7 +4,7 @@
 
 #pragma once
 
-namespace My {
+namespace My::MyECS {
 template <typename System>
 void SystemMngr::RegisterOne() {
   Register(std::string{nameof::nameof_type<System>()}, &System::OnUpdate);
@@ -29,4 +29,4 @@ template <typename... Systems>
 void SystemMngr::Deregister() noexcept {
   (DeregisterOne<Systems>(), ...);
 }
-}  // namespace My
+}  // namespace My::MyECS

@@ -9,7 +9,7 @@
 #include <functional>
 #include <unordered_map>
 
-namespace My {
+namespace My::MyECS {
 // run-time dynamic component traits, singleton
 // size (> 0) is neccessary
 // optional
@@ -92,6 +92,6 @@ class RTDCmptTraits {
   std::unordered_map<CmptType, std::function<void(void*)>> destructors;
   std::unordered_map<CmptType, std::string> names;
 };
-}  // namespace My
+}  // namespace My::MyECS
 
 #include "detail/RTDCmptTraits.inl"

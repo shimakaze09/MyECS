@@ -6,7 +6,7 @@
 
 #include <MyECS/EntityLocator.h>
 
-using namespace My;
+using namespace My::MyECS;
 using namespace std;
 
 RTDCmptsView::Iterator RTDCmptsView::begin() const noexcept {

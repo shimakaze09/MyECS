@@ -18,7 +18,7 @@
 
 #include <map>
 
-namespace My {
+namespace My::MyECS {
 class EntityMngr;
 
 // Entity is a special Component
@@ -148,6 +148,6 @@ class Archetype {
 
   inline static Pool<Chunk> sharedChunkPool;  // no lock
 };
-}  // namespace My
+}  // namespace My::MyECS
 
 #include "Archetype.inl"

@@ -8,10 +8,10 @@
 
 #include <MyECS/World.h>
 
-using namespace My;
+using namespace My::MyECS;
 using namespace std;
 
-namespace My::detail::Schedule_ {
+namespace My::MyECS::detail::Schedule_ {
 struct NoneGroup {
   NoneGroup() = default;
 
@@ -151,7 +151,7 @@ struct Compiler {
     return rst;
   }
 };
-}  // namespace My::detail::Schedule_
+}  // namespace My::MyECS::detail::Schedule_
 
 Schedule& Schedule::Order(string_view x, string_view y) {
   sysFuncOrder.emplace(SystemFunc::HashCode(x), SystemFunc::HashCode(y));

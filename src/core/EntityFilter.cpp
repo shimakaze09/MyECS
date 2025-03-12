@@ -4,7 +4,7 @@
 
 #include <MyECS/EntityFilter.h>
 
-using namespace My;
+using namespace My::MyECS;
 
 EntityFilter::EntityFilter()
     : allHashCode{TypeID<EntityFilter>},

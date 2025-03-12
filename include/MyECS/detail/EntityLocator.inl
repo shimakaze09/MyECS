@@ -10,7 +10,7 @@
 
 #include <MyTemplate/Func.h>
 
-namespace My {
+namespace My::MyECS {
 template <typename TaggedCmptList>
 EntityLocator::EntityLocator(TaggedCmptList)
     : EntityLocator{Filter_t<TaggedCmptList, CmptTag::IsLastFrame>{},
@@ -28,4 +28,4 @@ EntityLocator::EntityLocator(TypeList<LastFrameCmpts...>,
                 CmptType::Of<CmptTag::RemoveTag_t<WriteCmpts>>...,
                 CmptType::Of<CmptTag::RemoveTag_t<LatestCmpts>>...},
       hashCode{GenHashCode()} {}
-}  // namespace My
+}  // namespace My::MyECS

@@ -6,7 +6,7 @@
 
 #include <MyTemplate/Typelist.h>
 
-namespace My {
+namespace My::MyECS {
 namespace CmptTag {
 // LastFrame -> Write -> Latest
 
@@ -67,6 +67,6 @@ struct IsTaggedCmpt
 template <typename T>
 static constexpr bool IsTaggedCmpt_v = IsTaggedCmpt<T>::value;
 }  // namespace CmptTag
-}  // namespace My
+}  // namespace My::MyECS
 
 #include "detail/CmptTag.inl"

@@ -4,6 +4,8 @@
 
 #include <MyECS/World.h>
 
+using namespace My::MyECS;
+
 struct Position {
   float val;
 };
@@ -13,14 +15,14 @@ struct Velocity {
 };
 
 struct MoverSystem {
-  static void OnUpdate(My::Schedule& schedule) {
+  static void OnUpdate(Schedule& schedule) {
     schedule.Register([](const Velocity* v, Position* p) { p->val += v->val; },
                       "Mover");
   }
 };
 
 int main() {
-  My::World w;
+  World w;
   w.systemMngr.Register<MoverSystem>();
   w.entityMngr.Create<Position, Velocity>();
   w.Update();

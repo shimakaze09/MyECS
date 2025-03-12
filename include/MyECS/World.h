@@ -10,7 +10,7 @@
 
 #include <MyGraphviz/MyGraphviz.h>
 
-namespace My {
+namespace My::MyECS {
 class IListener;
 
 // SystemMngr + EntityMngr
@@ -45,4 +45,4 @@ class World {
   std::vector<Job*> jobs;
   Pool<Job> jobPool;
 };
-}  // namespace My
+}  // namespace My::MyECS

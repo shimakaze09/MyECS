@@ -10,7 +10,7 @@
 
 #include <set>
 
-namespace My {
+namespace My::MyECS {
 class EntityLocator;
 
 // use RTDCmptsView::Iterator to read CmptPtr
@@ -103,4 +103,4 @@ class RTDCmptsView {
   EntityLocator* locator;
   void* const* cmpts;
 };
-}  // namespace My
+}  // namespace My::MyECS

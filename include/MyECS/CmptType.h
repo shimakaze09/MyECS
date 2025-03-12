@@ -6,7 +6,7 @@
 
 #include <MyTemplate/TypeID.h>
 
-namespace My {
+namespace My::MyECS {
 // Component Type
 // use a hashcode to distinguish different type
 class CmptType {
@@ -45,6 +45,6 @@ class CmptType {
  private:
   size_t hashcode;
 };
-}  // namespace My
+}  // namespace My::MyECS
 
 #include "detail/CmptType.inl"

@@ -6,7 +6,7 @@
 
 #include "../RTDCmptTraits.h"
 
-namespace My {
+namespace My::MyECS {
 inline RTDCmptTraits& RTDCmptTraits::Instance() noexcept {
   static RTDCmptTraits instance;
   return instance;
@@ -167,4 +167,4 @@ inline RTDCmptTraits& RTDCmptTraits::Deregister(CmptType type) noexcept {
   destructors.erase(type);
   return *this;
 }
-}  // namespace My
+}  // namespace My::MyECS

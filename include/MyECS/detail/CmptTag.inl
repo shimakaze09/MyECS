@@ -6,12 +6,12 @@
 
 #include <type_traits>
 
-namespace My {
+namespace My::MyECS {
 class Entity;
 class EntityLocator;
-}  // namespace My
+}  // namespace My::MyECS
 
-namespace My::CmptTag {
+namespace My::MyECS::CmptTag {
 template <typename Cmpt>
 struct RemoveTag<const Cmpt*> : IType<Cmpt> {};
 
@@ -71,4 +71,4 @@ template <typename TaggedCmpt>
 struct IsTimePoint
     : IValue<bool, IsWrite_v<TaggedCmpt> || IsLastFrame_v<TaggedCmpt> ||
                        IsLatest_v<TaggedCmpt>> {};
-}  // namespace My::CmptTag
+}  // namespace My::MyECS::CmptTag

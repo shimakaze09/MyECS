@@ -4,7 +4,7 @@
 
 #pragma once
 
-namespace My {
+namespace My::MyECS {
 template <typename Func>
 Schedule& Schedule::Register(Func&& func, std::string name,
                              EntityFilter filter) {
@@ -40,4 +40,4 @@ inline Schedule& Schedule::LockFilter(std::string_view sys) {
   sysLockFilter.insert(SystemFunc::HashCode(sys));
   return *this;
 }
-}  // namespace My
+}  // namespace My::MyECS

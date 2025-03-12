@@ -9,7 +9,7 @@
 #include <functional>
 #include <unordered_map>
 
-namespace My {
+namespace My::MyECS {
 // run-time static component traits
 class RTSCmptTraits {
  public:
@@ -36,6 +36,6 @@ class RTSCmptTraits {
       move_constructors;  // dst <- src
   std::unordered_map<CmptType, std::function<void(void*)>> destructors;
 };
-}  // namespace My
+}  // namespace My::MyECS
 
 #include "RTSCmptTraits.inl"

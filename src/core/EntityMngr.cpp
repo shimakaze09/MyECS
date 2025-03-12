@@ -6,7 +6,7 @@
 
 #include <MyECS/IListener.h>
 
-using namespace My;
+using namespace My::MyECS;
 using namespace std;
 
 EntityMngr::~EntityMngr() {

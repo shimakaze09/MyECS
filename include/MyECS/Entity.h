@@ -6,7 +6,7 @@
 
 #include "detail/Util.h"
 
-namespace My {
+namespace My::MyECS {
 // index + version
 class Entity {
  public:
@@ -35,4 +35,4 @@ class Entity {
   size_t idx;
   size_t version;
 };
-}  // namespace My
+}  // namespace My::MyECS

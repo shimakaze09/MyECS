@@ -6,7 +6,7 @@
 
 #include <MyTemplate/TypeID.h>
 
-namespace My {
+namespace My::MyECS {
 constexpr size_t hash_combine(size_t x, size_t y) noexcept {
   return x ^ (y + 0x9e3779b9 + (x << 6) + (x >> 2));
 }
@@ -39,4 +39,4 @@ size_t hash_combine(const Container& container) noexcept {
 inline constexpr size_t hash_string(std::string_view str) noexcept {
   return RuntimeTypeID(str);
 }
-}  // namespace My
+}  // namespace My::MyECS

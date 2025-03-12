@@ -6,7 +6,7 @@
 
 #include "Util.h"
 
-namespace My {
+namespace My::MyECS {
 template <typename... AllCmpts, typename... AnyCmpts, typename... NoneCmpts>
 EntityFilter::EntityFilter(TypeList<AllCmpts...>, TypeList<AnyCmpts...>,
                            TypeList<NoneCmpts...>)
@@ -122,15 +122,15 @@ void EntityFilter::EraseNone(CmptTypes... types) {
   const std::array<CmptType, sizeof...(CmptTypes)> typeArr{types...};
   EraseNone(typeArr.data(), typeArr.size());
 }
-}  // namespace My
+}  // namespace My::MyECS
 
 namespace std {
 template <typename T>
 struct hash;
 
 template <>
-struct hash<My::EntityFilter> {
-  size_t operator()(const My::EntityFilter& filter) const noexcept {
+struct hash<My::MyECS::EntityFilter> {
+  size_t operator()(const My::MyECS::EntityFilter& filter) const noexcept {
     return filter.HashCode();
   }
 };

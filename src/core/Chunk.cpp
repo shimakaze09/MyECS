@@ -6,7 +6,7 @@
 
 #include <algorithm>
 
-using namespace My;
+using namespace My::MyECS;
 using namespace std;
 
 Chunk::Layout Chunk::GenLayout(const vector<size_t>& alignments,

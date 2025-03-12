@@ -4,7 +4,7 @@
 
 #pragma once
 
-namespace My {
+namespace My::MyECS {
 inline CmptTypeSet::CmptTypeSet(const CmptType* types, size_t num) {
   assert(types != nullptr && num != 0);
   for (size_t i = 0; i < num; i++)
@@ -110,12 +110,12 @@ inline bool CmptTypeSet::operator==(const CmptTypeSet& rhs) const {
   return static_cast<const std::set<CmptType>&>(*this) ==
          static_cast<const std::set<CmptType>&>(rhs);
 }
-}  // namespace My
+}  // namespace My::MyECS
 
 namespace std {
 template <>
-struct hash<My::CmptTypeSet> {
-  size_t operator()(const My::CmptTypeSet& types) const noexcept {
+struct hash<My::MyECS::CmptTypeSet> {
+  size_t operator()(const My::MyECS::CmptTypeSet& types) const noexcept {
     return types.HashCode();
   }
 };

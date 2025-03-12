@@ -6,6 +6,7 @@
 
 #include <MyECS/IListener.h>
 
+using namespace My::MyECS;
 using namespace My;
 using namespace std;
 

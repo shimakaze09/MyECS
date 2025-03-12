@@ -12,7 +12,7 @@
 
 #include <set>
 
-namespace My {
+namespace My::MyECS {
 class CmptTypeSet : std::set<CmptType> {
  public:
   CmptTypeSet() : hashcode{TypeID<CmptTypeSet>} {}
@@ -75,6 +75,6 @@ class CmptTypeSet : std::set<CmptType> {
 
   size_t hashcode;
 };
-}  // namespace My
+}  // namespace My::MyECS
 
 #include "CmptTypeSet.inl"

@@ -9,7 +9,7 @@
 #include <MyTemplate/Func.h>
 #include <MyTemplate/Typelist.h>
 
-namespace My {
+namespace My::MyECS {
 template <typename... Cmpts>
 Archetype* EntityMngr::GetOrCreateArchetypeOf() {
   static_assert(
@@ -244,4 +244,4 @@ inline void EntityMngr::AddCommand(const std::function<void()>& command) {
   std::lock_guard<std::mutex> guard(commandBufferMutex);
   commandBuffer.push_back(command);
 }
-}  // namespace My
+}  // namespace My::MyECS

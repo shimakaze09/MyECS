@@ -6,10 +6,11 @@
 
 #include <iostream>
 
-using namespace My;
+using namespace My::MyECS;
 using namespace std;
 
 struct A {};
+
 struct B {};
 
 struct MySystem {
@@ -21,7 +22,8 @@ struct MySystem {
                   "set flag")
         .Register(
             [flags]() {
-              for (auto flag : *flags) cout << flag << endl;
+              for (auto flag : *flags)
+                cout << flag << endl;
             },
             "print flag")
         .Order("set flag", "print flag");

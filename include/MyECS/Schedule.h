@@ -12,11 +12,11 @@
 
 #include <map>
 
-namespace My::detail::Schedule_ {
+namespace My::MyECS::detail::Schedule_ {
 struct Compiler;
-}  // namespace My::detail::Schedule_
+}  // namespace My::MyECS::detail::Schedule_
 
-namespace My {
+namespace My::MyECS {
 class EntityMngr;
 class SystemMngr;
 
@@ -128,6 +128,6 @@ class Schedule {
   SystemMngr* systemMngr;
   friend class World;
 };
-}  // namespace My
+}  // namespace My::MyECS
 
 #include "detail/Schedule.inl"

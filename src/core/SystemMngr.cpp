@@ -3,11 +3,11 @@
 //
 
 #include <MyECS/SystemMngr.h>
- 
- #include <MyECS/IListener.h>
- 
- using namespace My;
- 
+
+#include <MyECS/IListener.h>
+
+using namespace My::MyECS;
+
 void SystemMngr::Accept(IListener* listener) const {
   listener->EnterSystemMngr(this);
   for (const auto& [n, f] : onUpdateMap) {

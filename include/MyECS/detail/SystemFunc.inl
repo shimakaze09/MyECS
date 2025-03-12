@@ -6,12 +6,12 @@
 
 #include <_deps/nameof.hpp>
 
-namespace My::detail::System_ {
+namespace My::MyECS::detail::System_ {
 template <typename Func>
 auto Pack(Func&& func) noexcept;
-}  // namespace My::detail::System_
+}  // namespace My::MyECS::detail::System_
 
-namespace My {
+namespace My::MyECS {
 template <typename Func>
 SystemFunc::SystemFunc(Func&& func, std::string name, EntityLocator locator,
                        EntityFilter filter)
@@ -40,9 +40,9 @@ SystemFunc::SystemFunc(Func&& func, std::string name, EntityFilter filter,
       hashCode{HashCode(this->name)},
       query{std::move(filter),
             EntityLocator{Filter_t<ArgList, CmptTag::IsTaggedCmpt>{}}} {}
-}  // namespace My
+}  // namespace My::MyECS
 
-namespace My::detail::System_ {
+namespace My::MyECS::detail::System_ {
 template <typename DecayedArgList, typename SortedCmptList>
 struct Packer;
 
@@ -78,4 +78,4 @@ auto Pack(Func&& func) noexcept {
 
   return Packer<DecayedArgList, SortedCmptList>::run(std::forward<Func>(func));
 }
-}  // namespace My::detail::System_
+}  // namespace My::MyECS::detail::System_

@@ -4,7 +4,7 @@
 
 #include <MyECS/detail/Archetype.h>
 
-using namespace My;
+using namespace My::MyECS;
 using namespace std;
 
 void Archetype::SetLayout() {

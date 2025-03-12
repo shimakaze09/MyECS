@@ -10,7 +10,7 @@
 
 #include <functional>
 
-namespace My {
+namespace My::MyECS {
 // [description]
 // system function registered by Schedule in <System>::OnUpdate(Schedule&)
 // name + query + function<...>
@@ -63,6 +63,6 @@ class SystemFunc {
   bool isJob;
   size_t hashCode;  // after name
 };
-}  // namespace My
+}  // namespace My::MyECS
 
 #include "detail/SystemFunc.inl"

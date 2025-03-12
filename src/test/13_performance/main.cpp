@@ -7,6 +7,8 @@
 #include <chrono>
 #include <iostream>
 
+using namespace My::MyECS;
+
 struct A {
   float val;
 };
@@ -16,7 +18,7 @@ struct B {
 };
 
 struct TestSystem {
-  static void OnUpdate(My::Schedule& schedule) {
+  static void OnUpdate(Schedule& schedule) {
     schedule.Register(
         [](const A* a, B* b) {
           // 256 floating-point operations
@@ -30,7 +32,7 @@ struct TestSystem {
 int main() {
   size_t numEntities = 65536;
   size_t numUpdate = 144 * 10;
-  My::World w;
+  World w;
   w.systemMngr.Register<TestSystem>();
 
   auto t0 = std::chrono::steady_clock::now();

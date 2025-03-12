@@ -8,7 +8,7 @@
 
 #include <MyContainer/xSTL/xMap.h>
 
-namespace My {
+namespace My::MyECS {
 class IListener;
 
 // System Manager
@@ -45,6 +45,6 @@ class SystemMngr {
 
   friend class World;
 };
-}  // namespace My
+}  // namespace My::MyECS
 
 #include "detail/SystemMngr.inl"

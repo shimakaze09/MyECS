@@ -10,7 +10,7 @@
 
 #include <cassert>
 
-using namespace My;
+using namespace My::MyECS;
 using namespace std;
 
 bool SysFuncGraph::HaveVertex(SystemFunc* x) const {

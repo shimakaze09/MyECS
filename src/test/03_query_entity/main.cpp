@@ -6,11 +6,13 @@
 
 #include <iostream>
 
-using namespace My;
+using namespace My::MyECS;
 using namespace std;
 
 struct A {};
+
 struct B {};
+
 struct C {};
 
 struct MySystem {
