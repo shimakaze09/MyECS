@@ -21,11 +21,13 @@
 ```c++
 #include <MyECS/World.h>
 
+using namespace My::MyECS;
+
 struct Position { float val; };
 struct Velocity { float val; };
 
 struct MoverSystem {
-    static void OnUpdate(My::Schedule& schedule) {
+    static void OnUpdate(Schedule& schedule) {
         schedule.Request(
             [](const Velocity* v, Position* p) {
                 p->val += v->val;
@@ -34,7 +36,7 @@ struct MoverSystem {
 };
 
 int main() {
-    My::World w;
+    World w;
     w.systemMngr.Register<MoverSystem>();
     w.entityMngr.CreateEntity<Position, Velocity>();
     w.Update();
