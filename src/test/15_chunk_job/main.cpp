@@ -24,8 +24,11 @@ struct B {
 
 constexpr float dt = 0.003f;
 
-struct SAB_System {
-  static void OnUpdate(Schedule& schedule) {
+class SAB_System : public System {
+ public:
+  using System::System;
+
+  virtual void OnUpdate(Schedule& schedule) override {
     EntityFilter filter{
         TypeList<S>{},                     // all
         TypeList<Latest<A>, Latest<B>>{},  // any

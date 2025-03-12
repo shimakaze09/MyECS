@@ -10,6 +10,8 @@ using namespace My::MyECS;
 using namespace My;
 using namespace std;
 
+World::World() : schedule{&entityMngr, &systemMngr}, systemMngr{this} {}
+
 void World::Update() {
   schedule.Clear();
   for (auto job : jobs)
@@ -17,8 +19,9 @@ void World::Update() {
   jobs.clear();
   jobGraph.clear();
 
-  for (const auto& [id, onUpdate] : systemMngr.onUpdateMap)
-    onUpdate(schedule);
+  for (auto& [id, system] : systemMngr.systems)
+    system->OnUpdate(schedule);
+
   auto graph = schedule.GenSysFuncGraph();
 
   unordered_map<SystemFunc*, JobHandle> table;

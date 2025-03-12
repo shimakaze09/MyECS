@@ -16,7 +16,7 @@ class IListener;
 // SystemMngr + EntityMngr
 class World {
  public:
-  World() : schedule{&entityMngr, &systemMngr} {}
+  World();
 
   SystemMngr systemMngr;
   EntityMngr entityMngr;
@@ -44,5 +44,11 @@ class World {
   Job jobGraph;
   std::vector<Job*> jobs;
   Pool<Job> jobPool;
+
+  // ==================================================
+  World(const World& world) = delete;
+  World(World&& world) = delete;
+  World& operator==(World&& world) = delete;
+  World& operator=(const World& world) = delete;
 };
 }  // namespace My::MyECS

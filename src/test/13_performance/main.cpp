@@ -17,8 +17,11 @@ struct B {
   float val;
 };
 
-struct TestSystem {
-  static void OnUpdate(Schedule& schedule) {
+class TestSystem : public System {
+ public:
+  using System::System;
+
+  virtual void OnUpdate(Schedule& schedule) override {
     schedule.Register(
         [](const A* a, B* b) {
           // 256 floating-point operations

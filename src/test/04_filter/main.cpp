@@ -22,8 +22,11 @@ struct E {
   float val;
 };
 
-struct MySystem {
-  static void OnUpdate(Schedule& schedule) {
+class MySystem : public System {
+ public:
+  using System::System;
+
+  virtual void OnUpdate(Schedule& schedule) override {
     EntityFilter filter(TypeList<A>{},     // all
                         TypeList<B, C>{},  // any
                         TypeList<D>{}      // none

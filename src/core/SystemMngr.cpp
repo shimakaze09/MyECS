@@ -10,9 +10,9 @@ using namespace My::MyECS;
 
 void SystemMngr::Accept(IListener* listener) const {
   listener->EnterSystemMngr(this);
-  for (const auto& [n, f] : onUpdateMap) {
-    listener->EnterSystem(n);
-    listener->ExistSystem(n);
+  for (const auto& [n, system] : systems) {
+    listener->EnterSystem(system.get());
+    listener->ExistSystem(system.get());
   }
   listener->ExistSystemMngr(this);
 }

@@ -13,8 +13,11 @@ struct A {};
 
 struct B {};
 
-struct MySystem {
-  static void OnUpdate(Schedule& schedule) {
+class MySystem : public System {
+ public:
+  using System::System;
+
+  virtual void OnUpdate(Schedule& schedule) override {
     auto flags = std::make_shared<std::vector<bool>>();
     schedule
         .Register([flags](Entity e, size_t indexInQuery,

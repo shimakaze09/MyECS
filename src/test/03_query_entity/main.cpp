@@ -15,8 +15,11 @@ struct B {};
 
 struct C {};
 
-struct MySystem {
-  static void OnUpdate(Schedule& schedule) {
+class MySystem : public System {
+ public:
+  using System::System;
+
+  virtual void OnUpdate(Schedule& schedule) override {
     schedule.Register(
         [em = schedule.GetEntityMngr()](Entity e, const A* a, const B* b) {
           em->AddCommand([e, em]() {

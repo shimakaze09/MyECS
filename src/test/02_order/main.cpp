@@ -13,8 +13,11 @@ struct Data1 {};
 
 struct Data2 {};
 
-struct DataSystem {
-  static void OnUpdate(Schedule& schedule) {
+class DataSystem : public System {
+ public:
+  using System::System;
+
+  virtual void OnUpdate(Schedule& schedule) noexcept {
     schedule
         .Register([](Data1* d1, Data2* d2) { cout << "writer_sys0" << endl; },
                   "writer_sys0")
