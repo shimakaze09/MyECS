@@ -100,7 +100,7 @@ class Schedule {
     std::vector<SystemFunc*> latestSysFuncs;
   };
   friend struct detail::Schedule_::Compiler;
-  std::unordered_map<CmptType, CmptSysFuncs> cmptSysFuncsMap;
+  std::unordered_map<CmptType, CmptSysFuncs> GenCmptSysFuncsMap() const;
 
   SysFuncGraph GenSysFuncGraph() const;
 

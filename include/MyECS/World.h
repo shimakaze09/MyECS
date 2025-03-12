@@ -33,7 +33,7 @@ class World {
 
   // after running Update
   // use RTDCmptTraits' registered component name
-  Graphviz::Graph GenUpdateFrameGraph() const;
+  MyGraphviz::Graph GenUpdateFrameGraph() const;
 
   void Accept(IListener* listener) const;
 

@@ -9,7 +9,7 @@
 namespace My::MyECS {
 // LastFrame -> Write -> Latest
 
-enum class Mode { LAST_FRAME, WRITE, LATEST };
+enum class AccessMode { LAST_FRAME, WRITE, LATEST };
 
 template <typename Cmpt>
 class LastFrame {
@@ -67,6 +67,15 @@ struct IsTaggedCmpt
 
 template <typename T>
 static constexpr bool IsTaggedCmpt_v = IsTaggedCmpt<T>::value;
+
+template <typename T>
+static constexpr AccessMode AccessModeOf =
+    IsLastFrame_v<T>
+        ? AccessMode::LAST_FRAME
+        : (IsWrite_v<T> ? AccessMode::WRITE
+                        : (IsLatest_v<T> ? AccessMode::LAST_FRAME
+                                         : AccessMode::WRITE  // default
+                           ));
 }  // namespace My::MyECS
 
 #include "detail/CmptTag.inl"

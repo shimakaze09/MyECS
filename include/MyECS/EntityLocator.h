@@ -12,6 +12,7 @@
 
 namespace My::MyECS {
 // locate components in function's argument list for Archetype
+// TODO: combine with a system function's locator
 class EntityLocator {
  public:
   template <typename TaggedCmptList>
@@ -42,7 +43,7 @@ class EntityLocator {
 
   const std::set<CmptType>& CmptTypes() const noexcept { return cmptTypes; }
 
-  Mode GetCmptTagMode(CmptType type) const;
+  AccessMode GetCmptTagMode(CmptType type) const;
 
   bool operator==(const EntityLocator& locator) const noexcept;
 

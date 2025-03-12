@@ -65,6 +65,10 @@ class Archetype {
              std::vector<size_t>>
   Locate(const std::set<CmptType>& cmptTypes) const;
 
+  void* Locate(size_t chunkIdx, CmptType) const;
+
+  Chunk* GetChunk(size_t chunkIdx) const { return chunks[chunkIdx]; }
+
   void* At(CmptType type, size_t idx) const;
 
   template <typename Cmpt>
@@ -99,6 +103,8 @@ class Archetype {
   size_t CmptNum() const noexcept { return types.size() - 1; }
 
   size_t EntityNum() const noexcept { return entityNum; }
+
+  size_t EntityNumOfChunk(size_t chunkIdx) const noexcept;
 
   size_t ChunkNum() const noexcept { return chunks.size(); }
 
