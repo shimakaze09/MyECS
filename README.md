@@ -1,12 +1,23 @@
+```
+
+ __  __       _____ ____ ____  
+|  \/  |_   _| ____/ ___/ ___| 
+| |\/| | | | |  _|| |   \___ \ 
+| |  | | |_| | |__| |___ ___) |
+|_|  |_|\__, |_____\____|____/ 
+        |___/                  
+
+```
+
+[![repo-size](https://img.shields.io/github/languages/code-size/shimakaze09/MyECS?style=flat)](https://github.com/shimakaze09/MyECS/archive/main.zip) [![tag](https://img.shields.io/github/v/tag/shimakaze09/MyECS)](https://github.com/shimakaze09/MyECS/tags) [![license](https://img.shields.io/github/license/shimakaze09/MyECS)](LICENSE)
+
 # MyECS
 
 **My** **E**ntity-**C**omponent-**S**ystem in Unity3D-style
 
-[![repo-size](https://img.shields.io/github/languages/code-size/shimakaze09/MyECS?style=flat)](https://github.com/shimakaze09/MyECS/archive/main.zip) [![tag](https://img.shields.io/github/v/tag/shimakaze09/MyECS)](https://github.com/shimakaze09/MyECS/tags) [![license](https://img.shields.io/github/license/shimakaze09/MyECS)](LICENSE)
-
 ## Environment
 
-- MSVC 16.5.3 +
+- VS 2019
 - C++ 17
 - CMake 16.3 +
 

@@ -31,8 +31,10 @@ class EntityMngr {
  public:
   template <typename... Cmpts>
   std::tuple<Entity, Cmpts*...> Create();
+
   // use RTDCmptTraits
   Entity Create(const CmptType* types, size_t num);
+
   // call Create(const CmptType*, size_t)
   template <
       typename... CmptTypes,
@@ -46,8 +48,11 @@ class EntityMngr {
 
   template <typename... Cmpts>
   std::tuple<Cmpts*...> Attach(Entity);
+
   // use RTDCmptTraits
   void Attach(Entity, const CmptType* types, size_t num);
+
+  // call Attach(Entity, const CmptType*, size_t)
   template <
       typename... CmptTypes,
       // for function overload
@@ -59,8 +64,10 @@ class EntityMngr {
 
   template <typename... Cmpts>
   void Detach(Entity);
+
   // use RTDCmptTraits
   void Detach(Entity, const CmptType* types, size_t num);
+
   // call Detach(Entity, const CmptType*, size_t);
   template <
       typename... CmptTypes,
