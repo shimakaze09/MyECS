@@ -39,7 +39,7 @@ SystemFunc::SystemFunc(Func&& func, std::string name, EntityFilter filter,
       name{std::move(name)},
       hashCode{HashCode(this->name)},
       query{std::move(filter),
-            EntityLocator{Filter_t<ArgList, CmptTag::IsTaggedCmpt>{}}} {}
+            EntityLocator{Filter_t<ArgList, IsTaggedCmpt>{}}} {}
 }  // namespace My::MyECS
 
 namespace My::MyECS::detail::System_ {
@@ -67,13 +67,13 @@ template <typename Func>
 auto Pack(Func&& func) noexcept {
   using ArgList = FuncTraits_ArgList<Func>;
 
-  using DecayedArgList = Transform_t<ArgList, CmptTag::DecayTag>;
+  using DecayedArgList = Transform_t<ArgList, DecayTag>;
   static_assert(IsSet_v<DecayedArgList>,
                 "detail::System_::Pack: <Func>'s argument types must be a set");
 
-  using TaggedCmptList = Filter_t<ArgList, CmptTag::IsTaggedCmpt>;
+  using TaggedCmptList = Filter_t<ArgList, IsTaggedCmpt>;
 
-  using CmptList = Transform_t<TaggedCmptList, CmptTag::RemoveTag>;
+  using CmptList = Transform_t<TaggedCmptList, RemoveTag>;
   using SortedCmptList = QuickSort_t<CmptList, TypeID_Less>;
 
   return Packer<DecayedArgList, SortedCmptList>::run(std::forward<Func>(func));

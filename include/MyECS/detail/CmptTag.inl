@@ -11,7 +11,7 @@ class Entity;
 class EntityLocator;
 }  // namespace My::MyECS
 
-namespace My::MyECS::CmptTag {
+namespace My::MyECS {
 template <typename Cmpt>
 struct RemoveTag<const Cmpt*> : IType<Cmpt> {};
 
@@ -71,4 +71,4 @@ template <typename TaggedCmpt>
 struct IsTimePoint
     : IValue<bool, IsWrite_v<TaggedCmpt> || IsLastFrame_v<TaggedCmpt> ||
                        IsLatest_v<TaggedCmpt>> {};
-}  // namespace My::MyECS::CmptTag
+}  // namespace My::MyECS

@@ -7,7 +7,6 @@
 #include <MyTemplate/Typelist.h>
 
 namespace My::MyECS {
-namespace CmptTag {
 // LastFrame -> Write -> Latest
 
 enum class Mode { LAST_FRAME, WRITE, LATEST };
@@ -66,7 +65,6 @@ struct IsTaggedCmpt
 
 template <typename T>
 static constexpr bool IsTaggedCmpt_v = IsTaggedCmpt<T>::value;
-}  // namespace CmptTag
 }  // namespace My::MyECS
 
 #include "detail/CmptTag.inl"

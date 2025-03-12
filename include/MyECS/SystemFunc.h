@@ -18,7 +18,7 @@ namespace My::MyECS {
 // query.filter can be change dynamically by other <System> with Schedule
 // [system function kind] (distinguish by argument list)
 // 1. per entity function: [[const] Entity e, ] [size_t indexInQuery, ] <Tagged_Component>...
-// - - tagged component: CmptTag::{LastFrame|Write|Latest}<Component>
+// - - tagged component: {LastFrame|Write|Latest}<Component>
 // 2. job: empty argument list
 // 3. runtime dynamic function: const EntityLocator* locator, void** cmpts
 class SystemFunc {
