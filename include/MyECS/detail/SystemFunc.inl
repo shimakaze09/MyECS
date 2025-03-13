@@ -22,9 +22,8 @@ SystemFunc::SystemFunc(Func&& func, std::string name, EntityLocator locator,
       query{std::move(filter), std::move(locator)} {
   using ArgList = FuncTraits_ArgList<Func>;
 
-  static_assert(
-      Contain_v<ArgList, RTDCmptsView>,
-      "(Mode::Entity) <Func>'s argument list must contain RTDCmptsView");
+  static_assert(Contain_v<ArgList, CmptsView>,
+                "(Mode::Entity) <Func>'s argument list must contain CmptsView");
 
   static_assert(
       !Contain_v<ArgList, ChunkView>,
@@ -44,9 +43,9 @@ SystemFunc::SystemFunc(Func&& func, std::string name, EntityFilter filter,
       hashCode{HashCode(this->name)},
       query{std::move(filter),
             EntityLocator{Filter_t<ArgList, IsTaggedCmpt>{}}} {
-  static_assert(!Contain_v<ArgList, RTDCmptsView>,
-                "<Func>'s argument list contains RTDCmptsView, so you should "
-                "use the constructor of the run-time dynamic version");
+  static_assert(!Contain_v<ArgList, CmptsView>,
+                "<Func>'s argument list contains CmptsView, so you should use "
+                "the constructor of the run-time dynamic version");
   if constexpr (IsEmpty_v<ArgList>)
     mode = Mode::Job;
   else if constexpr (std::is_same_v<ArgList, TypeList<ChunkView>>)
@@ -71,7 +70,7 @@ struct Packer<TypeList<DecayedArgs...>, TypeList<Cmpts...>> {
   template <typename Func>
   static auto run(Func&& func) noexcept {
     return [func = std::forward<Func>(func)](
-               Entity e, size_t entityIndexInQuery, RTDCmptsView rtdcmpts,
+               Entity e, size_t entityIndexInQuery, CmptsView rtdcmpts,
                ChunkView chunkView) {
       auto unsorted_arg_tuple = std::make_tuple(
           e, entityIndexInQuery, rtdcmpts, chunkView,

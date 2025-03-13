@@ -23,9 +23,7 @@ class EntityLocator {
   EntityLocator(TypeList<LastFrameCmpts...>, TypeList<WriteCmpts...>,
                 TypeList<LatestCmpts...>);
 
-  EntityLocator(std::set<CmptType> lastFrameCmpts = {},
-                std::set<CmptType> writeFrameCmpts = {},
-                std::set<CmptType> latestCmpts = {});
+  EntityLocator(const CmptType* types, size_t num);
 
   size_t HashCode() const noexcept { return hashCode; }
 

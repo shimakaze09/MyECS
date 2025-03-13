@@ -14,35 +14,30 @@ class RTDSystem : public System {
   using System::System;
 
   virtual void OnUpdate(Schedule& schedule) override {
-    EntityLocator locator_write({},                     // read: last frame
-                                {CmptType{"LuaCmpt"}},  // write
-                                {}                      // read: lastest
-    );
-    EntityLocator locator_read({},                    // read: last frame
-                               {},                    // write
-                               {CmptType{"LuaCmpt"}}  // read: lastest
-    );
+    std::array<CmptType, 1> cmpts_write = {
+        CmptType{"LuaCmpt", AccessMode::WRITE}};
+    std::array<CmptType, 1> cmpts_read = {
+        CmptType{"LuaCmpt", AccessMode::LATEST}};
+
+    EntityLocator locator_write(cmpts_write.data(), cmpts_write.size());
+    EntityLocator locator_read(cmpts_read.data(), cmpts_read.size());
+
     schedule
         .Register(
-            [](RTDCmptsView cmpts) {
-              for (auto handle : cmpts) {
-                if (handle.GetCmptType() == CmptType{"LuaCmpt"}) {
-                  double& val =
-                      *reinterpret_cast<double*>(handle.AsWrite().Ptr());
-                  val = 520.;
-                }
-              }
+            [](CmptsView cmpts) {
+              auto luaCmpt =
+                  cmpts.GetCmpt(CmptType{"LuaCmpt", AccessMode::WRITE});
+              double& val = *reinterpret_cast<double*>(luaCmpt.Ptr());
+              val = 520.;
             },
             "write", locator_write)
         .Register(
-            [](RTDCmptsView cmpts) {
-              for (auto handle : cmpts) {
-                if (handle.GetCmptType() == CmptType{"LuaCmpt"}) {
-                  const double& val =
-                      *reinterpret_cast<const double*>(handle.AsLatest().Ptr());
-                  cout << "value : " << val << endl;
-                }
-              }
+            [](CmptsView cmpts) {
+              auto luaCmpt =
+                  cmpts.GetCmpt(CmptType{"LuaCmpt", AccessMode::LATEST});
+              const double& val =
+                  *reinterpret_cast<const double*>(luaCmpt.Ptr());
+              cout << "value : " << val << endl;
             },
             "read", locator_read);
   }
@@ -52,7 +47,7 @@ int main() {
   CmptType type("LuaCmpt");
   // LuaCmpt {
   //   number value;
-  // };
+  // }
   RTDCmptTraits::Instance().RegisterSize(type, 8);
   RTDCmptTraits::Instance().RegisterDefaultConstructor(
       type, [](void*) { cout << "construct" << endl; });

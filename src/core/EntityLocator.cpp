@@ -9,12 +9,24 @@
 using namespace My::MyECS;
 using namespace std;
 
-EntityLocator::EntityLocator(set<CmptType> lastFrameCmpts,
-                             set<CmptType> writeFrameCmpts,
-                             set<CmptType> latestCmpts)
-    : lastFrameCmptTypes{move(lastFrameCmpts)},
-      writeCmptTypes{move(writeFrameCmpts)},
-      latestCmptTypes{move(latestCmpts)} {
+EntityLocator::EntityLocator(const CmptType* types, size_t num) {
+  assert(types != nullptr);
+  for (size_t i = 0; i < num; i++) {
+    switch (types[i].GetAccessMode()) {
+      case My::MyECS::AccessMode::LAST_FRAME:
+        lastFrameCmptTypes.insert(types[i]);
+        break;
+      case My::MyECS::AccessMode::WRITE:
+        writeCmptTypes.insert(types[i]);
+        break;
+      case My::MyECS::AccessMode::LATEST:
+        latestCmptTypes.insert(types[i]);
+        break;
+      default:
+        assert(false);
+        break;
+    }
+  }
   cmptTypes = SetUnion(lastFrameCmptTypes, writeCmptTypes);
   cmptTypes = SetUnion(cmptTypes, latestCmptTypes);
   hashCode = GenHashCode();
