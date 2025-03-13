@@ -73,7 +73,7 @@ static constexpr AccessMode AccessModeOf =
     IsLastFrame_v<T>
         ? AccessMode::LAST_FRAME
         : (IsWrite_v<T> ? AccessMode::WRITE
-                        : (IsLatest_v<T> ? AccessMode::LAST_FRAME
+                        : (IsLatest_v<T> ? AccessMode::LATEST
                                          : AccessMode::WRITE  // default
                            ));
 }  // namespace My::MyECS
