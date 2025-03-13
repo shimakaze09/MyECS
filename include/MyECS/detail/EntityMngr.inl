@@ -31,13 +31,6 @@ Archetype* EntityMngr::GetOrCreateArchetypeOf() {
   return archetype;
 }
 
-template <typename... CmptTypes, typename>
-Archetype* EntityMngr::GetOrCreateArchetypeOf(CmptTypes... types) {
-  static_assert((std::is_same_v<CmptTypes, CmptType> && ...));
-  const std::array<CmptType, sizeof...(CmptTypes)> typeArr{types...};
-  return GetOrCreateArchetypeOf(typeArr.data(), typeArr.size());
-}
-
 template <typename... Cmpts>
 std::tuple<Entity, Cmpts*...> EntityMngr::Create() {
   static_assert(IsSet_v<TypeList<Entity, Cmpts...>>,
@@ -50,12 +43,6 @@ std::tuple<Entity, Cmpts*...> EntityMngr::Create() {
   auto [idxInArchetype, cmpts] = archetype->Create<Cmpts...>(e);
   info.idxInArchetype = idxInArchetype;
   return {e, std::get<Cmpts*>(cmpts)...};
-}
-
-template <typename... CmptTypes, typename>
-Entity EntityMngr::Create(CmptTypes... types) {
-  const std::array<CmptType, sizeof...(CmptTypes)> typeArr{types...};
-  return Create(typeArr.data(), typeArr.size());
 }
 
 template <typename... Cmpts>
@@ -107,14 +94,6 @@ void EntityMngr::AttachWithoutInit(Entity e) {
   info.idxInArchetype = dstIdxInArchetype;
 }
 
-template <typename... CmptTypes, typename>
-void EntityMngr::AttachWithoutInit(Entity e, CmptTypes... types) {
-  static_assert(sizeof...(CmptTypes) > 0,
-                "EntityMngr::AttachWithoutInit: !types.empty()");
-  const std::array<CmptType, sizeof...(CmptTypes)> typeArr{types...};
-  return AttachWithoutInit(e, typeArr.data(), typeArr.size());
-}
-
 template <typename... Cmpts>
 std::tuple<Cmpts*...> EntityMngr::Attach(Entity e) {
   static_assert((std::is_constructible_v<Cmpts> && ...),
@@ -138,35 +117,6 @@ std::tuple<Cmpts*...> EntityMngr::Attach(Entity e) {
   return cmpts;
 }
 
-template <typename... CmptTypes, typename>
-std::array<CmptPtr, sizeof...(CmptTypes)> EntityMngr::Attach(
-    Entity e, CmptTypes... types) {
-  if (!Exist(e))
-    throw std::invalid_argument("Entity is invalid");
-
-  constexpr size_t N = sizeof...(types);
-
-  std::array<CmptType, N> typeArr = {types...};
-  auto srcArchetype = entityTable[e.Idx()].archetype;
-  AttachWithoutInit(e, types...);
-  const auto& new_info = entityTable[e.Idx()];
-  std::array<CmptPtr, sizeof...(CmptTypes)> cmptPtrArr = {CmptPtr{
-      types, new_info.archetype->At(types, new_info.idxInArchetype)}...};
-  const auto& rtdct = RTDCmptTraits::Instance();
-  for (size_t i = 0; i < N; i++) {
-    auto type = typeArr[i];
-    if (srcArchetype->GetCmptTypeSet().Contains(type))
-      continue;
-    auto target = rtdct.default_constructors.find(type);
-    if (target == rtdct.default_constructors.end())
-      continue;
-
-    target->second(cmptPtrArr[i].Ptr());
-  }
-
-  return cmptPtrArr;
-}
-
 template <typename Cmpt, typename... Args>
 Cmpt* EntityMngr::Emplace(Entity e, Args&&... args) {
   static_assert(std::is_constructible_v<Cmpt, Args...> ||
@@ -187,29 +137,6 @@ Cmpt* EntityMngr::Emplace(Entity e, Args&&... args) {
     const auto& info = entityTable[e.Idx()];
     return info.archetype->At<Cmpt>(info.idxInArchetype);
   }
-}
-
-template <typename... Cmpts>
-void EntityMngr::Detach(Entity e) {
-  static_assert(sizeof...(Cmpts) > 0,
-                "EntityMngr::Detach: sizeof...(<Cmpts>) > 0");
-  static_assert(IsSet_v<TypeList<Entity, Cmpts...>>,
-                "EntityMngr::Detach: <Cmpts> must be different");
-  Detach(e, CmptType::Of<Cmpts>...);
-}
-
-template <typename... CmptTypes, typename>
-void EntityMngr::Detach(Entity e, CmptTypes... types) {
-  static_assert((std::is_same_v<CmptTypes, CmptType> && ...));
-  const std::array<CmptType, sizeof...(CmptTypes)> typeArr{types...};
-  return Detach(e, typeArr.data(), typeArr.size());
-}
-
-template <typename Cmpt>
-bool EntityMngr::Have(Entity e) const {
-  static_assert(!std::is_same_v<Cmpt, Entity>,
-                "EntityMngr::Have: <Cmpt> != Entity");
-  return Have(e, CmptType::Of<Cmpt>);
 }
 
 inline bool EntityMngr::Have(Entity e, CmptType type) const {

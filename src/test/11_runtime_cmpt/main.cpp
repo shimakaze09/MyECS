@@ -63,7 +63,7 @@ int main() {
   w.systemMngr.Register<RTDSystem>();
 
   auto [e] = w.entityMngr.Create();
-  w.entityMngr.Attach(e, type);
+  w.entityMngr.Attach(e, &type, 1);
 
   w.Update();
 

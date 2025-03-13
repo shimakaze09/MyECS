@@ -17,11 +17,6 @@ class ChunkView {
 
   bool Contains(CmptType) const;
 
-  template <typename Cmpt>
-  bool Contains() const {
-    return Contains(CmptType::Of<Cmpt>);
-  }
-
   // if not contain, return nullptr
   void* GetCmptArray(CmptType) const;
 

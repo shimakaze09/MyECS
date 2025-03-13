@@ -31,11 +31,6 @@ class Archetype {
   Archetype(TypeList<Cmpts...>);
 
   // auto add Entity, use RTDCmptTraits
-  template <
-      typename... CmptTypes,
-      // for function overload
-      typename = std::enable_if_t<(std::is_same_v<CmptTypes, CmptType> && ...)>>
-  static Archetype* New(CmptTypes...);
   static Archetype* New(const CmptType* types, size_t num);
 
   // auto add Entity
@@ -43,20 +38,10 @@ class Archetype {
   static Archetype* Add(const Archetype* from);
   static Archetype* Add(const Archetype* from, const CmptType* types,
                         size_t num);
-  template <
-      typename... CmptTypes,
-      // for function overload
-      typename = std::enable_if_t<(std::is_same_v<CmptTypes, CmptType> && ...)>>
-  static Archetype* Add(const Archetype* from, CmptTypes...);
 
   // auto add Entity
   static Archetype* Remove(const Archetype* from, const CmptType* types,
                            size_t num);
-  template <
-      typename... CmptTypes,
-      // for function overload
-      typename = std::enable_if_t<(std::is_same_v<CmptTypes, CmptType> && ...)>>
-  static Archetype* Remove(const Archetype* from, CmptTypes...);
 
   ~Archetype();
 
@@ -113,14 +98,6 @@ class Archetype {
   template <typename... Cmpts>
   static constexpr size_t HashCode() noexcept {
     return CmptTypeSet::HashCodeOf<Entity, Cmpts...>();
-  }
-
-  template <
-      typename... CmptTypes,
-      // for function overload
-      typename = std::enable_if_t<(std::is_same_v<CmptTypes, CmptType> && ...)>>
-  static size_t HashCode(CmptTypes... types) {
-    return CmptTypeSet{CmptType::Of<Entity>, types...}.HashCode();
   }
 
   static size_t HashCode(const CmptType* types, size_t num) {

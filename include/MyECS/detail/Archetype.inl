@@ -16,13 +16,6 @@ Archetype::Archetype(TypeList<Cmpts...>) : types(TypeList<Entity, Cmpts...>{}) {
   SetLayout();
 }
 
-template <typename... CmptTypes, typename>
-static Archetype* Archetype::New(CmptTypes... types) {
-  static_assert((std::is_same_v<CmptTypes, CmptType> && ...));
-  const std::array<CmptType, sizeof...(CmptTypes)> typeArr{types...};
-  return New(typeArr.data(), typeArr.size());
-}
-
 template <typename... Cmpts>
 Archetype* Archetype::Add(const Archetype* from) {
   assert(((!from->types.Contains(CmptType::Of<Cmpts>)) && ...));
@@ -37,18 +30,6 @@ Archetype* Archetype::Add(const Archetype* from) {
   rst->SetLayout();
 
   return rst;
-}
-
-template <typename... CmptTypes, typename>
-Archetype* Archetype::Add(const Archetype* from, CmptTypes... types) {
-  const std::array<CmptType, sizeof...(CmptTypes)> typeArr{types...};
-  return Add(typeArr.data(), typeArr.size());
-}
-
-template <typename... CmptTypes, typename>
-Archetype* Archetype::Remove(const Archetype* from, CmptTypes... types) {
-  const std::array<CmptType, sizeof...(CmptTypes)> typeArr{types...};
-  return Remove(typeArr.data(), typeArr.size());
 }
 
 template <typename Cmpt>
