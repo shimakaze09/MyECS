@@ -33,6 +33,8 @@ class DataSystem : public System {
 };
 
 int main() {
+  RTDCmptTraits::Instance().Register<Data1, Data2>();
+
   World w;
   w.systemMngr.Register<DataSystem>();
 
@@ -41,6 +43,7 @@ int main() {
   w.Update();
 
   cout << w.DumpUpdateJobGraph() << endl;
+  cout << w.GenUpdateFrameGraph().Dump() << endl;
 
   return 0;
 }
