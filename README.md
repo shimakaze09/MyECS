@@ -42,7 +42,7 @@ class MoverSystem : public System {
  	using System::System;
  
  	virtual void OnUpdate(Schedule& schedule) override {
-        schedule.Request(
+        schedule.Requester(
             [](const Velocity* v, Position* p) {
                 p->val += v->val;
             }, "Mover");
