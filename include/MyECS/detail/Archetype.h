@@ -77,6 +77,7 @@ class Archetype {
   // erase idx-th entity
   // if idx != num-1, back entity will put at idx, return moved Entity's index
   // else return size_t_invalid
+  // move-assignment + destructor
   size_t Erase(size_t idx);
 
   // Components + Entity

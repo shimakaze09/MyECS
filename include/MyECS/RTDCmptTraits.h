@@ -11,12 +11,13 @@
 
 namespace My::MyECS {
 // run-time dynamic component traits, singleton
-// size (> 0) is neccessary
+// size (> 0) is necessary
 // optional
 // - alignment: alignof(std::max_align_t) as default, 8 / 16 in most cases
 // - default constructor: do nothing as default
 // - copy constructor: memcpy as default
 // - move constructor: memcpy as default
+// - move assignment: memcpy as default
 // - destructor: do nothing as default
 // - name
 class RTDCmptTraits {
@@ -44,6 +45,10 @@ class RTDCmptTraits {
                                          std::function<void(void*, void*)> f);
 
   // optional
+  RTDCmptTraits& RegisterMoveAssignment(CmptType type,
+                                        std::function<void(void*, void*)> f);
+
+  // optional
   RTDCmptTraits& RegisterDestructor(CmptType type,
                                     std::function<void(void*)> f);
 
@@ -54,6 +59,7 @@ class RTDCmptTraits {
   size_t Alignof(CmptType type) const;
   void CopyConstruct(CmptType type, void* dst, void* src) const;
   void MoveConstruct(CmptType type, void* dst, void* src) const;
+  void MoveAssign(CmptType type, void* dst, void* src) const;
   void Destruct(CmptType type, void* cmpt) const;
   std::string_view Nameof(CmptType type) const;
 
@@ -89,6 +95,8 @@ class RTDCmptTraits {
       copy_constructors;  // dst <- src
   std::unordered_map<CmptType, std::function<void(void*, void*)>>
       move_constructors;  // dst <- src
+  std::unordered_map<CmptType, std::function<void(void*, void*)>>
+      move_assignments;  // dst <- src
   std::unordered_map<CmptType, std::function<void(void*)>> destructors;
   std::unordered_map<CmptType, std::string> names;
 };

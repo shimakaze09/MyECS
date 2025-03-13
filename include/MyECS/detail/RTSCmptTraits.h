@@ -17,6 +17,7 @@ class RTSCmptTraits {
   size_t Alignof(CmptType type) const;
   void CopyConstruct(CmptType type, void* dst, void* src) const;
   void MoveConstruct(CmptType type, void* dst, void* src) const;
+  void MoveAssign(CmptType type, void* dst, void* src) const;
   void Destruct(CmptType type, void* cmpt) const;
 
   template <typename Cmpt>
@@ -34,6 +35,8 @@ class RTSCmptTraits {
       copy_constructors;  // dst <- src
   std::unordered_map<CmptType, std::function<void(void*, void*)>>
       move_constructors;  // dst <- src
+  std::unordered_map<CmptType, std::function<void(void*, void*)>>
+      move_assignments;  // dst <- src
   std::unordered_map<CmptType, std::function<void(void*)>> destructors;
 };
 }  // namespace My::MyECS
