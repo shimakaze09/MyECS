@@ -1,5 +1,7 @@
 # API
 
+> maybe outmoded, it's better to read [source codes](../include/MyECS) directly
+
 ## `Entity`
 
 Entity = `index` + `version`
@@ -246,7 +248,9 @@ query
 ### Methods
 
 - `template<typename Func> SystemFunc(Func&& func, std::string name, EntityFilter filter = EntityFilter{})`
-- `template<typename Func> SystemFunc(Func&& func, std::string name, EntityLocator locator, EntityFilter filter = EntityFilter{})`: run-time dynamic function
+-
+`template<typename Func> SystemFunc(Func&& func, std::string name, EntityLocator locator, EntityFilter filter = EntityFilter{})`:
+run-time dynamic function
 - `const std::string& Name() const`
 - `static constexpr size_t HashCode(std::string_view name)`
 - `size_t HashCode() const`
@@ -267,7 +271,8 @@ schedule will be clear at the beginning of the **next** `World::Update()`
 #### Methods
 
 - `template<typename Func> Schedule& Register(Func&& func, std::string name, EntityFilter filter = EntityFilter{})`
-- `template<typename Func> Schedule& Register(Func&& func, std::string name, EntityLocator locator, EntityFilter filter = EntityFilter{})`
+-
+`template<typename Func> Schedule& Register(Func&& func, std::string name, EntityLocator locator, EntityFilter filter = EntityFilter{})`
 - `Schedule& LockFilter(std::string_view sys)`
 - `size_t EntityNumInQuery(std::string_view sys) const`
 - `EntityMngr* GetEntityMngr() const`
