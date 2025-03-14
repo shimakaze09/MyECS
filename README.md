@@ -72,3 +72,4 @@ int main() {
 - [performance test](src/test/13_performance/main.cpp)
 - [serialize](src/test/14_serialize/main.cpp)
 - [chunk job](src/test/15_chunk_job/main.cpp)
+- [singleton](src/test/16_singleton/main.cpp) 

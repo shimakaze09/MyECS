@@ -4,12 +4,12 @@
 
 #pragma once
 
+#include <MyContainer/Pool.h>
+
 #include "EntityQuery.h"
 #include "SystemFunc.h"
 #include "detail/Archetype.h"
 #include "detail/Job.h"
-
-#include <MyContainer/Pool.h>
 
 namespace My::MyECS {
 class World;
@@ -17,13 +17,14 @@ class World;
 class IListener;
 
 // Entity Manager of World
-// auto maintain Component's lifecycle ({default|copy|move} constructor, destructor)
-// [API]
+// auto maintain Component's lifecycle ({default|copy|move} constructor,
+// destructor) [API]
 // - Entity: Create, Instantiate, Destroy, Exist
 // - Component: Attach, Emplace, Detach, Have, Get, Components
 // - other: EntityNum, AddCommand
 // [important]
-// - API with CmptType need RTDCmptTraits to get {size|alignment|lifecycle function} (throw std::logic_error)
+// - API with CmptType need RTDCmptTraits to get {size|alignment|lifecycle
+// function} (throw std::logic_error)
 // - API with Entity require Entity exist  (throw std::invalid_argument)
 class EntityMngr {
  public:
@@ -62,6 +63,15 @@ class EntityMngr {
   void Destroy(Entity);
 
   size_t EntityNum(const EntityQuery&) const;
+
+  bool IsSingleton(CmptType) const;
+  Entity GetSingletonEntity(CmptType) const;
+  CmptPtr GetSingleton(CmptType) const;
+
+  template <typename Cmpt>
+  Cmpt* GetSingleton() const {
+    return GetSingleton(CmptType::Of<Cmpt>).As<Cmpt>();
+  }
 
   void Accept(IListener* listener) const;
 

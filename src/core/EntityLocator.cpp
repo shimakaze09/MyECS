@@ -3,14 +3,13 @@
 //
 
 #include <MyECS/EntityLocator.h>
-
 #include <MyECS/detail/Util.h>
 
 using namespace My::MyECS;
 using namespace std;
 
 EntityLocator::EntityLocator(const CmptType* types, size_t num) {
-  assert(types != nullptr);
+  assert(types != nullptr && num > 0);
   for (size_t i = 0; i < num; i++) {
     switch (types[i].GetAccessMode()) {
       case My::MyECS::AccessMode::LAST_FRAME:
@@ -32,10 +31,11 @@ EntityLocator::EntityLocator(const CmptType* types, size_t num) {
   hashCode = GenHashCode();
 }
 
+EntityLocator::EntityLocator() : hashCode{TypeID<EntityLocator>} {}
+
 size_t EntityLocator::GenHashCode() const noexcept {
   size_t rst = TypeID<EntityLocator>;
-  for (auto type : cmptTypes)
-    rst = hash_combine(rst, type.HashCode());
+  for (auto type : cmptTypes) rst = hash_combine(rst, type.HashCode());
   return rst;
 }
 

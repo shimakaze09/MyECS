@@ -4,11 +4,10 @@
 
 #pragma once
 
-#include "CmptTag.h"
-
-#include "CmptType.h"
-
 #include <set>
+
+#include "CmptTag.h"
+#include "CmptType.h"
 
 namespace My::MyECS {
 // locate components in function's argument list for Archetype
@@ -24,6 +23,8 @@ class EntityLocator {
                 TypeList<LatestCmpts...>);
 
   EntityLocator(const CmptType* types, size_t num);
+
+  EntityLocator();
 
   size_t HashCode() const noexcept { return hashCode; }
 
