@@ -71,6 +71,7 @@ MyGraphviz::Graph World::GenUpdateFrameGraph() const {
   auto& registry = graph.GetRegistry();
 
   auto& subgraph_cmpt = graph.GenSubgraph("Component Nodes");
+  auto& subgraph_singleton = graph.GenSubgraph("Singleton Nodes");
   auto& subgraph_sys = graph.GenSubgraph("System Function Nodes");
 
   auto& subgraph_lastframe = graph.GenSubgraph("LastFrame Edges");
@@ -85,6 +86,9 @@ MyGraphviz::Graph World::GenUpdateFrameGraph() const {
 
   subgraph_cmpt.RegisterGraphNodeAttr("shape", "ellipse")
       .RegisterGraphNodeAttr("color", "#6597AD");
+
+  subgraph_singleton.RegisterGraphNodeAttr("shape", "ellipse")
+      .RegisterGraphNodeAttr("color", "#BFB500");
 
   subgraph_sys.RegisterGraphNodeAttr("shape", "box")
       .RegisterGraphNodeAttr("color", "#F79646");
@@ -126,12 +130,17 @@ MyGraphviz::Graph World::GenUpdateFrameGraph() const {
       cmptTypes.insert(cmptType);
     for (auto cmptType : sysFunc->entityQuery.filter.NoneCmptTypes())
       cmptTypes.insert(cmptType);
+    for (auto singleton : sysFunc->singletonLocator.SingletonTypes())
+      cmptTypes.insert(singleton);
   }
 
   for (auto cmptType : cmptTypes) {
     auto cmptIdx = registry.RegisterNode(queryCmptName(cmptType));
     cmptType2idx[cmptType] = cmptIdx;
-    subgraph_cmpt.AddNode(cmptIdx);
+    if (AccessMode_IsSingleton(cmptType.GetAccessMode()))
+      subgraph_singleton.AddNode(cmptIdx);
+    else
+      subgraph_cmpt.AddNode(cmptIdx);
   }
 
   for (const auto& [hash, sysFunc] : schedule.sysFuncs) {
@@ -140,16 +149,16 @@ MyGraphviz::Graph World::GenUpdateFrameGraph() const {
 
     subgraph_sys.AddNode(sysIdx);
 
-    const auto& locator = sysFunc->entityQuery.locator;
-    for (const auto& cmptType : locator.LastFrameCmptTypes()) {
+    const auto& cmptlocator = sysFunc->entityQuery.locator;
+    for (const auto& cmptType : cmptlocator.LastFrameCmptTypes()) {
       auto edgeIdx = registry.RegisterEdge(cmptType2idx[cmptType], sysIdx);
       subgraph_lastframe.AddEdge(edgeIdx);
     }
-    for (const auto& cmptType : locator.WriteCmptTypes()) {
+    for (const auto& cmptType : cmptlocator.WriteCmptTypes()) {
       auto edgeIdx = registry.RegisterEdge(sysIdx, cmptType2idx[cmptType]);
       subgraph_write.AddEdge(edgeIdx);
     }
-    for (const auto& cmptType : locator.LatestCmptTypes()) {
+    for (const auto& cmptType : cmptlocator.LatestCmptTypes()) {
       auto edgeIdx = registry.RegisterEdge(cmptType2idx[cmptType], sysIdx);
       subgraph_latest.AddEdge(edgeIdx);
     }
@@ -221,6 +230,20 @@ MyGraphviz::Graph World::GenUpdateFrameGraph() const {
         continue;
       auto edgeIdx = registry.RegisterEdge(sysIdx, cmptType2idx[cmptType]);
       subgraph_none.AddEdge(edgeIdx);
+    }
+
+    const auto& singletonlocator = sysFunc->singletonLocator;
+    for (const auto& singleton : singletonlocator.LastFrameSingletonTypes()) {
+      auto edgeIdx = registry.RegisterEdge(cmptType2idx[singleton], sysIdx);
+      subgraph_lastframe.AddEdge(edgeIdx);
+    }
+    for (const auto& singleton : singletonlocator.WriteSingletonTypes()) {
+      auto edgeIdx = registry.RegisterEdge(sysIdx, cmptType2idx[singleton]);
+      subgraph_write.AddEdge(edgeIdx);
+    }
+    for (const auto& singleton : singletonlocator.LatestSingletonTypes()) {
+      auto edgeIdx = registry.RegisterEdge(cmptType2idx[singleton], sysIdx);
+      subgraph_latest.AddEdge(edgeIdx);
     }
   }
 
