@@ -20,8 +20,7 @@ void Archetype::SetLayout() {
   chunkCapacity = layout.capacity;
 
   size_t i = 0;
-  for (const auto& type : types)
-    type2offset[type] = layout.offsets[i++];
+  for (const auto& type : types) type2offset[type] = layout.offsets[i++];
 }
 
 Archetype* Archetype::New(const CmptType* types, size_t num) {
@@ -29,8 +28,7 @@ Archetype* Archetype::New(const CmptType* types, size_t num) {
   rst->types = CmptTypeSet{types, num};
   rst->types.Insert(CmptType::Of<Entity>);
   rst->cmptTraits.Register<Entity>();
-  for (size_t i = 0; i < num; i++)
-    rst->cmptTraits.Register(types[i]);
+  for (size_t i = 0; i < num; i++) rst->cmptTraits.Register(types[i]);
   rst->SetLayout();
   return rst;
 }
@@ -38,8 +36,7 @@ Archetype* Archetype::New(const CmptType* types, size_t num) {
 Archetype* Archetype::Add(const Archetype* from, const CmptType* types,
                           size_t num) {
 #ifndef NDEBUG
-  for (size_t i = 0; i < num; i++)
-    assert(!from->types.Contains(types[i]));
+  for (size_t i = 0; i < num; i++) assert(!from->types.Contains(types[i]));
 #endif  // !NDEBUG
 
   Archetype* rst = new Archetype;
@@ -58,8 +55,7 @@ Archetype* Archetype::Add(const Archetype* from, const CmptType* types,
 
 Archetype* Archetype::Remove(const Archetype* from, const CmptType* types,
                              size_t num) {
-  for (size_t i = 0; i < num; i++)
-    assert(from->types.Contains(types[i]));
+  for (size_t i = 0; i < num; i++) assert(from->types.Contains(types[i]));
 
   Archetype* rst = new Archetype;
 
@@ -111,8 +107,7 @@ Archetype::~Archetype() {
       cmptTraits.Destruct(type, address);
     }
   }
-  for (Chunk* chunk : chunks)
-    sharedChunkPool.Recycle(chunk);
+  for (Chunk* chunk : chunks) sharedChunkPool.Recycle(chunk);
 }
 
 size_t Archetype::RequestBuffer() {
@@ -178,8 +173,7 @@ tuple<vector<Entity*>, vector<vector<void*>>, vector<size_t>> Archetype::Locate(
 
   vector<size_t> sizes;
 
-  for (const auto& type : cmptTypes)
-    sizes.push_back(cmptTraits.Sizeof(type));
+  for (const auto& type : cmptTypes) sizes.push_back(cmptTraits.Sizeof(type));
 
   return {chunkEntity, chunkCmpts, sizes};
 }
@@ -197,7 +191,7 @@ size_t Archetype::Erase(size_t idx) {
   size_t dstIdxInChunk = idx % chunkCapacity;
   byte* dstBuffer = chunks[idx / chunkCapacity]->Data();
 
-  size_t movedIdx = size_t_invalid;
+  size_t movedIdx;
 
   if (idx != entityNum - 1) {
     size_t movedIdxInArchetype = entityNum - 1;
@@ -211,13 +205,14 @@ size_t Archetype::Erase(size_t idx) {
       byte* dst = dstBuffer + offset + dstIdxInChunk * size;
       byte* src = srcBuffer + offset + srcIdxInChunk * size;
 
-      if (type.Is<Entity>())
-        movedIdx = reinterpret_cast<Entity*>(dst)->Idx();
+      if (type.Is<Entity>()) movedIdx = reinterpret_cast<Entity*>(src)->Idx();
 
       cmptTraits.MoveAssign(type, dst, src);
       cmptTraits.Destruct(type, src);
     }
   } else {
+    movedIdx = size_t_invalid;
+
     for (auto type : types) {
       auto size = cmptTraits.Sizeof(type);
       auto offset = Offsetof(type);
@@ -241,8 +236,7 @@ vector<CmptPtr> Archetype::Components(size_t idx) const {
   vector<CmptPtr> rst;
 
   for (const auto& type : types) {
-    if (type.Is<Entity>())
-      continue;
+    if (type.Is<Entity>()) continue;
     rst.emplace_back(type, At(type, idx));
   }
 

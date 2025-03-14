@@ -25,6 +25,8 @@ class ChunkView {
     return reinterpret_cast<Cmpt*>(GetCmptArray(CmptType::Of<Cmpt>));
   }
 
+  const Entity* GetEntityArray() const { return GetCmptArray<Entity>(); }
+
   size_t EntityNum() const;
 
  private:
