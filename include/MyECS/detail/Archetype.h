@@ -86,7 +86,7 @@ class Archetype {
   const RTSCmptTraits& GetRTSCmptTraits() const noexcept { return cmptTraits; }
 
   // no Entity
-  size_t CmptNum() const noexcept { return types.size() - 1; }
+  size_t CmptNum() const noexcept { return types.data.size() - 1; }
 
   size_t EntityNum() const noexcept { return entityNum; }
 
@@ -96,16 +96,10 @@ class Archetype {
 
   size_t ChunkCapacity() const noexcept { return chunkCapacity; }
 
+  // add Entity
+  static CmptTypeSet GenCmptTypeSet(const CmptType* types, size_t num);
   template <typename... Cmpts>
-  static constexpr size_t HashCode() noexcept {
-    return CmptTypeSet::HashCodeOf<Entity, Cmpts...>();
-  }
-
-  static size_t HashCode(const CmptType* types, size_t num) {
-    CmptTypeSet typeset{types, num};
-    typeset.Insert(CmptType::Of<Entity>);
-    return typeset.HashCode();
-  }
+  static CmptTypeSet GenCmptTypeSet();
 
  private:
   Archetype() = default;

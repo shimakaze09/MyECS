@@ -8,7 +8,7 @@
 
 namespace My::MyECS {
 template <typename... Cmpts>
-Archetype::Archetype(TypeList<Cmpts...>) : types(TypeList<Entity, Cmpts...>{}) {
+Archetype::Archetype(TypeList<Cmpts...>) : types(GenCmptTypeSet<Cmpts...>()) {
   static_assert(IsSet_v<TypeList<Entity, Cmpts...>>,
                 "Archetype::Archetype: <Cmpts> must be different");
   cmptTraits.Register<Entity>();
@@ -23,7 +23,7 @@ Archetype* Archetype::Add(const Archetype* from) {
   Archetype* rst = new Archetype;
 
   rst->types = from->types;
-  rst->types.Insert(CmptType::Of<Cmpts>...);
+  rst->types.data.insert(CmptType::Of<Cmpts>...);
   rst->cmptTraits = from->cmptTraits;
   (rst->cmptTraits.Register<Cmpts>(), ...);
 
@@ -40,7 +40,7 @@ Cmpt* Archetype::At(size_t idx) const {
 template <typename... Cmpts>
 std::tuple<size_t, std::tuple<Cmpts*...>> Archetype::Create(Entity e) {
   assert((types.Contains(CmptType::Of<Cmpts>) && ...) &&
-         types.size() == 1 + sizeof...(Cmpts));
+         types.data.size() == 1 + sizeof...(Cmpts));
   static_assert((std::is_constructible_v<Cmpts> && ...),
                 "Archetype::Create: <Cmpts> isn't constructible");
   static_assert(IsSet_v<TypeList<Entity, Cmpts...>>,
@@ -57,5 +57,15 @@ std::tuple<size_t, std::tuple<Cmpts*...>> Archetype::Create(Entity e) {
                                       idxInChunk * sizeof(Cmpts)) Cmpts...};
 
   return {idx, cmpts};
+}
+
+template <typename... Cmpts>
+CmptTypeSet Archetype::GenCmptTypeSet() {
+  if constexpr (sizeof...(Cmpts) == 0)
+    return Archetype::GenCmptTypeSet(nullptr, 0);
+  else {
+    constexpr std::array types = {CmptType::Of<Cmpts>...};
+    return Archetype::GenCmptTypeSet(types.data(), types.size());
+  }
 }
 }  // namespace My::MyECS

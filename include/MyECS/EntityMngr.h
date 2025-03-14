@@ -6,6 +6,8 @@
 
 #include <MyContainer/Pool.h>
 
+#include <memory>
+
 #include "EntityQuery.h"
 #include "SystemFunc.h"
 #include "detail/Archetype.h"
@@ -87,7 +89,6 @@ class EntityMngr {
  private:
   friend class World;
   EntityMngr() = default;
-  ~EntityMngr();
 
   static bool IsSet(const CmptType* types, size_t num);
 
@@ -116,8 +117,8 @@ class EntityMngr {
   size_t RequestEntityFreeEntry();
   void RecycleEntityEntry(Entity e);
 
-  std::unordered_map<size_t, Archetype*>
-      h2a;  // archetype's hashcode to archetype
+  std::unordered_map<CmptTypeSet, std::unique_ptr<Archetype>>
+      ts2a;  // archetype's CmptTypeSet to archetype
 
   mutable std::unordered_map<EntityQuery, std::set<Archetype*>> queryCache;
 };
