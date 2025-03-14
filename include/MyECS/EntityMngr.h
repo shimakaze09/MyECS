@@ -11,8 +11,6 @@
 
 #include <MyContainer/Pool.h>
 
-#include <mutex>
-
 namespace My::MyECS {
 class World;
 
@@ -65,8 +63,6 @@ class EntityMngr {
 
   size_t EntityNum(const EntityQuery&) const;
 
-  void AddCommand(const std::function<void()>& command);
-
   void Accept(IListener* listener) const;
 
  private:
@@ -86,8 +82,8 @@ class EntityMngr {
   void AttachWithoutInit(Entity);
   void AttachWithoutInit(Entity, const CmptType* types, size_t num);
 
-  void GenEntityJob(Job* job, SystemFunc* sys) const;
-  void GenChunkJob(Job* job, SystemFunc* sys) const;
+  void GenEntityJob(World*, Job*, SystemFunc*) const;
+  void GenChunkJob(World*, Job*, SystemFunc*) const;
 
   struct EntityInfo {
     Archetype* archetype{nullptr};
@@ -104,11 +100,6 @@ class EntityMngr {
       h2a;  // archetype's hashcode to archetype
 
   mutable std::unordered_map<EntityQuery, std::set<Archetype*>> queryCache;
-
-  // command
-  std::vector<std::function<void()>> commandBuffer;
-  std::mutex commandBufferMutex;
-  void RunCommands();
 };
 }  // namespace My::MyECS
 

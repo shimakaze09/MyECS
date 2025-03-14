@@ -9,6 +9,7 @@
 namespace My::MyECS {
 class Entity;
 class EntityLocator;
+class World;
 }  // namespace My::MyECS
 
 namespace My::MyECS {
@@ -27,18 +28,14 @@ struct RemoveTag<LastFrame<Cmpt>> : IType<Cmpt> {};
 template <typename T>
 struct DecayTag : IType<T> {};
 
-// template<typename Cmpt> struct DecayTag<Cmpt*> : IType<Cmpt*> {};
 template <typename Cmpt>
 struct DecayTag<const Cmpt*> : IType<Cmpt*> {};
 
 template <typename Cmpt>
 struct DecayTag<LastFrame<Cmpt>> : IType<Cmpt*> {};
 
-template <>
-struct DecayTag<const Entity> : IType<Entity> {};
-
-template <>
-struct DecayTag<const EntityLocator*> : IType<const EntityLocator*> {};
+template <typename T>
+struct DecayTag<const T> : IType<T> {};
 
 template <typename TaggedCmpt>
 struct IsLastFrame : std::false_type {};
@@ -56,16 +53,16 @@ template <typename Cmpt>
 struct IsWrite<Cmpt*> : std::true_type {};
 
 template <>
-struct IsWrite<Entity*> : std::false_type {};
+struct IsWrite<World*> : std::false_type {};
 
 template <typename TaggedCmpt>
 struct IsLatest : std::false_type {};
 
-template <>
-struct IsLatest<const EntityLocator*> : std::false_type {};
-
 template <typename Cmpt>
 struct IsLatest<const Cmpt*> : std::true_type {};
+
+template <>
+struct IsLatest<const World*> : std::false_type {};
 
 template <typename TaggedCmpt>
 struct IsTimePoint

@@ -184,12 +184,26 @@ void RTDCmptTraits::Deregister() {
 }
 
 inline RTDCmptTraits& RTDCmptTraits::Deregister(CmptType type) noexcept {
+  names.erase(type);
   sizeofs.erase(type);
   alignments.erase(type);
   default_constructors.erase(type);
   copy_constructors.erase(type);
   move_constructors.erase(type);
+  move_assignments.erase(type);
   destructors.erase(type);
+  return *this;
+}
+
+inline RTDCmptTraits& RTDCmptTraits::Clear() {
+  names.clear();
+  sizeofs.clear();
+  alignments.clear();
+  default_constructors.clear();
+  copy_constructors.clear();
+  move_constructors.clear();
+  move_assignments.clear();
+  destructors.clear();
   return *this;
 }
 }  // namespace My::MyECS

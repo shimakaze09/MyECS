@@ -10,6 +10,8 @@
 
 #include <MyGraphviz/MyGraphviz.h>
 
+#include <mutex>
+
 namespace My::MyECS {
 class IListener;
 
@@ -28,7 +30,7 @@ class World {
   void Update();
 
   // after running Update
-  // you can use graphviz to vistualize the graph
+  // you can use graphviz to visualize the graph
   std::string DumpUpdateJobGraph() const;
 
   // after running Update
@@ -37,6 +39,8 @@ class World {
 
   void Accept(IListener* listener) const;
 
+  void AddCommand(std::function<void(World*)> command);
+
  private:
   mutable JobExecutor executor;
   Schedule schedule;
@@ -44,6 +48,11 @@ class World {
   Job jobGraph;
   std::vector<Job*> jobs;
   Pool<Job> jobPool;
+
+  // command
+  std::vector<std::function<void(World*)>> commandBuffer;
+  std::mutex commandBufferMutex;
+  void RunCommands();
 
   // ==================================================
   World(const World& world) = delete;

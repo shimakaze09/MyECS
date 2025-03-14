@@ -26,6 +26,8 @@ class RTDCmptTraits {
 
   static RTDCmptTraits& Instance() noexcept;
 
+  RTDCmptTraits& Clear();
+
   // neccessary
   RTDCmptTraits& RegisterSize(CmptType type, size_t size);
 

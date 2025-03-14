@@ -29,8 +29,8 @@ class AVP_System : public System {
   using System::System;
 
   virtual void OnUpdate(Schedule& schedule) override {
-    schedule.Register([](const A*, V*, P*) { cout << "AVP" << endl; }, "AVP")
-        .InsertNone("VP", CmptType::Of<A>);
+    schedule.Register([](const A*, V*, P*) { cout << "AVP" << endl; }, "AVP");
+    schedule.InsertNone("VP", CmptType::Of<A>);
   }
 };
 

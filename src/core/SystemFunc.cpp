@@ -6,21 +6,21 @@
 
 using namespace My::MyECS;
 
-void SystemFunc::operator()(Entity e, size_t entityIndexInQuery,
+void SystemFunc::operator()(World* w, Entity e, size_t entityIndexInQuery,
                             CmptsView rtdcmpts) {
   assert(mode == Mode::Entity);
-  return func(e, entityIndexInQuery, rtdcmpts,
+  return func(w, e, entityIndexInQuery, rtdcmpts,
               ChunkView{nullptr, size_t_invalid, nullptr});
 }
 
-void SystemFunc::operator()(ChunkView chunkView) {
+void SystemFunc::operator()(World* w, ChunkView chunkView) {
   assert(mode == Mode::Chunk);
-  return func(Entity::Invalid(), size_t_invalid, CmptsView{nullptr, nullptr},
+  return func(w, Entity::Invalid(), size_t_invalid, CmptsView{nullptr, nullptr},
               chunkView);
 }
 
-void SystemFunc::operator()() {
+void SystemFunc::operator()(World* w) {
   assert(mode == Mode::Job);
-  return func(Entity::Invalid(), size_t_invalid, CmptsView{nullptr, nullptr},
+  return func(w, Entity::Invalid(), size_t_invalid, CmptsView{nullptr, nullptr},
               ChunkView{nullptr, size_t_invalid, nullptr});
 }
