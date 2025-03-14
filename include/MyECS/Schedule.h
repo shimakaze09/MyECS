@@ -12,9 +12,9 @@
 
 #include <map>
 
-namespace My::MyECS::detail::Schedule_ {
+namespace My::MyECS::detail {
 struct Compiler;
-}  // namespace My::MyECS::detail::Schedule_
+}  // namespace My::MyECS::detail
 
 namespace My::MyECS {
 class EntityMngr;
@@ -63,7 +63,7 @@ class Schedule {
     std::vector<SystemFunc*> writeSysFuncs;
     std::vector<SystemFunc*> latestSysFuncs;
   };
-  friend struct detail::Schedule_::Compiler;
+  friend struct detail::Compiler;
   std::unordered_map<CmptType, CmptSysFuncs> GenCmptSysFuncsMap() const;
 
   SysFuncGraph GenSysFuncGraph() const;

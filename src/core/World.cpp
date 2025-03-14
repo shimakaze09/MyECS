@@ -134,9 +134,9 @@ MyGraphviz::Graph World::GenUpdateFrameGraph() const {
       cmptTypes.insert(singleton);
   }
 
-  for (auto cmptType : cmptTypes) {
+  for (const auto& cmptType : cmptTypes) {
     auto cmptIdx = registry.RegisterNode(queryCmptName(cmptType));
-    cmptType2idx[cmptType] = cmptIdx;
+    cmptType2idx.emplace(cmptType, cmptIdx);
     if (AccessMode_IsSingleton(cmptType.GetAccessMode()))
       subgraph_singleton.AddNode(cmptIdx);
     else
@@ -149,18 +149,25 @@ MyGraphviz::Graph World::GenUpdateFrameGraph() const {
 
     subgraph_sys.AddNode(sysIdx);
 
-    const auto& cmptlocator = sysFunc->entityQuery.locator;
-    for (const auto& cmptType : cmptlocator.LastFrameCmptTypes()) {
-      auto edgeIdx = registry.RegisterEdge(cmptType2idx[cmptType], sysIdx);
-      subgraph_lastframe.AddEdge(edgeIdx);
-    }
-    for (const auto& cmptType : cmptlocator.WriteCmptTypes()) {
-      auto edgeIdx = registry.RegisterEdge(sysIdx, cmptType2idx[cmptType]);
-      subgraph_write.AddEdge(edgeIdx);
-    }
-    for (const auto& cmptType : cmptlocator.LatestCmptTypes()) {
-      auto edgeIdx = registry.RegisterEdge(cmptType2idx[cmptType], sysIdx);
-      subgraph_latest.AddEdge(edgeIdx);
+    for (const auto& cmptType : sysFunc->entityQuery.locator.CmptTypes()) {
+      size_t edgeIdx;
+      switch (cmptType.GetAccessMode()) {
+        case My::MyECS::AccessMode::LAST_FRAME:
+          edgeIdx = registry.RegisterEdge(cmptType2idx[cmptType], sysIdx);
+          subgraph_lastframe.AddEdge(edgeIdx);
+          break;
+        case My::MyECS::AccessMode::WRITE:
+          edgeIdx = registry.RegisterEdge(sysIdx, cmptType2idx[cmptType]);
+          subgraph_write.AddEdge(edgeIdx);
+          break;
+        case My::MyECS::AccessMode::LATEST:
+          edgeIdx = registry.RegisterEdge(cmptType2idx[cmptType], sysIdx);
+          subgraph_latest.AddEdge(edgeIdx);
+          break;
+        default:
+          assert(false);
+          break;
+      }
     }
 
     const auto& filter = sysFunc->entityQuery.filter;
@@ -232,18 +239,25 @@ MyGraphviz::Graph World::GenUpdateFrameGraph() const {
       subgraph_none.AddEdge(edgeIdx);
     }
 
-    const auto& singletonlocator = sysFunc->singletonLocator;
-    for (const auto& singleton : singletonlocator.LastFrameSingletonTypes()) {
-      auto edgeIdx = registry.RegisterEdge(cmptType2idx[singleton], sysIdx);
-      subgraph_lastframe.AddEdge(edgeIdx);
-    }
-    for (const auto& singleton : singletonlocator.WriteSingletonTypes()) {
-      auto edgeIdx = registry.RegisterEdge(sysIdx, cmptType2idx[singleton]);
-      subgraph_write.AddEdge(edgeIdx);
-    }
-    for (const auto& singleton : singletonlocator.LatestSingletonTypes()) {
-      auto edgeIdx = registry.RegisterEdge(cmptType2idx[singleton], sysIdx);
-      subgraph_latest.AddEdge(edgeIdx);
+    for (const auto& singleton : sysFunc->singletonLocator.SingletonTypes()) {
+      size_t edgeIdx;
+      switch (singleton.GetAccessMode()) {
+        case My::MyECS::AccessMode::LAST_FRAME_SINGLETON:
+          edgeIdx = registry.RegisterEdge(cmptType2idx[singleton], sysIdx);
+          subgraph_lastframe.AddEdge(edgeIdx);
+          break;
+        case My::MyECS::AccessMode::WRITE_SINGLETON:
+          edgeIdx = registry.RegisterEdge(sysIdx, cmptType2idx[singleton]);
+          subgraph_write.AddEdge(edgeIdx);
+          break;
+        case My::MyECS::AccessMode::LATEST_SINGLETON:
+          edgeIdx = registry.RegisterEdge(cmptType2idx[singleton], sysIdx);
+          subgraph_latest.AddEdge(edgeIdx);
+          break;
+        default:
+          assert(false);
+          break;
+      }
     }
   }
 

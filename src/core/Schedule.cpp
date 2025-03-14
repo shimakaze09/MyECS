@@ -11,7 +11,7 @@
 using namespace My::MyECS;
 using namespace std;
 
-namespace My::MyECS::detail::Schedule_ {
+namespace My::MyECS::detail {
 struct NoneGroup {
   NoneGroup() = default;
 
@@ -151,7 +151,7 @@ struct Compiler {
     return rst;
   }
 };
-}  // namespace My::MyECS::detail::Schedule_
+}  // namespace My::MyECS::detail
 
 Schedule& Schedule::Order(string_view x, string_view y) {
   sysFuncOrder.emplace(SystemFunc::HashCode(x), SystemFunc::HashCode(y));
@@ -219,21 +219,38 @@ unordered_map<CmptType, Schedule::CmptSysFuncs> Schedule::GenCmptSysFuncsMap()
     const {
   unordered_map<CmptType, Schedule::CmptSysFuncs> rst;
   for (const auto& [hashcode, sysFunc] : sysFuncs) {
-    const auto& cmptsLocator = sysFunc->entityQuery.locator;
-    for (const auto& type : cmptsLocator.LastFrameCmptTypes())
-      rst[type].lastFrameSysFuncs.push_back(sysFunc);
-    for (const auto& type : cmptsLocator.WriteCmptTypes())
-      rst[type].writeSysFuncs.push_back(sysFunc);
-    for (const auto& type : cmptsLocator.LatestCmptTypes())
-      rst[type].latestSysFuncs.push_back(sysFunc);
-
-    const auto& singletonsLocator = sysFunc->singletonLocator;
-    for (const auto& type : singletonsLocator.LastFrameSingletonTypes())
-      rst[type].lastFrameSysFuncs.push_back(sysFunc);
-    for (const auto& type : singletonsLocator.WriteSingletonTypes())
-      rst[type].writeSysFuncs.push_back(sysFunc);
-    for (const auto& type : singletonsLocator.LatestSingletonTypes())
-      rst[type].latestSysFuncs.push_back(sysFunc);
+    for (const auto& type : sysFunc->entityQuery.locator.CmptTypes()) {
+      switch (type.GetAccessMode()) {
+        case My::MyECS::AccessMode::LAST_FRAME:
+          rst[type].lastFrameSysFuncs.push_back(sysFunc);
+          break;
+        case My::MyECS::AccessMode::WRITE:
+          rst[type].writeSysFuncs.push_back(sysFunc);
+          break;
+        case My::MyECS::AccessMode::LATEST:
+          rst[type].latestSysFuncs.push_back(sysFunc);
+          break;
+        default:
+          assert(false);
+          break;
+      }
+    }
+    for (const auto& type : sysFunc->singletonLocator.SingletonTypes()) {
+      switch (type.GetAccessMode()) {
+        case My::MyECS::AccessMode::LAST_FRAME_SINGLETON:
+          rst[type].lastFrameSysFuncs.push_back(sysFunc);
+          break;
+        case My::MyECS::AccessMode::WRITE_SINGLETON:
+          rst[type].writeSysFuncs.push_back(sysFunc);
+          break;
+        case My::MyECS::AccessMode::LATEST_SINGLETON:
+          rst[type].latestSysFuncs.push_back(sysFunc);
+          break;
+        default:
+          assert(false);
+          break;
+      }
+    }
 
     if (sysFunc->GetMode() == SystemFunc::Mode::Chunk) {
       const auto& filter = sysFunc->entityQuery.filter;
@@ -300,7 +317,7 @@ SysFuncGraph Schedule::GenSysFuncGraph() const {
   auto cmptSysFuncsMap = GenCmptSysFuncsMap();
 
   // [gen groupMap]
-  unordered_map<SystemFunc*, detail::Schedule_::NoneGroup> groupMap;
+  unordered_map<SystemFunc*, detail::NoneGroup> groupMap;
   for (const auto& [hashcode, sysFunc] : sysFuncs)
     groupMap.emplace(sysFunc, sysFunc);
 
@@ -327,15 +344,15 @@ SysFuncGraph Schedule::GenSysFuncGraph() const {
 
   // [gen graph] - edge - time point
   for (const auto& [type, cmptSysFuncs] : cmptSysFuncsMap)
-    detail::Schedule_::Compiler::SetPrePostEdge(graph, cmptSysFuncs, groupMap);
+    detail::Compiler::SetPrePostEdge(graph, cmptSysFuncs, groupMap);
 
   // [gen graph] - edge - none group
   for (const auto& [type, cmptSysFuncs] : cmptSysFuncsMap) {
     if (cmptSysFuncs.writeSysFuncs.empty())
       continue;
 
-    auto sortedGroup = detail::Schedule_::Compiler::GenSortNoneGroup(
-        graph, cmptSysFuncs, groupMap);
+    auto sortedGroup =
+        detail::Compiler::GenSortNoneGroup(graph, cmptSysFuncs, groupMap);
 
     for (size_t i = 0; i < sortedGroup.size() - 1; i++) {
       const auto& gx = sortedGroup[i];

@@ -38,6 +38,7 @@ class CmptType {
     return hashcode == TypeID<Cmpt>;
   }
 
+  // only compare hash
   constexpr bool operator<(const CmptType& rhs) const noexcept {
     return hashcode < rhs.hashcode;
   }

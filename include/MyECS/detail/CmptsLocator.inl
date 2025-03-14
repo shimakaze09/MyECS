@@ -30,10 +30,6 @@ CmptLocator CmptLocator::Generate() {
 template <typename Func>
 CmptLocator& CmptLocator::Combine() {
   CmptLocator funcLocator = Generate<Func>();
-  lastFrameCmptTypes =
-      SetUnion(lastFrameCmptTypes, funcLocator.lastFrameCmptTypes);
-  writeCmptTypes = SetUnion(writeCmptTypes, funcLocator.writeCmptTypes);
-  latestCmptTypes = SetUnion(latestCmptTypes, funcLocator.latestCmptTypes);
   cmptTypes = SetUnion(cmptTypes, funcLocator.cmptTypes);
   return *this;
 }

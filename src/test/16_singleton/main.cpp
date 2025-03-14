@@ -38,7 +38,6 @@ class MoverSystem : public System {
 };
 
 int main() {
-  constexpr auto mode = AccessModeOf<const Singleton<Timer>>;
   RTDCmptTraits::Instance().Register<Timer, Velocity, Position>();
 
   World w;

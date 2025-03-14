@@ -26,18 +26,6 @@ class CmptLocator {
 
   size_t HashCode() const noexcept { return hashCode; }
 
-  const std::set<CmptType>& LastFrameCmptTypes() const noexcept {
-    return lastFrameCmptTypes;
-  }
-
-  const std::set<CmptType>& WriteCmptTypes() const noexcept {
-    return writeCmptTypes;
-  }
-
-  const std::set<CmptType>& LatestCmptTypes() const noexcept {
-    return latestCmptTypes;
-  }
-
   const std::set<CmptType>& CmptTypes() const noexcept { return cmptTypes; }
 
   bool operator==(const CmptLocator& rhs) const noexcept;
@@ -45,9 +33,6 @@ class CmptLocator {
  private:
   size_t GenHashCode() const noexcept;
 
-  std::set<CmptType> lastFrameCmptTypes;
-  std::set<CmptType> writeCmptTypes;
-  std::set<CmptType> latestCmptTypes;
   std::set<CmptType> cmptTypes;
 
   size_t hashCode;
