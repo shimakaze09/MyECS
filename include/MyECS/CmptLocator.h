@@ -18,6 +18,12 @@ class CmptLocator {
 
   CmptLocator();
 
+  template <typename Func>
+  static CmptLocator Generate();
+
+  template <typename Func>
+  CmptLocator& Combine();
+
   size_t HashCode() const noexcept { return hashCode; }
 
   const std::set<CmptType>& LastFrameCmptTypes() const noexcept {
@@ -47,3 +53,5 @@ class CmptLocator {
   size_t hashCode;
 };
 }  // namespace My::MyECS
+
+#include "detail/CmptsLocator.inl"

@@ -17,6 +17,12 @@ class SingletonLocator {
 
   SingletonLocator();
 
+  template <typename Func>
+  static SingletonLocator Generate();
+
+  template <typename Func>
+  SingletonLocator& Combine();
+
   const std::set<CmptType>& LastFrameSingletonTypes() const noexcept {
     return lastFrameSingletonTypes;
   }
@@ -40,3 +46,5 @@ class SingletonLocator {
   std::set<CmptType> singletonTypes;
 };
 }  // namespace My::MyECS
+
+#include "detail/SingletonLocator.inl"

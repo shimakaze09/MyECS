@@ -34,7 +34,7 @@ class MySystem : public System {
         "job");
     schedule.Order("system function", "job");
 
-    size_t num = GetWorld()->entityMngr.EntityNum(f->query);
+    size_t num = GetWorld()->entityMngr.EntityNum(f->entityQuery);
     buffer->resize(num);
   }
 };
