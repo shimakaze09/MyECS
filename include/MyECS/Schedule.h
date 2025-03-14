@@ -21,7 +21,7 @@ class EntityMngr;
 class SystemMngr;
 
 // [description]
-// system infomation record
+// system information record
 // - SystemFunc
 // - orders
 // - dynamic filter changes
@@ -30,16 +30,19 @@ class SystemMngr;
 class Schedule {
  public:
   template <typename Func>
-  const SystemFunc* Register(
-      Func&& func, std::string name, ArchetypeFilter filter = ArchetypeFilter{},
-      SingletonLocator singletonLocator = SingletonLocator{});
+  const SystemFunc* RegisterEntityJob(Func&&, std::string name,
+                                      ArchetypeFilter = {}, CmptLocator = {},
+                                      SingletonLocator = {});
 
-  // run-time dynamic function
   template <typename Func>
-  const SystemFunc* Register(
-      Func&& func, std::string name, CmptLocator locator,
-      ArchetypeFilter filter = ArchetypeFilter{},
-      SingletonLocator singletonLocator = SingletonLocator{});
+  const SystemFunc* RegisterChunkJob(Func&&, std::string name,
+                                     ArchetypeFilter = {},
+                                     SingletonLocator = {});
+
+  //  Mode::Job
+  template <typename Func>
+  const SystemFunc* RegisterJob(Func&&, std::string name,
+                                SingletonLocator = {});
 
   Schedule& LockFilter(std::string_view sys);
 
@@ -54,7 +57,7 @@ class Schedule {
 
  private:
   template <typename... Args>
-  const SystemFunc* Request(Args&&... args);
+  const SystemFunc* Request(Args&&...);
 
   void Clear();
 

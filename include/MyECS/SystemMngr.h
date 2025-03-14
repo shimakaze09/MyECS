@@ -42,7 +42,7 @@ class SystemMngr {
   template <typename... DerivedSystems>
   void Deregister() noexcept;
 
-  void Accept(IListener* listener) const;
+  void Accept(IListener*) const;
 
  private:
   template <typename DerivedSystem>

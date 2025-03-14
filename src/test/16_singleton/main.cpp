@@ -25,14 +25,14 @@ class MoverSystem : public System {
   using System::System;
 
   virtual void OnUpdate(Schedule& schedule) override {
-    schedule.Register([](Singleton<Timer> timer) { timer->dt = 0.03f; },
-                      "Timer");
-    schedule.Register(
+    schedule.RegisterJob([](Singleton<Timer> timer) { timer->dt = 0.03f; },
+                         "Timer");
+    schedule.RegisterEntityJob(
         [](const Velocity* v, Position* p, Latest<Singleton<Timer>> timer) {
           p->val += timer->dt * v->val;
         },
         "Mover");
-    schedule.Register(
+    schedule.RegisterEntityJob(
         [](const Position* p) { std::cout << p->val << std::endl; }, "Print");
   }
 };

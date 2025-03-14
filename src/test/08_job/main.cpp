@@ -19,12 +19,12 @@ class MySystem : public System {
 
   virtual void OnUpdate(Schedule& schedule) override {
     auto buffer = std::make_shared<std::vector<size_t>>();
-    auto f = schedule.Register(
+    auto f = schedule.RegisterEntityJob(
         [buffer](size_t idxInQuery, const Data* data) {
           buffer->at(idxInQuery) = data->value;
         },
         "system function");
-    schedule.Register(
+    schedule.RegisterEntityJob(
         [buffer]() {
           size_t sum = 0;
           for (size_t i : *buffer)

@@ -17,7 +17,7 @@ class System {
 
   const std::string& GetName() const noexcept { return name; }
 
-  virtual void OnUpdate(Schedule& schedule) = 0;
+  virtual void OnUpdate(Schedule&) = 0;
 
  private:
   World* world;

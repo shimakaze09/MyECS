@@ -18,7 +18,7 @@ class MySystem : public System {
   using System::System;
 
   virtual void OnUpdate(Schedule& schedule) override {
-    schedule.Register(
+    schedule.RegisterEntityJob(
         [](Entity e, const A* a) { cout << e.Idx() << ": " << a->val << endl; },
         "");
   }

@@ -20,7 +20,7 @@ class MySystem : public System {
   using System::System;
 
   virtual void OnUpdate(Schedule& schedule) override {
-    schedule.Register(
+    schedule.RegisterEntityJob(
         [](World* w, Entity e, const A* a, const B* b) {
           w->AddCommand([e](World* w) {
             if (!w->entityMngr.Have(e, CmptType::Of<C>)) {
@@ -30,7 +30,7 @@ class MySystem : public System {
           });
         },
         "AB");
-    schedule.Register(
+    schedule.RegisterEntityJob(
         [](World* w, Entity e, const A* a, const B* b, const C* c) {
           w->AddCommand([e](World* w) {
             if (w->entityMngr.Have(e, CmptType::Of<C>)) {

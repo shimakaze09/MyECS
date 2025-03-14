@@ -22,20 +22,20 @@ class RTDSystem : public System {
     CmptLocator locator_write(cmpts_write.data(), cmpts_write.size());
     CmptLocator locator_read(cmpts_read.data(), cmpts_read.size());
 
-    schedule.Register(
+    schedule.RegisterEntityJob(
         [](CmptsView cmpts) {
           auto luaCmpt = cmpts.GetCmpt(CmptType{"LuaCmpt", AccessMode::WRITE});
           double& val = *reinterpret_cast<double*>(luaCmpt.Ptr());
           val = 520.;
         },
-        "write", locator_write);
-    schedule.Register(
+        "write", ArchetypeFilter{}, locator_write);
+    schedule.RegisterEntityJob(
         [](CmptsView cmpts) {
           auto luaCmpt = cmpts.GetCmpt(CmptType{"LuaCmpt", AccessMode::LATEST});
           const double& val = *reinterpret_cast<const double*>(luaCmpt.Ptr());
           cout << "value : " << val << endl;
         },
-        "read", locator_read);
+        "read", ArchetypeFilter{}, locator_read);
   }
 };
 

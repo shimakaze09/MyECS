@@ -35,7 +35,7 @@ class SAB_System : public System {
         TypeList<>{}                       // none
     };
 
-    schedule.Register(
+    schedule.RegisterChunkJob(
         [](ChunkView chunk) {
           auto arrayS = chunk.GetCmptArray<S>();
           auto arrayA = chunk.GetCmptArray<A>();

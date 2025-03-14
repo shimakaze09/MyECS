@@ -30,11 +30,11 @@ class MySystem : public System {
 
   virtual void OnUpdate(Schedule& schedule) override {
     ArchetypeFilter filter(TypeList<D>{},     // all
-                        TypeList<E, F>{},  // any
-                        TypeList<G>{}      // none
+                           TypeList<E, F>{},  // any
+                           TypeList<G>{}      // none
     );
-    schedule.Register([](LastFrame<A> a, Write<B> b, Latest<C> c) {},
-                      "System Func", filter);
+    schedule.RegisterEntityJob([](LastFrame<A> a, Write<B> b, Latest<C> c) {},
+                               "System Func", filter);
   }
 };
 

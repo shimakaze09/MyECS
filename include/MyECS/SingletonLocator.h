@@ -27,6 +27,8 @@ class SingletonLocator {
     return singletonTypes;
   }
 
+  bool HasWriteSingletonType() const noexcept;
+
  private:
   std::set<CmptType> singletonTypes;
 };

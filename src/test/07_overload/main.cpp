@@ -20,7 +20,8 @@ class VP_System : public System {
   using System::System;
 
   virtual void OnUpdate(Schedule& schedule) override {
-    schedule.Register([](const V*, P*) { cout << "VP" << endl; }, "VP");
+    schedule.RegisterEntityJob([](const V*, P*) { cout << "VP" << endl; },
+                               "VP");
   }
 };
 
@@ -29,7 +30,8 @@ class AVP_System : public System {
   using System::System;
 
   virtual void OnUpdate(Schedule& schedule) override {
-    schedule.Register([](const A*, V*, P*) { cout << "AVP" << endl; }, "AVP");
+    schedule.RegisterEntityJob([](const A*, V*, P*) { cout << "AVP" << endl; },
+                               "AVP");
     schedule.InsertNone("VP", CmptType::Of<A>);
   }
 };

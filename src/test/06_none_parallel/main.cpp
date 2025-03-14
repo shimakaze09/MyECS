@@ -20,15 +20,15 @@ class MySystem : public System {
 
   virtual void OnUpdate(Schedule& schedule) override {
     ArchetypeFilter filter_w0(TypeList<>{},  // all
-                           TypeList<>{},  // any
-                           TypeList<A>{}  // none
+                              TypeList<>{},  // any
+                              TypeList<A>{}  // none
     );
     ArchetypeFilter filter_w1(TypeList<A>{},  // all
-                           TypeList<>{},   // any
-                           TypeList<>{}    // none
+                              TypeList<>{},   // any
+                              TypeList<>{}    // none
     );
-    schedule.Register([](B*) {}, "need B, none A", filter_w0);
-    schedule.Register([](B*) {}, "need A, B", filter_w1);
+    schedule.RegisterEntityJob([](B*) {}, "need B, none A", filter_w0);
+    schedule.RegisterEntityJob([](B*) {}, "need A, B", filter_w1);
     ;
   }
 };

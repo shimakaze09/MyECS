@@ -37,7 +37,7 @@ class World {
   // use RTDCmptTraits' registered component name
   MyGraphviz::Graph GenUpdateFrameGraph() const;
 
-  void Accept(IListener* listener) const;
+  void Accept(IListener*) const;
 
   void AddCommand(std::function<void(World*)> command);
 

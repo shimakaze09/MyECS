@@ -19,11 +19,12 @@ class MySystem : public System {
 
   virtual void OnUpdate(Schedule& schedule) override {
     auto flags = std::make_shared<std::vector<bool>>();
-    auto f =
-        schedule.Register([flags](Entity e, size_t indexInQuery,
-                                  const A*) { flags->at(indexInQuery) = true; },
-                          "set flag");
-    schedule.Register(
+    auto f = schedule.RegisterEntityJob(
+        [flags](Entity e, size_t indexInQuery, const A*) {
+          flags->at(indexInQuery) = true;
+        },
+        "set flag");
+    schedule.RegisterEntityJob(
         [flags]() {
           for (auto flag : *flags)
             cout << flag << endl;

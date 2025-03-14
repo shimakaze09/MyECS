@@ -31,8 +31,8 @@ class MySystem : public System {
                            TypeList<B, C>{},  // any
                            TypeList<D>{}      // none
     );
-    schedule.Register([](const E* e) { cout << e->val << endl; }, "test filter",
-                      filter);
+    schedule.RegisterEntityJob([](const E* e) { cout << e->val << endl; },
+                               "test filter", filter);
   }
 };
 

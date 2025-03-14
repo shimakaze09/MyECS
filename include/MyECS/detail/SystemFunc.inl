@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <_deps/nameof.hpp>
-
 #include <MyTemplate/Func.h>
+
+#include <_deps/nameof.hpp>
 
 namespace My::MyECS::detail {
 template <typename Func>
@@ -14,34 +14,10 @@ auto Pack(Func&& func) noexcept;
 }  // namespace My::MyECS::detail
 
 namespace My::MyECS {
+// Mode::Entity
 template <typename Func>
 SystemFunc::SystemFunc(Func&& func, std::string name,
-                       ArchetypeFilter archetypeFilter,
-                       SingletonLocator singletonLocator)
-    : func{detail::Pack(std::forward<Func>(func))},
-      entityQuery{std::move(archetypeFilter),
-                  CmptLocator::Generate<decltype(func)>()},
-      singletonLocator{std::move(singletonLocator.Combine<decltype(func)>())},
-      name{std::move(name)},
-      hashCode{HashCode(this->name)} {
-  using ArgList = FuncTraits_ArgList<std::decay_t<Func>>;
-  static_assert(!Contain_v<ArgList, CmptsView>);
-
-  if constexpr (Length_v<Filter_t<ArgList, IsNonSingleton>> > 0) {
-    static_assert(!Contain_v<ArgList, ChunkView>);
-    mode = Mode::Entity;
-  } else {
-    static_assert(!Contain_v<ArgList, Entity> && !Contain_v<ArgList, size_t>);
-    if constexpr (Contain_v<ArgList, ChunkView>)
-      mode = Mode::Chunk;
-    else
-      mode = Mode::Job;
-  }
-}
-
-template <typename Func>
-SystemFunc::SystemFunc(Func&& func, std::string name, CmptLocator cmptLocator,
-                       ArchetypeFilter archetypeFilter,
+                       ArchetypeFilter archetypeFilter, CmptLocator cmptLocator,
                        SingletonLocator singletonLocator)
     : mode{Mode::Entity},
       func{detail::Pack(std::forward<Func>(func))},
@@ -51,8 +27,66 @@ SystemFunc::SystemFunc(Func&& func, std::string name, CmptLocator cmptLocator,
       name{std::move(name)},
       hashCode{HashCode(this->name)} {
   using ArgList = FuncTraits_ArgList<std::decay_t<Func>>;
+
+  static_assert(Length_v<Filter_t<ArgList, IsWriteSingleton>> == 0,
+                "(Mode::Entity) SystemFunc can't write singletons, use "
+                "{Latest|LastFrame}Singleton<Cmpt> instead");
+
   static_assert(!Contain_v<ArgList, ChunkView>);
-  assert(!entityQuery.locator.CmptTypes().empty());
+
+  assert(
+      "(Mode::Entity) SystemFunc can't write singletons, use "
+      "{Latest|LastFrame}Singleton<Cmpt> instead" &&
+      !singletonLocator.HasWriteSingletonType());
+}
+
+// Mode::Chunk
+template <typename Func>
+SystemFunc::SystemFunc(Func&& func, std::string name,
+                       ArchetypeFilter archetypeFilter,
+                       SingletonLocator singletonLocator)
+    : mode{Mode::Chunk},
+      func{detail::Pack(std::forward<Func>(func))},
+      entityQuery{std::move(archetypeFilter)},
+      singletonLocator{std::move(singletonLocator.Combine<decltype(func)>())},
+      name{std::move(name)},
+      hashCode{HashCode(this->name)} {
+  using ArgList = FuncTraits_ArgList<std::decay_t<Func>>;
+
+  static_assert(Length_v<Filter_t<ArgList, IsWriteSingleton>> == 0,
+                "(Mode::Chunk) SystemFunc can't write singletons, use "
+                "{Latest|LastFrame}Singleton<Cmpt> instead");
+
+  static_assert(Contain_v<ArgList, ChunkView>);
+
+  static_assert(
+      Length_v<Filter_t<ArgList, IsNonSingleton>> == 0,
+      "(Mode::Chunk) SystemFunc can't directly access entities' components");
+
+  assert(
+      "(Mode::Chunk) SystemFunc can't write singletons, use "
+      "{Latest|LastFrame}Singleton<Cmpt> instead" &&
+      !singletonLocator.HasWriteSingletonType());
+}
+
+// Mode::Job
+template <typename Func>
+SystemFunc::SystemFunc(Func&& func, std::string name,
+                       SingletonLocator singletonLocator)
+    : mode{Mode::Job},
+      func{detail::Pack(std::forward<Func>(func))},
+      singletonLocator{std::move(singletonLocator.Combine<decltype(func)>())},
+      name{std::move(name)},
+      hashCode{HashCode(this->name)} {
+  using ArgList = FuncTraits_ArgList<std::decay_t<Func>>;
+
+  static_assert(Length_v<Filter_t<ArgList, IsNonSingleton>> == 0,
+                "(Mode::Job) SystemFunc can't access entities' components");
+
+  static_assert(!Contain_v<ArgList, Entity> && !Contain_v<ArgList, size_t> &&
+                    !Contain_v<ArgList, ChunkView>,
+                "(Mode::Job) SystemFunc's argument list cann't have Entity, "
+                "indexInQuery or ChunkView");
 }
 }  // namespace My::MyECS
 
@@ -76,16 +110,18 @@ struct Packer<TypeList<DecayedArgs...>, TypeList<Singletons...>,
             size_t entityIndexInQuery, CmptsView cmpts, ChunkView chunkView) {
           auto args = std::tuple{
               w,
+              singletons,
               reinterpret_cast<Singletons*>(
                   singletons.Singletons()[Find_v<SingletonList, Singletons>]
                       .Ptr())...,
               e,
               entityIndexInQuery,
               cmpts,
-              chunkView,
               reinterpret_cast<NonSingletons*>(
                   cmpts.Components()[Find_v<NonSingletonList, NonSingletons>]
-                      .Ptr())...};
+                      .Ptr())...,
+              chunkView,
+          };
           func(std::get<DecayedArgs>(args)...);
         };
   }
