@@ -10,8 +10,6 @@ using namespace My::MyECS;
 using namespace My;
 using namespace std;
 
-World::World() : systemMngr{this} {}
-
 void World::Update() {
   schedule.Clear();
   for (auto job : jobs)
@@ -124,11 +122,11 @@ MyGraphviz::Graph World::GenUpdateFrameGraph() const {
   for (const auto& [hash, sysFunc] : schedule.sysFuncs) {
     for (auto cmptType : sysFunc->entityQuery.locator.CmptTypes())
       cmptTypes.insert(cmptType);
-    for (auto cmptType : sysFunc->entityQuery.filter.AllCmptTypes())
+    for (auto cmptType : sysFunc->entityQuery.filter.all)
       cmptTypes.insert(cmptType);
-    for (auto cmptType : sysFunc->entityQuery.filter.AnyCmptTypes())
+    for (auto cmptType : sysFunc->entityQuery.filter.any)
       cmptTypes.insert(cmptType);
-    for (auto cmptType : sysFunc->entityQuery.filter.NoneCmptTypes())
+    for (auto cmptType : sysFunc->entityQuery.filter.none)
       cmptTypes.insert(cmptType);
     for (auto singleton : sysFunc->singletonLocator.SingletonTypes())
       cmptTypes.insert(singleton);
@@ -173,7 +171,7 @@ MyGraphviz::Graph World::GenUpdateFrameGraph() const {
     const auto& filter = sysFunc->entityQuery.filter;
     if (sysFunc->GetMode() == SystemFunc::Mode::Chunk) {
       // filter's <All> and <Any> components are treat as r/w
-      for (const auto& cmptType : filter.AllCmptTypes()) {
+      for (const auto& cmptType : filter.all) {
         auto cmptIdx = cmptType2idx[cmptType];
         size_t edgeIdx;
         switch (cmptType.GetAccessMode()) {
@@ -194,7 +192,7 @@ MyGraphviz::Graph World::GenUpdateFrameGraph() const {
             break;
         }
       }
-      for (const auto& cmptType : filter.AnyCmptTypes()) {
+      for (const auto& cmptType : filter.any) {
         auto cmptIdx = cmptType2idx[cmptType];
         size_t edgeIdx;
         switch (cmptType.GetAccessMode()) {
@@ -216,14 +214,14 @@ MyGraphviz::Graph World::GenUpdateFrameGraph() const {
         }
       }
     } else {
-      for (const auto& cmptType : filter.AllCmptTypes()) {
+      for (const auto& cmptType : filter.all) {
         auto cmptIdx = cmptType2idx[cmptType];
         if (registry.IsRegisteredEdge(sysIdx, cmptIdx))
           continue;
         auto edgeIdx = registry.RegisterEdge(sysIdx, cmptType2idx[cmptType]);
         subgraph_all.AddEdge(edgeIdx);
       }
-      for (const auto& cmptType : filter.AnyCmptTypes()) {
+      for (const auto& cmptType : filter.any) {
         auto cmptIdx = cmptType2idx[cmptType];
         if (registry.IsRegisteredEdge(sysIdx, cmptIdx))
           continue;
@@ -231,7 +229,7 @@ MyGraphviz::Graph World::GenUpdateFrameGraph() const {
         subgraph_any.AddEdge(edgeIdx);
       }
     }
-    for (const auto& cmptType : filter.NoneCmptTypes()) {
+    for (const auto& cmptType : filter.none) {
       auto cmptIdx = cmptType2idx[cmptType];
       if (registry.IsRegisteredEdge(sysIdx, cmptIdx))
         continue;

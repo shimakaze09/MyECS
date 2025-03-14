@@ -11,7 +11,7 @@
 
 namespace My::MyECS {
 // locate components in function's argument list for Archetype
-// TODO: combine with a system function's locator
+// immutable
 class CmptLocator {
  public:
   CmptLocator(const CmptType* types, size_t num);

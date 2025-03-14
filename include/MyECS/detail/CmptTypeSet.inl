@@ -51,9 +51,8 @@ bool CmptTypeSet::NotContain(const CmptTypeContainer& types) const {
 }
 
 inline bool CmptTypeSet::IsMatch(const ArchetypeFilter& filter) const {
-  return Contains(filter.AllCmptTypes()) &&
-         ContainsAny(filter.AnyCmptTypes()) &&
-         NotContain(filter.NoneCmptTypes());
+  return Contains(filter.all) && ContainsAny(filter.any) &&
+         NotContain(filter.none);
 }
 
 inline bool CmptTypeSet::IsMatch(const CmptLocator& locator) const {
