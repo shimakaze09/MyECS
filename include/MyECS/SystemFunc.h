@@ -8,6 +8,8 @@
 #include "CmptsView.h"
 #include "Entity.h"
 #include "EntityQuery.h"
+#include "SingletonLocator.h"
+#include "SingletonsView.h"
 
 #include <functional>
 
@@ -18,14 +20,14 @@ namespace My::MyECS {
 // name must be unique in global
 // query.filter can be change dynamically by other <System> with Schedule
 // [system function kind] (distinguish by argument list)
+// common : [World*], [{LastFrame|Write|Latest}Singleton<Component>], [SingletonsView]
 // 1. per entity function
-// * [[const] World*]
-// * [[const] Entity]
+// * [Entity]
 // * [size_t indexInQuery]
-// * [[const] CmptsView]
 // * <tagged-component>: {LastFrame|Write|Latest}<Component>
-// 2. chunk: [[const] World*], [const] ChunkView
-// 3. job: [[const] World*]
+// * [CmptsView]
+// 2. chunk: ChunkView
+// 3. job
 class SystemFunc {
  public:
   enum class Mode {
@@ -34,16 +36,11 @@ class SystemFunc {
     Job,
   };
 
-  EntityQuery query;
+  EntityQuery entityQuery;
+  SingletonLocator singletonLocator;
 
   template <typename Func>
-  SystemFunc(Func&& func, std::string name,
-             EntityFilter filter = EntityFilter{});
-
-  // run-time dynamic function
-  template <typename Func>
-  SystemFunc(Func&& func, std::string name, EntityLocator locator,
-             EntityFilter filter = EntityFilter{});
+  SystemFunc(Func&& func, std::string name, ArchetypeFilter archetypeFilter);
 
   const std::string& Name() const noexcept { return name; }
 
@@ -53,10 +50,10 @@ class SystemFunc {
 
   size_t HashCode() const noexcept { return hashCode; }
 
-  void operator()(World*, Entity e, size_t entityIndexInQuery,
-                  CmptsView rtdcmpts);
-  void operator()(World*, ChunkView chunkView);
-  void operator()(World*);
+  void operator()(World*, SingletonsView singletonsView, Entity e,
+                  size_t entityIndexInQuery, CmptsView cmptsView);
+  void operator()(World*, SingletonsView singletonsView, ChunkView chunkView);
+  void operator()(World*, SingletonsView singletonsView);
 
   Mode GetMode() const noexcept { return mode; }
 
@@ -65,10 +62,9 @@ class SystemFunc {
   }
 
  private:
-  template <typename Func, typename ArgList>
-  SystemFunc(Func&& func, std::string name, EntityFilter filter, ArgList);
-
-  std::function<void(World*, Entity, size_t, CmptsView, ChunkView)> func;
+  std::function<void(World*, SingletonsView singletonsView, Entity, size_t,
+                     CmptsView, ChunkView)>
+      func;
 
   std::string name;
   Mode mode;

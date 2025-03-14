@@ -37,7 +37,7 @@ void World::Update() {
         entityMngr.GenChunkJob(this, job, func);
         break;
       case My::MyECS::SystemFunc::Mode::Job:
-        job->emplace([this, func = func]() { (*func)(this); });
+        entityMngr.GenJob(this, job, func);
         break;
       default:
         break;
@@ -118,13 +118,13 @@ MyGraphviz::Graph World::GenUpdateFrameGraph() const {
   };
 
   for (const auto& [hash, sysFunc] : schedule.sysFuncs) {
-    for (auto cmptType : sysFunc->query.locator.CmptTypes())
+    for (auto cmptType : sysFunc->entityQuery.locator.CmptTypes())
       cmptTypes.insert(cmptType);
-    for (auto cmptType : sysFunc->query.filter.AllCmptTypes())
+    for (auto cmptType : sysFunc->entityQuery.filter.AllCmptTypes())
       cmptTypes.insert(cmptType);
-    for (auto cmptType : sysFunc->query.filter.AnyCmptTypes())
+    for (auto cmptType : sysFunc->entityQuery.filter.AnyCmptTypes())
       cmptTypes.insert(cmptType);
-    for (auto cmptType : sysFunc->query.filter.NoneCmptTypes())
+    for (auto cmptType : sysFunc->entityQuery.filter.NoneCmptTypes())
       cmptTypes.insert(cmptType);
   }
 
@@ -140,7 +140,7 @@ MyGraphviz::Graph World::GenUpdateFrameGraph() const {
 
     subgraph_sys.AddNode(sysIdx);
 
-    const auto& locator = sysFunc->query.locator;
+    const auto& locator = sysFunc->entityQuery.locator;
     for (const auto& cmptType : locator.LastFrameCmptTypes()) {
       auto edgeIdx = registry.RegisterEdge(cmptType2idx[cmptType], sysIdx);
       subgraph_lastframe.AddEdge(edgeIdx);
@@ -154,7 +154,7 @@ MyGraphviz::Graph World::GenUpdateFrameGraph() const {
       subgraph_latest.AddEdge(edgeIdx);
     }
 
-    const auto& filter = sysFunc->query.filter;
+    const auto& filter = sysFunc->entityQuery.filter;
     if (sysFunc->GetMode() == SystemFunc::Mode::Chunk) {
       // filter's <All> and <Any> components are treat as r/w
       for (const auto& cmptType : filter.AllCmptTypes()) {

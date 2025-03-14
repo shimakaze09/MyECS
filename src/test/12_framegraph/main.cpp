@@ -29,7 +29,7 @@ class MySystem : public System {
   using System::System;
 
   virtual void OnUpdate(Schedule& schedule) override {
-    EntityFilter filter(TypeList<D>{},     // all
+    ArchetypeFilter filter(TypeList<D>{},     // all
                         TypeList<E, F>{},  // any
                         TypeList<G>{}      // none
     );

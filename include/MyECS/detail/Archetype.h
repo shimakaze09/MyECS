@@ -4,19 +4,18 @@
 
 #pragma once
 
-#include "../CmptPtr.h"
-#include "../Entity.h"
-
-#include "Chunk.h"
-#include "CmptTypeSet.h"
-#include "RTSCmptTraits.h"
-
+#include <MyContainer/Pool.h>
 #include <MyTemplate/TypeID.h>
 #include <MyTemplate/Typelist.h>
 
-#include <MyContainer/Pool.h>
-
 #include <map>
+
+#include "../CmptLocator.h"
+#include "../CmptPtr.h"
+#include "../Entity.h"
+#include "Chunk.h"
+#include "CmptTypeSet.h"
+#include "RTSCmptTraits.h"
 
 namespace My::MyECS {
 class EntityMngr;
@@ -46,9 +45,10 @@ class Archetype {
   ~Archetype();
 
   // Entity + Components
-  std::tuple<std::vector<Entity*>, std::vector<std::vector<void*>>,
+  // without singleton
+  std::tuple<std::vector<Entity*>, std::vector<std::vector<CmptPtr>>,
              std::vector<size_t>>
-  Locate(const std::set<CmptType>& cmptTypes) const;
+  Locate(const CmptLocator& locator) const;
 
   void* Locate(size_t chunkIdx, CmptType) const;
 

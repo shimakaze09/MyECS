@@ -19,8 +19,8 @@ class RTDSystem : public System {
     std::array<CmptType, 1> cmpts_read = {
         CmptType{"LuaCmpt", AccessMode::LATEST}};
 
-    EntityLocator locator_write(cmpts_write.data(), cmpts_write.size());
-    EntityLocator locator_read(cmpts_read.data(), cmpts_read.size());
+    CmptLocator locator_write(cmpts_write.data(), cmpts_write.size());
+    CmptLocator locator_read(cmpts_read.data(), cmpts_read.size());
 
     schedule.Register(
         [](CmptsView cmpts) {

@@ -19,11 +19,11 @@ class MySystem : public System {
   using System::System;
 
   virtual void OnUpdate(Schedule& schedule) override {
-    EntityFilter filter_w0(TypeList<>{},  // all
+    ArchetypeFilter filter_w0(TypeList<>{},  // all
                            TypeList<>{},  // any
                            TypeList<A>{}  // none
     );
-    EntityFilter filter_w1(TypeList<A>{},  // all
+    ArchetypeFilter filter_w1(TypeList<A>{},  // all
                            TypeList<>{},   // any
                            TypeList<>{}    // none
     );

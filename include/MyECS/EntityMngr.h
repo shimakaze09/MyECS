@@ -17,14 +17,13 @@ class World;
 class IListener;
 
 // Entity Manager of World
-// auto maintain Component's lifecycle ({default|copy|move} constructor,
-// destructor) [API]
+// auto maintain Component's lifecycle ({default|copy|move} constructor, destructor)
+// [API]
 // - Entity: Create, Instantiate, Destroy, Exist
 // - Component: Attach, Emplace, Detach, Have, Get, Components
 // - other: EntityNum, AddCommand
 // [important]
-// - API with CmptType need RTDCmptTraits to get {size|alignment|lifecycle
-// function} (throw std::logic_error)
+// - API with CmptType need RTDCmptTraits to get {size|alignment|lifecycle function} (throw std::logic_error)
 // - API with Entity require Entity exist  (throw std::invalid_argument)
 class EntityMngr {
  public:
@@ -67,6 +66,8 @@ class EntityMngr {
   bool IsSingleton(CmptType) const;
   Entity GetSingletonEntity(CmptType) const;
   CmptPtr GetSingleton(CmptType) const;
+  // nullptr if not singleton
+  CmptPtr GetIfSingleton(CmptType) const;
 
   template <typename Cmpt>
   Cmpt* GetSingleton() const {
@@ -92,8 +93,12 @@ class EntityMngr {
   void AttachWithoutInit(Entity);
   void AttachWithoutInit(Entity, const CmptType* types, size_t num);
 
+  std::tuple<bool, std::vector<CmptPtr>> LocateSingletons(
+      const SingletonLocator& locator) const;
+
   void GenEntityJob(World*, Job*, SystemFunc*) const;
   void GenChunkJob(World*, Job*, SystemFunc*) const;
+  void GenJob(World*, Job*, SystemFunc*) const;
 
   struct EntityInfo {
     Archetype* archetype{nullptr};

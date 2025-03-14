@@ -7,14 +7,14 @@
 namespace My::MyECS {
 template <typename Func>
 const SystemFunc* Schedule::Register(Func&& func, std::string name,
-                                     EntityFilter filter) {
+                                     ArchetypeFilter filter) {
   return Request(std::forward<Func>(func), std::move(name), std::move(filter));
 }
 
 template <typename Func>
 const SystemFunc* Schedule::Register(Func&& func, std::string name,
-                                     EntityLocator locator,
-                                     EntityFilter filter) {
+                                     CmptLocator locator,
+                                     ArchetypeFilter filter) {
   return Request(std::forward<Func>(func), std::move(name), std::move(locator),
                  std::move(filter));
 }

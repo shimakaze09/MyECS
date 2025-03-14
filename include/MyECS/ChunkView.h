@@ -10,6 +10,7 @@ namespace My::MyECS {
 class Archetype;
 struct Chunk;
 
+// you should get singleton (registered in locator) by world
 class ChunkView {
  public:
   ChunkView(Archetype* archetype, size_t chunkIdx, Chunk* chunk)

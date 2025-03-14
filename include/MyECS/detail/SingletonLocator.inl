@@ -1,0 +1,8 @@
+//
+// Created by Admin on 14/03/2025.
+//
+
+#ifndef SINGLETONLOCATOR_INL
+#define SINGLETONLOCATOR_INL
+
+#endif //SINGLETONLOCATOR_INL

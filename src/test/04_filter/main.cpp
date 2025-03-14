@@ -27,9 +27,9 @@ class MySystem : public System {
   using System::System;
 
   virtual void OnUpdate(Schedule& schedule) override {
-    EntityFilter filter(TypeList<A>{},     // all
-                        TypeList<B, C>{},  // any
-                        TypeList<D>{}      // none
+    ArchetypeFilter filter(TypeList<A>{},     // all
+                           TypeList<B, C>{},  // any
+                           TypeList<D>{}      // none
     );
     schedule.Register([](const E* e) { cout << e->val << endl; }, "test filter",
                       filter);

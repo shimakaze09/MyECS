@@ -12,32 +12,32 @@
 
 namespace My::MyECS {
 // filter Archetype with All, Any and None
-class EntityFilter {
+class ArchetypeFilter {
  public:
-  EntityFilter();
+  ArchetypeFilter();
 
   template <typename... AllCmpts, typename... AnyCmpts, typename... NoneCmpts>
-  EntityFilter(TypeList<AllCmpts...> allList, TypeList<AnyCmpts...> anyList,
-               TypeList<NoneCmpts...> noneList);
+  ArchetypeFilter(TypeList<AllCmpts...> allList, TypeList<AnyCmpts...> anyList,
+                  TypeList<NoneCmpts...> noneList);
 
   template <typename... AllCmpts>
-  static EntityFilter CreateAll() {
+  static ArchetypeFilter CreateAll() {
     return {TypeList<AllCmpts...>{}, TypeList<>{}, TypeList<>{}};
   }
 
   template <typename... AnyCmpts>
-  static EntityFilter CreateAny() {
+  static ArchetypeFilter CreateAny() {
     return {TypeList<>{}, TypeList<AnyCmpts...>{}, TypeList<>{}};
   }
 
   template <typename... NoneCmpts>
-  static EntityFilter CreateNone() {
+  static ArchetypeFilter CreateNone() {
     return {TypeList<>{}, TypeList<>{}, TypeList<NoneCmpts...>{}};
   }
 
-  EntityFilter(std::set<CmptType> allCmptTypes,
-               std::set<CmptType> anyCmptTypes = {},
-               std::set<CmptType> noneCmptTypes = {});
+  ArchetypeFilter(std::set<CmptType> allCmptTypes,
+                  std::set<CmptType> anyCmptTypes = {},
+                  std::set<CmptType> noneCmptTypes = {});
 
   size_t HashCode() const noexcept { return combinedHashCode; }
 
@@ -79,7 +79,7 @@ class EntityFilter {
   template <typename CmptTypeContainer>
   void EraseNone(const CmptTypeContainer&);
 
-  bool operator==(const EntityFilter& filter) const noexcept;
+  bool operator==(const ArchetypeFilter& filter) const noexcept;
 
  private:
   size_t GenAllHashCode() const noexcept;
@@ -99,4 +99,4 @@ class EntityFilter {
 };
 }  // namespace My::MyECS
 
-#include "detail/EntityFilter.inl"
+#include "detail/ArchetypeFilter.inl"
