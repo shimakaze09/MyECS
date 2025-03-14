@@ -9,7 +9,7 @@ INIT_MYCMAKE()
 INIT_PROJECT()
 
 ADD_DEP(MyContainer 0.0.6)
-ADD_DEP(MyTemplate 0.4.6)
+ADD_DEP(MyTemplate 0.4.7)
 ADD_DEP(MyGraphviz 0.1.4)
 
 ADD_SUB_DIRS_REC(include)
