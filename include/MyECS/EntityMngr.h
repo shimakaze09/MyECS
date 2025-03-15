@@ -45,6 +45,8 @@ class EntityMngr {
   // use RTDCmptTraits
   void Attach(Entity, const CmptType* types, size_t num);
 
+  // if not exist cmpt, attach with Args...
+  // else return it directly
   template <typename Cmpt, typename... Args>
   Cmpt* Emplace(Entity, Args&&...);
 
@@ -96,6 +98,7 @@ class EntityMngr {
 
   template <typename... Cmpts>
   Archetype* GetOrCreateArchetypeOf();
+  // types not contain Entity
   Archetype* GetOrCreateArchetypeOf(const CmptType* types, size_t num);
 
   template <typename... Cmpts>

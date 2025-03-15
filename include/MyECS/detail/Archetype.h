@@ -45,7 +45,6 @@ class Archetype {
   ~Archetype();
 
   // Entity + Components
-  // without singleton
   std::tuple<std::vector<Entity*>, std::vector<std::vector<CmptPtr>>,
              std::vector<size_t>>
   Locate(const CmptLocator& locator) const;
@@ -69,6 +68,8 @@ class Archetype {
   // size_t: index in archetype
   template <typename... Cmpts>
   std::tuple<size_t, std::tuple<Cmpts*...>> Create(Entity);
+
+  // use RTDCmptTraits's default constructor
   size_t Create(Entity);
 
   // return index in archetype
@@ -111,6 +112,8 @@ class Archetype {
   size_t Offsetof(CmptType type) const {
     return type2offset.find(type)->second;
   }
+
+  static bool NotContainEntity(const CmptType* types, size_t num);
 
   friend class EntityMngr;
 

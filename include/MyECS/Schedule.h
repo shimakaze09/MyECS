@@ -29,24 +29,40 @@ class SystemMngr;
 // schedule will be clear at the beginning of the next World::Update()
 class Schedule {
  public:
+  // Func's argument list:
+  // World*
+  // {LastFrame|Latest}<Singleton<Cmpt>>
+  // SingletonsView
+  // Entity
+  // size_t indexInQuery
+  // <tagged-components>: {LastFrame|Write|Latest}<Cmpt>...
+  // CmptsView
   template <typename Func>
   const SystemFunc* RegisterEntityJob(Func&&, std::string name,
                                       ArchetypeFilter = {}, CmptLocator = {},
                                       SingletonLocator = {});
 
+  // Func's argument list:
+  // World*
+  // {LastFrame|Latest}<Singleton<Cmpt>>
+  // SingletonsView
+  // ChunkView (necessary)
   template <typename Func>
   const SystemFunc* RegisterChunkJob(Func&&, std::string name,
                                      ArchetypeFilter = {},
                                      SingletonLocator = {});
 
-  //  Mode::Job
+  // Func's argument list:
+  // World*
+  // {LastFrame|Write|Latest}<Singleton<Cmpt>>
+  // SingletonsView
   template <typename Func>
   const SystemFunc* RegisterJob(Func&&, std::string name,
                                 SingletonLocator = {});
 
-  Schedule& LockFilter(std::string_view sys);
-
   Schedule& Order(std::string_view x, std::string_view y);
+
+  Schedule& LockFilter(std::string_view sys);
 
   Schedule& InsertAll(std::string_view sys, CmptType);
   Schedule& InsertAny(std::string_view sys, CmptType);

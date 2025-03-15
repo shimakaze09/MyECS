@@ -7,6 +7,21 @@
 using namespace My::MyECS;
 using namespace std;
 
+Archetype::~Archetype() {
+  for (const auto& type : types.data) {
+    size_t size = cmptTraits.Sizeof(type);
+    size_t offset = Offsetof(type);
+    for (size_t i = 0; i < entityNum; i++) {
+      size_t idxInChunk = i % chunkCapacity;
+      byte* buffer = chunks[i / chunkCapacity]->Data();
+      byte* address = buffer + offset + idxInChunk * size;
+      cmptTraits.Destruct(type, address);
+    }
+  }
+  for (Chunk* chunk : chunks)
+    sharedChunkPool.Recycle(chunk);
+}
+
 void Archetype::SetLayout() {
   vector<size_t> alignments;
   vector<size_t> sizes;
@@ -25,6 +40,8 @@ void Archetype::SetLayout() {
 }
 
 Archetype* Archetype::New(const CmptType* types, size_t num) {
+  assert(NotContainEntity(types, num));
+
   auto rst = new Archetype;
   rst->types.Insert(types, num);
   rst->types.data.insert(CmptType::Of<Entity>);
@@ -37,10 +54,8 @@ Archetype* Archetype::New(const CmptType* types, size_t num) {
 
 Archetype* Archetype::Add(const Archetype* from, const CmptType* types,
                           size_t num) {
-#ifndef NDEBUG
-  for (size_t i = 0; i < num; i++)
-    assert(!from->types.Contains(types[i]));
-#endif  // !NDEBUG
+  assert(NotContainEntity(types, num));
+  assert(!from->types.ContainsAny(types, num));
 
   Archetype* rst = new Archetype;
 
@@ -57,8 +72,7 @@ Archetype* Archetype::Add(const Archetype* from, const CmptType* types,
 
 Archetype* Archetype::Remove(const Archetype* from, const CmptType* types,
                              size_t num) {
-  for (size_t i = 0; i < num; i++)
-    assert(from->types.Contains(types[i]));
+  assert(from->types.Contains(types, num));
 
   Archetype* rst = new Archetype;
 
@@ -96,21 +110,6 @@ size_t Archetype::Create(Entity e) {
   }
 
   return idx;
-}
-
-Archetype::~Archetype() {
-  for (const auto& type : types.data) {
-    size_t size = cmptTraits.Sizeof(type);
-    size_t offset = Offsetof(type);
-    for (size_t i = 0; i < entityNum; i++) {
-      size_t idxInChunk = i % chunkCapacity;
-      byte* buffer = chunks[i / chunkCapacity]->Data();
-      byte* address = buffer + offset + idxInChunk * size;
-      cmptTraits.Destruct(type, address);
-    }
-  }
-  for (Chunk* chunk : chunks)
-    sharedChunkPool.Recycle(chunk);
 }
 
 size_t Archetype::RequestBuffer() {
@@ -259,8 +258,17 @@ size_t Archetype::EntityNumOfChunk(size_t chunkIdx) const noexcept {
 }
 
 CmptTypeSet Archetype::GenCmptTypeSet(const CmptType* types, size_t num) {
+  assert(NotContainEntity(types, num));
   CmptTypeSet typeset;
   typeset.Insert(types, num);
   typeset.data.insert(CmptType::Of<Entity>);
   return typeset;
+}
+
+bool Archetype::NotContainEntity(const CmptType* types, size_t num) {
+  for (size_t i = 0; i < num; i++) {
+    if (types[i].Is<Entity>())
+      return false;
+  }
+  return true;
 }
