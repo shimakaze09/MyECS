@@ -4,6 +4,8 @@
 
 #include <MyECS/detail/Archetype.h>
 
+#include <MyECS/EntityMngr.h>
+
 using namespace My::MyECS;
 using namespace std;
 
@@ -19,7 +21,7 @@ Archetype::~Archetype() {
     }
   }
   for (Chunk* chunk : chunks)
-    sharedChunkPool.Recycle(chunk);
+    entityMngr->sharedChunkPool.Recycle(chunk);
 }
 
 void Archetype::SetLayout() {
@@ -45,10 +47,11 @@ void Archetype::SetLayout() {
     type2offset.emplace(type, layout.offsets[i++]);
 }
 
-Archetype* Archetype::New(const CmptType* types, size_t num) {
+Archetype* Archetype::New(EntityMngr* entityMngr, const CmptType* types,
+                          size_t num) {
   assert(NotContainEntity(types, num));
 
-  auto rst = new Archetype;
+  auto rst = new Archetype{entityMngr};
   rst->types.Insert(types, num);
   rst->types.data.insert(CmptType::Of<Entity>);
   rst->cmptTraits.Register<Entity>();
@@ -63,7 +66,7 @@ Archetype* Archetype::Add(const Archetype* from, const CmptType* types,
   assert(NotContainEntity(types, num));
   assert(!from->types.ContainsAny(types, num));
 
-  Archetype* rst = new Archetype;
+  Archetype* rst = new Archetype{from->entityMngr};
 
   rst->types = from->types;
   rst->cmptTraits = from->cmptTraits;
@@ -79,9 +82,9 @@ Archetype* Archetype::Add(const Archetype* from, const CmptType* types,
 Archetype* Archetype::Remove(const Archetype* from, const CmptType* types,
                              size_t num) {
   assert(NotContainEntity(types, num));
-  assert(from->types.Contains(types, num));
+  assert(from->types.ContainsAny(types, num));
 
-  Archetype* rst = new Archetype;
+  Archetype* rst = new Archetype{from->entityMngr};
 
   rst->types = from->types;
   rst->cmptTraits = from->cmptTraits;
@@ -121,7 +124,7 @@ size_t Archetype::Create(Entity e) {
 
 size_t Archetype::RequestBuffer() {
   if (entityNum == chunks.size() * chunkCapacity) {
-    auto chunk = sharedChunkPool.Request();
+    auto chunk = entityMngr->sharedChunkPool.Request();
     chunks.push_back(chunk);
   }
   return entityNum++;
@@ -242,7 +245,7 @@ size_t Archetype::Erase(size_t idx) {
 
   if (chunks.size() * chunkCapacity - entityNum >= chunkCapacity) {
     Chunk* chunk = chunks.back();
-    sharedChunkPool.Recycle(chunk);
+    entityMngr->sharedChunkPool.Recycle(chunk);
     chunks.pop_back();
   }
 

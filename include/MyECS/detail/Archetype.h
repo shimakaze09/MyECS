@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <MyContainer/Pool.h>
 #include <MyTemplate/TypeID.h>
 #include <MyTemplate/Typelist.h>
 
@@ -27,10 +26,12 @@ class Archetype {
   // argument TypeList<Cmpts...> is for type deduction
   // auto add Entity
   template <typename... Cmpts>
-  Archetype(TypeList<Cmpts...>);
+  Archetype(EntityMngr*, TypeList<Cmpts...>);
+
+  ~Archetype();
 
   // auto add Entity, use RTDCmptTraits
-  static Archetype* New(const CmptType* types, size_t num);
+  static Archetype* New(EntityMngr*, const CmptType* types, size_t num);
 
   // auto add Entity
   template <typename... Cmpts>
@@ -41,8 +42,6 @@ class Archetype {
   // auto add Entity
   static Archetype* Remove(const Archetype* from, const CmptType* types,
                            size_t num);
-
-  ~Archetype();
 
   // Entity + Components
   std::tuple<std::vector<Entity*>, std::vector<std::vector<CmptPtr>>,
@@ -105,7 +104,7 @@ class Archetype {
   static CmptTypeSet GenCmptTypeSet();
 
  private:
-  Archetype() = default;
+  Archetype(EntityMngr* entityMngr) : entityMngr{entityMngr} {}
 
   // set type2alignment
   // call after setting type2size and type2offset
@@ -118,6 +117,7 @@ class Archetype {
   static bool NotContainEntity(const CmptType* types, size_t num) noexcept;
 
   friend class EntityMngr;
+  EntityMngr* entityMngr;
 
   CmptTypeSet types;  // Entity + Components
   RTSCmptTraits cmptTraits;
@@ -128,8 +128,6 @@ class Archetype {
   std::vector<Chunk*> chunks;
 
   size_t entityNum{0};  // number of entities
-
-  inline static Pool<Chunk> sharedChunkPool;  // no lock
 };
 }  // namespace My::MyECS
 

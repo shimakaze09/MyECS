@@ -8,7 +8,8 @@
 
 namespace My::MyECS {
 template <typename... Cmpts>
-Archetype::Archetype(TypeList<Cmpts...>) : types(GenCmptTypeSet<Cmpts...>()) {
+Archetype::Archetype(EntityMngr* entityMngr, TypeList<Cmpts...>)
+    : entityMngr{entityMngr}, types(GenCmptTypeSet<Cmpts...>()) {
   static_assert(IsSet_v<TypeList<Entity, Cmpts...>>,
                 "Archetype::Archetype: <Cmpts>... must be different");
   cmptTraits.Register<Entity>();
@@ -21,7 +22,7 @@ Archetype* Archetype::Add(const Archetype* from) {
   static_assert(sizeof...(Cmpts) > 0);
   assert(((!from->types.Contains(CmptType::Of<Cmpts>)) && ...));
 
-  Archetype* rst = new Archetype;
+  Archetype* rst = new Archetype{from->entityMngr};
 
   rst->types = from->types;
   rst->types.data.insert(CmptType::Of<Cmpts>...);
