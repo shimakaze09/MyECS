@@ -9,7 +9,7 @@
 using namespace My::MyECS;
 
 void* ChunkView::GetCmptArray(CmptType t) const {
-  return Contains(t) ? archetype->Locate(chunkIdx, t) : nullptr;
+  return archetype->Locate(chunkIdx, t);
 }
 
 size_t ChunkView::EntityNum() const noexcept {

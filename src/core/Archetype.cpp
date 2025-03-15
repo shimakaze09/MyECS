@@ -64,7 +64,7 @@ Archetype* Archetype::New(EntityMngr* entityMngr, const CmptType* types,
 Archetype* Archetype::Add(const Archetype* from, const CmptType* types,
                           size_t num) {
   assert(NotContainEntity(types, num));
-  assert(!from->types.ContainsAny(types, num));
+  assert(!from->types.Contains(types, num));
 
   Archetype* rst = new Archetype{from->entityMngr};
 
@@ -132,7 +132,9 @@ size_t Archetype::RequestBuffer() {
 
 void* Archetype::At(CmptType type, size_t idx) const {
   assert(idx < entityNum);
-  assert(types.Contains(type));
+
+  if (!types.Contains(type))
+    return nullptr;
 
   size_t size = cmptTraits.Sizeof(type);
   size_t offset = Offsetof(type);
@@ -198,8 +200,10 @@ Archetype::Locate(const CmptLocator& locator) const {
 }
 
 void* Archetype::Locate(size_t chunkIdx, CmptType t) const {
-  assert(types.Contains(t));
   assert(chunkIdx < chunks.size());
+  if (!types.Contains(t))
+    return nullptr;
+
   auto buffer = chunks[chunkIdx]->Data();
   return buffer + Offsetof(t);
 }

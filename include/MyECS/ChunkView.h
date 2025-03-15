@@ -17,7 +17,7 @@ class ChunkView {
 
   bool Contains(CmptType) const;
 
-  // if not contain, return nullptr
+  // nullptr if not contain
   void* GetCmptArray(CmptType) const;
 
   template <typename Cmpt>
