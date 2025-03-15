@@ -31,6 +31,8 @@ class RTSCmptTraits {
   void Deregister(CmptType type) noexcept;
 
  private:
+  friend class Archetype;
+
   std::unordered_map<CmptType, size_t> sizeofs;
   std::unordered_map<CmptType, size_t> alignments;
   std::unordered_map<CmptType, std::function<void(void*, void*)>>
