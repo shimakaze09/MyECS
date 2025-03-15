@@ -38,12 +38,11 @@ class MoverSystem : public System {
 };
 
 int main() {
-  RTDCmptTraits::Instance().Register<Timer, Velocity, Position>();
-
   World w;
   w.systemMngr.Register<MoverSystem>();
   w.entityMngr.Create<Position, Velocity>();
   w.entityMngr.Create<Timer>();
+  w.entityMngr.cmptTraits.Register<Timer, Velocity, Position>();
 
   w.Update();
   std::cout << w.DumpUpdateJobGraph() << std::endl;

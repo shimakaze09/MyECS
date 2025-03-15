@@ -64,10 +64,10 @@ class SAB_System : public System {
 };
 
 int main() {
-  RTDCmptTraits::Instance().Register<S, A, B>();
-
   World w;
   w.systemMngr.Register<SAB_System>();
+
+  w.entityMngr.cmptTraits.Register<S, A, B>();
 
   w.entityMngr.Create<S>();
   w.entityMngr.Create<S, A>();

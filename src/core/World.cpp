@@ -115,8 +115,8 @@ MyGraphviz::Graph World::GenUpdateFrameGraph() const {
   unordered_map<CmptType, size_t> cmptType2idx;
   unordered_map<size_t, size_t> sysFuncHashcode2idx;
 
-  auto queryCmptName = [](CmptType type) -> string {
-    auto cmptName = RTDCmptTraits::Instance().Nameof(type);
+  auto queryCmptName = [this](CmptType type) -> string {
+    auto cmptName = entityMngr.cmptTraits.Nameof(type);
     return cmptName.empty() ? std::to_string(type.HashCode())
                             : string{cmptName};
   };

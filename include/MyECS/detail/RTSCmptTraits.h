@@ -5,6 +5,7 @@
 #pragma once
 
 #include "../CmptType.h"
+#include "../RTDCmptTraits.h"
 
 #include <functional>
 #include <unordered_map>
@@ -24,7 +25,7 @@ class RTSCmptTraits {
   void Register();
 
   // use RTDCmptTraits
-  void Register(CmptType type);
+  void Register(const RTDCmptTraits& rtdCmptTraits, CmptType type);
 
   template <typename Cmpt>
   void Deregister();
