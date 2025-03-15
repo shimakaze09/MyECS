@@ -14,8 +14,7 @@ namespace My::MyECS {
 class SingletonLocator {
  public:
   SingletonLocator(const CmptType* types, size_t num);
-
-  SingletonLocator();
+  SingletonLocator() = default;
 
   template <typename Func>
   static SingletonLocator Generate();

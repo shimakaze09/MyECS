@@ -27,7 +27,7 @@ class EntityQuery {
     return hash_combine(filter.HashCode(), locator.HashCode());
   }
 
-  bool operator==(const EntityQuery& query) const noexcept {
+  bool operator==(const EntityQuery& query) const {
     return filter == query.filter && locator == query.locator;
   }
 };

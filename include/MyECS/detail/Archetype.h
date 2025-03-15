@@ -56,7 +56,9 @@ class Archetype {
   void* At(CmptType, size_t idx) const;
 
   template <typename Cmpt>
-  Cmpt* At(size_t idx) const;
+  Cmpt* At(size_t idx) const {
+    return reinterpret_cast<Cmpt*>(At(CmptType::Of<Cmpt>, idx));
+  }
 
   // no Entity
   std::vector<CmptPtr> Components(size_t idx) const;
@@ -113,7 +115,7 @@ class Archetype {
     return type2offset.find(type)->second;
   }
 
-  static bool NotContainEntity(const CmptType* types, size_t num);
+  static bool NotContainEntity(const CmptType* types, size_t num) noexcept;
 
   friend class EntityMngr;
 

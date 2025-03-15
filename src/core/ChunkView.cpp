@@ -12,7 +12,7 @@ void* ChunkView::GetCmptArray(CmptType t) const {
   return Contains(t) ? archetype->Locate(chunkIdx, t) : nullptr;
 }
 
-size_t ChunkView::EntityNum() const {
+size_t ChunkView::EntityNum() const noexcept {
   return archetype->EntityNumOfChunk(chunkIdx);
 }
 

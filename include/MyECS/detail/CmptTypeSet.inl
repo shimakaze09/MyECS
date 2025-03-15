@@ -6,11 +6,13 @@
 
 namespace My::MyECS {
 inline void CmptTypeSet::Insert(const CmptType* types, size_t num) {
+  assert(types || num == 0);
   for (size_t i = 0; i < num; i++)
     data.insert(types[i]);
 }
 
 inline void CmptTypeSet::Erase(const CmptType* types, size_t num) {
+  assert(types || num == 0);
   for (size_t i = 0; i < num; i++)
     data.erase(types[i]);
 }
@@ -20,6 +22,7 @@ inline bool CmptTypeSet::Contains(CmptType type) const {
 }
 
 inline bool CmptTypeSet::Contains(const CmptType* types, size_t num) const {
+  assert(types || num == 0);
   for (size_t i = 0; i < num; i++) {
     if (!Contains(types[i]))
       return false;
@@ -37,6 +40,7 @@ bool CmptTypeSet::Contains(const CmptTypeContainer& types) const {
 }
 
 inline bool CmptTypeSet::ContainsAny(const CmptType* types, size_t num) const {
+  assert(types || num == 0);
   for (size_t i = 0; i < num; i++) {
     if (Contains(types[i]))
       return true;

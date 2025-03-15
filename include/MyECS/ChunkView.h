@@ -12,8 +12,8 @@ struct Chunk;
 
 class ChunkView {
  public:
-  ChunkView(Archetype* archetype, size_t chunkIdx, Chunk* chunk)
-      : archetype{archetype}, chunkIdx{chunkIdx}, chunk{chunk} {}
+  ChunkView(Archetype* archetype, size_t chunkIdx)
+      : archetype{archetype}, chunkIdx{chunkIdx} {}
 
   bool Contains(CmptType) const;
 
@@ -27,11 +27,10 @@ class ChunkView {
 
   const Entity* GetEntityArray() const { return GetCmptArray<Entity>(); }
 
-  size_t EntityNum() const;
+  size_t EntityNum() const noexcept;
 
  private:
   Archetype* archetype;
   size_t chunkIdx;
-  Chunk* chunk;
 };
 }  // namespace My::MyECS

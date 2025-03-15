@@ -10,6 +10,8 @@ using namespace My::MyECS;
 using namespace My;
 using namespace std;
 
+World::World() : systemMngr{this} {}
+
 void World::Update() {
   schedule.Clear();
   for (auto job : jobs)

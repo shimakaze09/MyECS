@@ -19,6 +19,6 @@ struct ArchetypeFilter {
 
   size_t HashCode() const noexcept;
 
-  bool operator==(const ArchetypeFilter& rhs) const noexcept;
+  bool operator==(const ArchetypeFilter& rhs) const;
 };
 }  // namespace My::MyECS

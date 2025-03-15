@@ -22,6 +22,8 @@ class RTSCmptTraits {
 
   template <typename Cmpt>
   void Register();
+
+  // use RTDCmptTraits
   void Register(CmptType type);
 
   template <typename Cmpt>

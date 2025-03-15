@@ -18,6 +18,7 @@ Archetype::Archetype(TypeList<Cmpts...>) : types(GenCmptTypeSet<Cmpts...>()) {
 
 template <typename... Cmpts>
 Archetype* Archetype::Add(const Archetype* from) {
+  static_assert(sizeof...(Cmpts) > 0);
   assert(((!from->types.Contains(CmptType::Of<Cmpts>)) && ...));
 
   Archetype* rst = new Archetype;
@@ -30,11 +31,6 @@ Archetype* Archetype::Add(const Archetype* from) {
   rst->SetLayout();
 
   return rst;
-}
-
-template <typename Cmpt>
-Cmpt* Archetype::At(size_t idx) const {
-  return reinterpret_cast<Cmpt*>(At(CmptType::Of<Cmpt>, idx));
 }
 
 template <typename... Cmpts>

@@ -7,14 +7,12 @@
 #include "CmptPtr.h"
 
 namespace My::MyECS {
-class CmptLocator;
-
-// use CmptsView::Iterator to read CmptPtr
 class CmptsView {
  public:
-  CmptsView(const CmptPtr* cmpts, size_t num) : cmpts{cmpts}, num{num} {}
+  CmptsView(const CmptPtr* cmpts, size_t num) noexcept
+      : cmpts{cmpts}, num{num} {}
 
-  CmptPtr GetCmpt(CmptType) const;
+  CmptPtr GetCmpt(CmptType) const noexcept;
 
   const CmptPtr* Components() const noexcept { return cmpts; }
 
