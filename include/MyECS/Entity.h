@@ -26,6 +26,8 @@ class Entity {
     return {size_t_invalid, size_t_invalid};
   }
 
+  constexpr bool IsValid() const noexcept { return idx == size_t_invalid; }
+
  private:
   friend class EntityMngr;
   friend class Archetype;

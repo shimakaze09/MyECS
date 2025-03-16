@@ -30,8 +30,8 @@ class MySystem : public System {
 
   virtual void OnUpdate(Schedule& schedule) override {
     ArchetypeFilter filter;
-    filter.all = {CmptType::Of<D>};
-    filter.any = {CmptType::Of<E>, CmptType::Of<F>};
+    filter.all = {CmptAccessType::Of<D>};
+    filter.any = {CmptAccessType::Of<E>, CmptAccessType::Of<F>};
     filter.none = {CmptType::Of<G>};
     schedule.RegisterEntityJob([](LastFrame<A> a, Write<B> b, Latest<C> c) {},
                                "System Func", filter);
@@ -42,8 +42,7 @@ int main() {
   World w;
   w.systemMngr.Register<MySystem>();
 
-  w.entityMngr.cmptTraits
-      .RegisterName(CmptType::Of<A>, "A")
+  w.entityMngr.cmptTraits.RegisterName(CmptType::Of<A>, "A")
       .RegisterName(CmptType::Of<B>, "B")
       .RegisterName(CmptType::Of<C>, "C")
       .RegisterName(CmptType::Of<D>, "D")

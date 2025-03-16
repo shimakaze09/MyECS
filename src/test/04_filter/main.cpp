@@ -28,8 +28,8 @@ class MySystem : public System {
 
   virtual void OnUpdate(Schedule& schedule) override {
     ArchetypeFilter filter;
-    filter.all = {CmptType::Of<A>};
-    filter.any = {CmptType::Of<B>, CmptType::Of<C>};
+    filter.all = {CmptAccessType::Of<A>};
+    filter.any = {CmptAccessType::Of<B>, CmptAccessType::Of<C>};
     filter.none = {CmptType::Of<D>};
 
     schedule.RegisterEntityJob([](const E* e) { cout << e->val << endl; },

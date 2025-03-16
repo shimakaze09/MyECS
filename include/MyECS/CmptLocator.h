@@ -14,7 +14,7 @@ namespace My::MyECS {
 // immutable
 class CmptLocator {
  public:
-  CmptLocator(const CmptType* types, size_t num);
+  CmptLocator(const CmptAccessType* types, size_t num);
 
   CmptLocator();
 
@@ -26,14 +26,16 @@ class CmptLocator {
 
   size_t HashCode() const noexcept { return hashCode; }
 
-  const std::set<CmptType>& CmptTypes() const noexcept { return cmptTypes; }
+  const std::set<CmptAccessType>& CmptAccessTypes() const noexcept {
+    return cmptTypes;
+  }
 
   bool operator==(const CmptLocator& rhs) const;
 
  private:
   size_t GenHashCode() const noexcept;
 
-  std::set<CmptType> cmptTypes;
+  std::set<CmptAccessType> cmptTypes;
 
   size_t hashCode;
 };

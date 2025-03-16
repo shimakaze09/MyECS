@@ -4,16 +4,6 @@
 
 #pragma once
 
-namespace My::MyECS {
-template <typename... AllCmpts, typename... AnyCmpts, typename... NoneCmpts,
-          typename... Cmpts>
-EntityQuery::EntityQuery(TypeList<AllCmpts...>, TypeList<AnyCmpts...>,
-                         TypeList<NoneCmpts...>, TypeList<Cmpts...>)
-    : filter{TypeList<AllCmpts...>{}, TypeList<AnyCmpts...>{},
-             TypeList<NoneCmpts...>{}},
-      locator{TypeList<Cmpts...>{}} {}
-}  // namespace My::MyECS
-
 namespace std {
 template <typename T>
 struct hash;

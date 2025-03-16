@@ -14,4 +14,12 @@ struct hash<My::MyECS::CmptType> {
     return t.HashCode();
   }
 };
+
+template <>
+struct hash<My::MyECS::CmptAccessType> {
+  constexpr size_t operator()(
+      const My::MyECS::CmptAccessType& t) const noexcept {
+    return t.HashCode();
+  }
+};
 }  // namespace std

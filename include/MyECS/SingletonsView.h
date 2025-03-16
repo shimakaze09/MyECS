@@ -9,17 +9,17 @@
 namespace My::MyECS {
 class SingletonsView {
  public:
-  SingletonsView(const CmptPtr* singletons, size_t num)
+  SingletonsView(const CmptAccessPtr* singletons, size_t num)
       : singletons{singletons}, num{num} {}
 
-  CmptPtr GetSingleton(CmptType) const;
+  CmptAccessPtr GetSingleton(CmptAccessType) const;
 
-  const CmptPtr* Singletons() const noexcept { return singletons; }
+  const CmptAccessPtr* Singletons() const noexcept { return singletons; }
 
   size_t NumberOfSingletons() const noexcept { return num; }
 
  private:
-  const CmptPtr* singletons;
+  const CmptAccessPtr* singletons;
   size_t num;
 };
 }  // namespace My::MyECS

@@ -48,8 +48,7 @@ class EntityMngr {
   // use RTDCmptTraits
   void Attach(Entity, const CmptType* types, size_t num);
 
-  // if not exist cmpt, attach with <Args>...
-  // else return it directly
+  // assert(Have(e, CmptType::Of<Cmpt>))
   template <typename Cmpt, typename... Args>
   Cmpt* Emplace(Entity, Args&&...);
 
@@ -57,10 +56,10 @@ class EntityMngr {
 
   bool Have(Entity, CmptType) const;
 
-  // nullptr if not singleton
+  // nullptr if not containts <Cmpt>
   template <typename Cmpt>
   Cmpt* Get(Entity) const;
-  // nullptr if not singleton
+  // nullptr if not containts CmptType
   CmptPtr Get(Entity, CmptType) const;
 
   std::vector<CmptPtr> Components(Entity) const;
@@ -71,7 +70,7 @@ class EntityMngr {
 
   size_t EntityNum(const EntityQuery&) const;
 
-  std::tuple<bool, std::vector<CmptPtr>> LocateSingletons(
+  std::tuple<bool, std::vector<CmptAccessPtr>> LocateSingletons(
       const SingletonLocator&) const;
 
   bool IsSingleton(CmptType) const;

@@ -11,8 +11,8 @@
 using namespace My::MyECS;
 using namespace std;
 
-CmptLocator::CmptLocator(const CmptType* types, size_t num) {
-  assert(types != nullptr && num > 0);
+CmptLocator::CmptLocator(const CmptAccessType* types, size_t num) {
+  assert(types || num == 0);
   for (size_t i = 0; i < num; i++)
     cmptTypes.insert(types[i]);
 

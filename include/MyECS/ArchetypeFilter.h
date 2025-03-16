@@ -11,10 +11,10 @@
 #include <set>
 
 namespace My::MyECS {
-// filter Archetype with All, Any and None
+// filter Archetype with all, any and none
 struct ArchetypeFilter {
-  std::set<CmptType> all;
-  std::set<CmptType> any;
+  std::set<CmptAccessType> all;
+  std::set<CmptAccessType> any;
   std::set<CmptType> none;
 
   size_t HashCode() const noexcept;

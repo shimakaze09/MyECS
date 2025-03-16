@@ -55,6 +55,7 @@ inline void RTSCmptTraits::Destruct(CmptType type, void* cmpt) const {
 
 template <typename Cmpt>
 void RTSCmptTraits::Register() {
+  static_assert(!IsTaggedCmpt_v<Cmpt>, "<Cmpt> should not be tagged");
   static_assert(std::is_copy_constructible_v<Cmpt>,
                 "<Cmpt> must be copy-constructible");
   static_assert(std::is_move_constructible_v<Cmpt>,

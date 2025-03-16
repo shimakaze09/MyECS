@@ -143,6 +143,11 @@ class Latest<Singleton<Cmpt>> {
   const Cmpt* cmpt;
 };
 
+template <typename TaggedCmpt>
+void* CastToVoidPointer(TaggedCmpt p) {
+  return const_cast<void*>(reinterpret_cast<const void*>(p));
+}
+
 // <Cmpt> (without read/write and singleton tag)
 template <typename TaggedCmpt>
 struct RemoveTag;
@@ -223,8 +228,8 @@ struct IsTaggedCmpt : IValue<bool, IsNonSingleton_v<T> || IsSingleton_v<T>> {};
 template <typename T>
 static constexpr bool IsTaggedCmpt_v = IsTaggedCmpt<T>::value;
 
-template <typename T>
-static constexpr AccessMode AccessModeOf =
+template <typename T, AccessMode defaultMode>
+static constexpr AccessMode AccessModeOf_default =
     IsLastFrame_v<T>
         ? AccessMode::LAST_FRAME
         : (IsWrite_v<T>
@@ -237,9 +242,11 @@ static constexpr AccessMode AccessModeOf =
                                     ? AccessMode::WRITE_SINGLETON
                                     : (IsLatestSingleton_v<T>
                                            ? AccessMode::LATEST_SINGLETON
-                                           : AccessMode::
-                                                 WRITE  // default, TODO : use static_assert
-                                       )))));
+                                           : defaultMode)))));
+
+template <typename T>
+static constexpr AccessMode AccessModeOf =
+    AccessModeOf_default<T, AccessMode::LATEST>;
 }  // namespace My::MyECS
 
 #include "detail/CmptTag.inl"

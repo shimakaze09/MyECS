@@ -9,17 +9,17 @@
 namespace My::MyECS {
 class CmptsView {
  public:
-  CmptsView(const CmptPtr* cmpts, size_t num) noexcept
+  CmptsView(const CmptAccessPtr* cmpts, size_t num) noexcept
       : cmpts{cmpts}, num{num} {}
 
-  CmptPtr GetCmpt(CmptType) const noexcept;
+  CmptAccessPtr GetCmpt(CmptAccessType) const noexcept;
 
-  const CmptPtr* Components() const noexcept { return cmpts; }
+  const CmptAccessPtr* Components() const noexcept { return cmpts; }
 
   size_t NumberOfComponents() const noexcept { return num; }
 
  private:
-  const CmptPtr* cmpts;
+  const CmptAccessPtr* cmpts;
   size_t num;
 };
 }  // namespace My::MyECS
