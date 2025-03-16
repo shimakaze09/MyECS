@@ -18,7 +18,7 @@ class CmptPtr {
   CmptPtr(Cmpt* p) noexcept : type{CmptType::Of<Cmpt>}, p{p} {}
 
   // unchecked
-  void* Ptr() const noexcept { return p; }
+  void* const& Ptr() const noexcept { return p; }
 
   CmptType Type() const noexcept { return type; }
 
