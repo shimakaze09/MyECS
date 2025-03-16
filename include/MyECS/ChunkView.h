@@ -8,7 +8,6 @@
 
 namespace My::MyECS {
 class Archetype;
-struct Chunk;
 
 class ChunkView {
  public:

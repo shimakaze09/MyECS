@@ -31,10 +31,8 @@ class CmptType {
 
   constexpr bool Valid() const noexcept { return hashcode == size_t_invalid; }
 
-  template <typename Cmpt, std::enable_if_t<!IsTaggedCmpt_v<Cmpt>, int> = 0>
-  constexpr bool Is() const noexcept {
-    return hashcode == TypeID<Cmpt>;
-  }
+  template <typename Cmpt>
+  constexpr bool Is() const noexcept;
 
   constexpr bool operator<(const CmptType& rhs) const noexcept {
     return hashcode < rhs.hashcode;

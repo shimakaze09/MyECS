@@ -9,12 +9,14 @@
 #include <tuple>
 #include <vector>
 
+#include "../config.h"
+
 namespace My::MyECS {
 using byte = uint8_t;
 static_assert(sizeof(byte) == 1);
 
-struct alignas(128) Chunk {
-  static constexpr size_t size = 16 * 1024;
+struct alignas(CHUNK_ALIGNMENT) Chunk {
+  static constexpr size_t size = CHUNK_SIZE;
 
   struct Layout {
     size_t capacity;

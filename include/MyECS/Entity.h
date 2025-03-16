@@ -14,6 +14,12 @@ class Entity {
 
   size_t Version() const noexcept { return version; }
 
+  static constexpr Entity Invalid() noexcept {
+    return {size_t_invalid, size_t_invalid};
+  }
+
+  constexpr bool IsValid() const noexcept { return idx == size_t_invalid; }
+
   bool operator==(const Entity& rhs) const noexcept {
     return idx == rhs.idx && version == rhs.version;
   }
@@ -21,12 +27,6 @@ class Entity {
   bool operator<(const Entity& rhs) const noexcept {
     return idx < rhs.idx || (idx == rhs.idx && version < rhs.version);
   }
-
-  static constexpr Entity Invalid() noexcept {
-    return {size_t_invalid, size_t_invalid};
-  }
-
-  constexpr bool IsValid() const noexcept { return idx == size_t_invalid; }
 
  private:
   friend class EntityMngr;

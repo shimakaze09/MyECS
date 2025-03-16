@@ -54,6 +54,10 @@ class CmptAccessPtr {
   explicit constexpr CmptAccessPtr(CmptPtr p) noexcept
       : CmptAccessPtr{p, AccessMode::LATEST} {}
 
+  explicit constexpr operator CmptPtr() const noexcept {
+    return {CmptType{accessType}, p};
+  }
+
   constexpr void* Ptr() const noexcept { return p; }
 
   constexpr CmptAccessType AccessType() const noexcept { return accessType; }
