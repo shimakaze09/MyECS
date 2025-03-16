@@ -84,6 +84,12 @@ class EntityMngr {
     return GetSingleton(CmptType::Of<Cmpt>).As<Cmpt>();
   }
 
+  // filter's all contains cmpt
+  template <typename Cmpt>
+  std::vector<Cmpt*> GetCmptArray(const ArchetypeFilter&) const;
+  std::vector<CmptPtr> GetCmptArray(const ArchetypeFilter&, CmptType) const;
+  std::vector<Entity> GetEntityArray(const ArchetypeFilter&) const;
+
   void Accept(IListener* listener) const;
 
  private:
@@ -106,7 +112,7 @@ class EntityMngr {
   Archetype* AttachWithoutInit(Entity);
   Archetype* AttachWithoutInit(Entity, const CmptType* types, size_t num);
 
-  const std::set<Archetype*>& QueryArchetypes(const EntityQuery& query) const;
+  const std::set<Archetype*>& QueryArchetypes(const EntityQuery&) const;
   mutable std::unordered_map<EntityQuery, std::set<Archetype*>> queryCache;
 
   void GenEntityJob(World*, Job*, SystemFunc*) const;
@@ -122,7 +128,7 @@ class EntityMngr {
   std::vector<EntityInfo> entityTable;
   std::vector<size_t> entityTableFreeEntry;
   size_t RequestEntityFreeEntry();
-  void RecycleEntityEntry(Entity e);
+  void RecycleEntityEntry(Entity);
 
   std::unordered_map<CmptTypeSet, std::unique_ptr<Archetype>>
       ts2a;  // archetype's CmptTypeSet to archetype
