@@ -44,11 +44,12 @@ class SystemFunc {
   // Mode::Entity
   template <typename Func>
   SystemFunc(Func&&, std::string name, ArchetypeFilter, CmptLocator,
-             SingletonLocator);
+             SingletonLocator, bool isParallel);
 
   // Mode::Chunk
   template <typename Func>
-  SystemFunc(Func&&, std::string name, ArchetypeFilter, SingletonLocator);
+  SystemFunc(Func&&, std::string name, ArchetypeFilter, SingletonLocator,
+             bool isParallel);
 
   // Mode::Job
   template <typename Func>
@@ -69,6 +70,8 @@ class SystemFunc {
 
   Mode GetMode() const noexcept { return mode; }
 
+  bool IsParallel() const noexcept { return isParallel; }
+
   bool operator==(const SystemFunc& sysFunc) const noexcept {
     return name == sysFunc.name;
   }
@@ -81,6 +84,7 @@ class SystemFunc {
   std::string name;
   Mode mode;
   size_t hashCode;  // after name
+  bool isParallel;
 };
 }  // namespace My::MyECS
 

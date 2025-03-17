@@ -40,7 +40,8 @@ class Schedule {
   template <typename Func>
   const SystemFunc* RegisterEntityJob(Func&&, std::string name,
                                       ArchetypeFilter = {}, CmptLocator = {},
-                                      SingletonLocator = {});
+                                      SingletonLocator = {},
+                                      bool isParallel = true);
 
   // Func's argument list:
   // World*
@@ -50,7 +51,8 @@ class Schedule {
   template <typename Func>
   const SystemFunc* RegisterChunkJob(Func&&, std::string name,
                                      ArchetypeFilter = {},
-                                     SingletonLocator = {});
+                                     SingletonLocator = {},
+                                     bool isParallel = true);
 
   // Func's argument list:
   // World*

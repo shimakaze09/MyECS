@@ -31,7 +31,7 @@ class RTDSystem : public System {
     schedule.RegisterEntityJob(
         [](CmptsView cmpts) {
           auto luaCmpt =
-              cmpts.GetCmpt(CmptAccessType{"LuaCmpt", AccessMode::LATEST});src/test/12_framegraph/main.cpp
+              cmpts.GetCmpt(CmptAccessType{"LuaCmpt", AccessMode::LATEST});
           const double& val = *reinterpret_cast<const double*>(luaCmpt.Ptr());
           cout << "value : " << val << endl;
         },

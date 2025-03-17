@@ -6,19 +6,23 @@
 
 namespace My::MyECS {
 template <typename Func>
-const SystemFunc* Schedule::RegisterEntityJob(
-    Func&& func, std::string name, ArchetypeFilter filter,
-    CmptLocator cmptLocator, SingletonLocator singletonLocator) {
+const SystemFunc* Schedule::RegisterEntityJob(Func&& func, std::string name,
+                                              ArchetypeFilter filter,
+                                              CmptLocator cmptLocator,
+                                              SingletonLocator singletonLocator,
+                                              bool isParallel) {
   return Request(std::forward<Func>(func), std::move(name), std::move(filter),
-                 std::move(cmptLocator), std::move(singletonLocator));
+                 std::move(cmptLocator), std::move(singletonLocator),
+                 isParallel);
 }
 
 template <typename Func>
-const SystemFunc* Schedule::RegisterChunkJob(
-    Func&& func, std::string name, ArchetypeFilter filter,
-    SingletonLocator singletonLocator) {
+const SystemFunc* Schedule::RegisterChunkJob(Func&& func, std::string name,
+                                             ArchetypeFilter filter,
+                                             SingletonLocator singletonLocator,
+                                             bool isParallel) {
   return Request(std::forward<Func>(func), std::move(name), std::move(filter),
-                 std::move(singletonLocator));
+                 std::move(singletonLocator), isParallel);
 }
 
 template <typename Func>
