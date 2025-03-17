@@ -49,10 +49,13 @@ string World::DumpUpdateJobGraph() const {
 }
 
 void World::Run(SystemFunc* sys) {
-  Job job;
-  JobExecutor executor;
-  entityMngr.AutoGen(this, &job, sys);
-  executor.run(job).wait();
+  if (sys->IsParallel()) {
+    Job job;
+    JobExecutor executor;
+    entityMngr.AutoGen(this, &job, sys);
+    executor.run(job).wait();
+  } else
+    entityMngr.AutoGen(this, nullptr, sys);
 }
 
 // after running Update
