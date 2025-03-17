@@ -17,6 +17,8 @@ class CmptPtr {
   template <typename Cmpt>
   constexpr CmptPtr(Cmpt* p) noexcept : type{CmptType::Of<Cmpt>}, p{p} {}
 
+  constexpr CmptPtr() noexcept : CmptPtr{Invalid()} {}
+
   constexpr void* Ptr() const noexcept { return p; }
 
   constexpr CmptType Type() const noexcept { return type; }
@@ -53,6 +55,8 @@ class CmptAccessPtr {
 
   explicit constexpr CmptAccessPtr(CmptPtr p) noexcept
       : CmptAccessPtr{p, AccessMode::LATEST} {}
+
+  explicit constexpr CmptAccessPtr() noexcept : CmptAccessPtr{Invalid()} {}
 
   explicit constexpr operator CmptPtr() const noexcept {
     return {CmptType{accessType}, p};

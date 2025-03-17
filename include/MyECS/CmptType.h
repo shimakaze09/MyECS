@@ -20,6 +20,8 @@ class CmptType {
   explicit constexpr CmptType(std::string_view type_name) noexcept
       : hashcode{RuntimeTypeID(type_name)} {}
 
+  explicit constexpr CmptType() noexcept : CmptType{Invalid()} {}
+
   template <typename Cmpt, std::enable_if_t<!IsTaggedCmpt_v<Cmpt>, int> = 0>
   static constexpr CmptType Of = CmptType{TypeID<Cmpt>};
 
@@ -76,6 +78,8 @@ class CmptAccessType {
 
   explicit constexpr CmptAccessType(CmptType type) noexcept
       : CmptAccessType{type, AccessMode::LATEST} {}
+
+  explicit constexpr CmptAccessType() noexcept : CmptAccessType{Invalid()} {}
 
   template <typename Cmpt, AccessMode mode = AccessMode::LATEST>
   static constexpr CmptAccessType Of = CmptAccessType{
