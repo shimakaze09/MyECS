@@ -26,7 +26,7 @@ class CmptLocator {
 
   size_t HashCode() const noexcept { return hashCode; }
 
-  const std::set<CmptAccessType>& CmptAccessTypes() const noexcept {
+  const CmptAccessTypeSet& CmptAccessTypes() const noexcept {
     return cmptTypes;
   }
 
@@ -35,7 +35,7 @@ class CmptLocator {
  private:
   size_t GenHashCode() const noexcept;
 
-  std::set<CmptAccessType> cmptTypes;
+  CmptAccessTypeSet cmptTypes;
 
   size_t hashCode;
 };

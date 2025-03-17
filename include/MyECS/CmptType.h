@@ -10,6 +10,8 @@
 
 #include <MyTemplate/TypeID.h>
 
+#include <set>
+
 namespace My::MyECS {
 // Component Type
 // use a hashcode to distinguish different type
@@ -125,10 +127,66 @@ class CmptAccessType {
     return type != rhs.type;
   }
 
+  constexpr bool operator<(const CmptType& rhs) const noexcept {
+    return type < rhs;
+  }
+
+  constexpr bool operator<=(const CmptType& rhs) const noexcept {
+    return type <= rhs;
+  }
+
+  constexpr bool operator>(const CmptType& rhs) const noexcept {
+    return type > rhs;
+  }
+
+  constexpr bool operator>=(const CmptType& rhs) const noexcept {
+    return type >= rhs;
+  }
+
+  constexpr bool operator==(const CmptType& rhs) const noexcept {
+    return type == rhs;
+  }
+
+  constexpr bool operator!=(const CmptType& rhs) const noexcept {
+    return type != rhs;
+  }
+
+  friend constexpr bool operator<(const CmptType& lhs,
+                                  const CmptAccessType& rhs) noexcept {
+    return lhs < rhs.type;
+  }
+
+  friend constexpr bool operator<=(const CmptType& lhs,
+                                   const CmptAccessType& rhs) noexcept {
+    return lhs <= rhs.type;
+  }
+
+  friend constexpr bool operator>(const CmptType& lhs,
+                                  const CmptAccessType& rhs) noexcept {
+    return lhs > rhs.type;
+  }
+
+  friend constexpr bool operator>=(const CmptType& lhs,
+                                   const CmptAccessType& rhs) noexcept {
+    return lhs >= rhs.type;
+  }
+
+  friend constexpr bool operator==(const CmptType& lhs,
+                                   const CmptAccessType& rhs) noexcept {
+    return lhs == rhs.type;
+  }
+
+  friend constexpr bool operator!=(const CmptType& lhs,
+                                   const CmptAccessType& rhs) noexcept {
+    return lhs != rhs.type;
+  }
+
  private:
   CmptType type;
   AccessMode mode;
 };
+
+using CmptAccessTypeSet = std::set<CmptAccessType, std::less<>>;
 }  // namespace My::MyECS
 
 #include "detail/CmptType.inl"
