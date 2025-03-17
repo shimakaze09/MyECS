@@ -27,7 +27,7 @@ class RTDSystem : public System {
           double& val = *reinterpret_cast<double*>(luaCmpt.Ptr());
           val = 520.;
         },
-        "write", ArchetypeFilter{}, locator_write);
+        "write", true, ArchetypeFilter{}, locator_write);
     schedule.RegisterEntityJob(
         [](CmptsView cmpts) {
           auto luaCmpt =
@@ -35,7 +35,7 @@ class RTDSystem : public System {
           const double& val = *reinterpret_cast<const double*>(luaCmpt.Ptr());
           cout << "value : " << val << endl;
         },
-        "read", ArchetypeFilter{}, locator_read);
+        "read", true, ArchetypeFilter{}, locator_read);
   }
 };
 

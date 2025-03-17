@@ -21,7 +21,7 @@ class EntityMngr;
 class SystemMngr;
 
 // [description]
-// system information record
+// system infomation record
 // - SystemFunc
 // - orders
 // - dynamic filter changes
@@ -39,9 +39,9 @@ class Schedule {
   // CmptsView
   template <typename Func>
   const SystemFunc* RegisterEntityJob(Func&&, std::string name,
+                                      bool isParallel = true,
                                       ArchetypeFilter = {}, CmptLocator = {},
-                                      SingletonLocator = {},
-                                      bool isParallel = true);
+                                      SingletonLocator = {});
 
   // Func's argument list:
   // World*
@@ -51,8 +51,8 @@ class Schedule {
   template <typename Func>
   const SystemFunc* RegisterChunkJob(Func&&, std::string name,
                                      ArchetypeFilter = {},
-                                     SingletonLocator = {},
-                                     bool isParallel = true);
+                                     bool isParallel = true,
+                                     SingletonLocator = {});
 
   // Func's argument list:
   // World*

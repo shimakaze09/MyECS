@@ -132,6 +132,7 @@ class EntityMngr {
   void GenEntityJob(World*, Job*, SystemFunc*) const;
   void GenChunkJob(World*, Job*, SystemFunc*) const;
   void GenJob(World*, Job*, SystemFunc*) const;
+  void AutoGen(World*, Job*, SystemFunc*) const;
 
   struct EntityInfo {
     Archetype* archetype{nullptr};

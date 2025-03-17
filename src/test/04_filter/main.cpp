@@ -33,7 +33,7 @@ class MySystem : public System {
     filter.none = {CmptType::Of<D>};
 
     schedule.RegisterEntityJob([](const E* e) { cout << e->val << endl; },
-                               "test filter", filter);
+                               "test filter", true, filter);
   }
 };
 

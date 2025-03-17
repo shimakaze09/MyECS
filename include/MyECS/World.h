@@ -30,7 +30,7 @@ class World {
   void Update();
 
   // after running Update
-  // you can use graphviz to visualize the graph
+  // you can use graphviz to vistualize the graph
   std::string DumpUpdateJobGraph() const;
 
   // after running Update
@@ -40,6 +40,34 @@ class World {
   void Accept(IListener*) const;
 
   void AddCommand(std::function<void(World*)> command);
+
+  // Func's argument list:
+  // World*
+  // {LastFrame|Latest}<Singleton<Cmpt>>
+  // SingletonsView
+  // Entity
+  // size_t indexInQuery
+  // <tagged-components>: [const] <Cmpt>*...
+  // CmptsView
+  template <typename Func>
+  void RunEntityJob(Func&&, bool isParallel = true, ArchetypeFilter = {},
+                    CmptLocator = {}, SingletonLocator = {});
+
+  // Func's argument list:
+  // World*
+  // {LastFrame|Latest}<Singleton<Cmpt>>
+  // SingletonsView
+  // ChunkView (necessary)
+  template <typename Func>
+  void RunChunkJob(Func&&, ArchetypeFilter = {}, bool isParallel = true,
+                   SingletonLocator = {});
+
+  // Func's argument list:
+  // World*
+  // {LastFrame|Write|Latest}<Singleton<Cmpt>>
+  // SingletonsView
+  template <typename Func>
+  void RunJob(Func&&, SingletonLocator = {});
 
  private:
   mutable JobExecutor executor;
@@ -54,6 +82,8 @@ class World {
   std::mutex commandBufferMutex;
   void RunCommands();
 
+  void Run(SystemFunc*);
+
   // ==================================================
   World(const World& world) = delete;
   World(World&& world) = delete;
@@ -61,3 +91,5 @@ class World {
   World& operator=(const World& world) = delete;
 };
 }  // namespace My::MyECS
+
+#include "detail/World.inl"

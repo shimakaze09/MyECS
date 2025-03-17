@@ -34,7 +34,7 @@ class MySystem : public System {
     filter.any = {CmptAccessType::Of<E>, CmptAccessType::Of<F>};
     filter.none = {CmptType::Of<G>};
     schedule.RegisterEntityJob([](LastFrame<A> a, Write<B> b, Latest<C> c) {},
-                               "System Func", filter);
+                               "System Func", true, filter);
   }
 };
 
