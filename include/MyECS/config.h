@@ -12,6 +12,6 @@
  constexpr size_t CHUNK_ALIGNMENT = 64;
  
  // 16384 bytes : 16 KB
- // it has to be a multiple of UECS_CHUNK_ALIGNMENT and an exponent of 2
+ // it has to be a multiple of MYECS_CHUNK_ALIGNMENT and an exponent of 2
  constexpr size_t CHUNK_SIZE = 16384;
  }
