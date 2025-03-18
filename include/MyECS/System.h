@@ -9,6 +9,7 @@
 namespace My::MyECS {
 class World;
 
+// stateless
 class System {
  public:
   System(World* world, std::string name) noexcept : world{world}, name{name} {}

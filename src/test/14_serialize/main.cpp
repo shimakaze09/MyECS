@@ -137,7 +137,7 @@ class Dumper : public IListener {
     cout << "{" << endl;
     indent++;
     PrintIndent();
-    cout << "\"type\" : \"" << w->entityMngr.cmptTraits.Nameof(cmpt->Type())
+    cout << "\"type\" : \"" << w->cmptTraits.Nameof(cmpt->Type())
          << "\"";
     if (cmpt->Type().Is<Velocity>()) {
       auto v = cmpt->As<Velocity>();
@@ -172,7 +172,7 @@ class MoverSystem : public System {
 
 int main() {
   World w;
-  w.entityMngr.cmptTraits.Register<Position, Velocity>();
+  w.cmptTraits.Register<Position, Velocity>();
   w.systemMngr.Register<MoverSystem>();
   w.entityMngr.Create<Position, Velocity>();
   w.entityMngr.Create<Position>();

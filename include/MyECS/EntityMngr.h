@@ -32,7 +32,12 @@ class IListener;
 // - when free entries is empty, use new entity entry (version is 0)
 class EntityMngr {
  public:
-  RTDCmptTraits cmptTraits;
+  EntityMngr(World* world) : world{world} {}
+
+  EntityMngr(const EntityMngr& em);
+
+  // same world
+  void Swap(EntityMngr& rhs) noexcept;
 
   template <typename... Cmpts>
   std::tuple<Entity, Cmpts*...> Create();
@@ -108,11 +113,10 @@ class EntityMngr {
 
  private:
   Pool<Chunk> sharedChunkPool;  // destruct finally
+  World* world;
 
   friend class World;
   friend class Archetype;
-
-  EntityMngr() = default;
 
   static bool IsSet(const CmptType* types, size_t num) noexcept;
 

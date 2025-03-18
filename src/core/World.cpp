@@ -10,7 +10,7 @@ using namespace My::MyECS;
 using namespace My;
 using namespace std;
 
-World::World() : systemMngr{this} {}
+World::World() : systemMngr{this}, entityMngr{this} {}
 
 void World::Update() {
   schedule.Clear();
@@ -114,7 +114,7 @@ MyGraphviz::Graph World::GenUpdateFrameGraph() const {
   unordered_map<size_t, size_t> sysFuncHashcode2idx;
 
   auto queryCmptName = [this](CmptType type) -> string {
-    auto cmptName = entityMngr.cmptTraits.Nameof(type);
+    auto cmptName = cmptTraits.Nameof(type);
     return cmptName.empty() ? std::to_string(type.HashCode())
                             : string{cmptName};
   };

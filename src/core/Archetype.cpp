@@ -4,6 +4,8 @@
 
 #include <MyECS/detail/Archetype.h>
 
+#include <MyECS/World.h>
+
 #include <MyECS/EntityMngr.h>
 
 using namespace My::MyECS;
@@ -29,6 +31,36 @@ Archetype::~Archetype() {
   }
   for (Chunk* chunk : chunks)
     entityMngr->sharedChunkPool.Recycle(chunk);
+}
+
+Archetype::Archetype(EntityMngr* em, const Archetype& src) : entityMngr{em} {
+  types = src.types;
+  cmptTraits = src.cmptTraits;
+  type2offset = src.type2offset;
+  entityNum = src.entityNum;
+  chunkCapacity = src.chunkCapacity;
+
+  chunks.resize(src.chunks.size(), nullptr);
+  for (size_t i = 0; i < src.chunks.size(); i++) {
+    auto srcChunk = src.chunks[i];
+    auto dstChunk = chunks[i] = entityMngr->sharedChunkPool.Request();
+    size_t num = src.EntityNumOfChunk(i);
+    for (auto type : types.data) {
+      auto offset = Offsetof(type);
+      auto srcBegin = srcChunk->Data() + offset;
+      auto dstBegin = dstChunk->Data() + offset;
+      auto size = cmptTraits.Sizeof(type);
+      auto target = cmptTraits.copy_constructors.find(type);
+      if (target != cmptTraits.copy_constructors.end()) {
+        const auto& copy_ctor = target->second;
+        for (size_t j = 0; j < num; j++) {
+          auto offset_j = j * size;
+          copy_ctor(dstBegin + offset_j, srcBegin + offset_j);
+        }
+      } else
+        memcpy(dstBegin, srcBegin, num * size);
+    }
+  }
 }
 
 void Archetype::SetLayout() {
@@ -63,7 +95,7 @@ Archetype* Archetype::New(EntityMngr* entityMngr, const CmptType* types,
   rst->types.data.insert(CmptType::Of<Entity>);
   rst->cmptTraits.Register<Entity>();
   for (size_t i = 0; i < num; i++)
-    rst->cmptTraits.Register(entityMngr->cmptTraits, types[i]);
+    rst->cmptTraits.Register(entityMngr->world->cmptTraits, types[i]);
   rst->SetLayout();
   return rst;
 }
@@ -79,7 +111,7 @@ Archetype* Archetype::Add(const Archetype* from, const CmptType* types,
   rst->cmptTraits = from->cmptTraits;
   rst->types.Insert(types, num);
   for (size_t i = 0; i < num; i++)
-    rst->cmptTraits.Register(rst->entityMngr->cmptTraits, types[i]);
+    rst->cmptTraits.Register(rst->entityMngr->world->cmptTraits, types[i]);
 
   rst->SetLayout();
 
@@ -109,7 +141,7 @@ size_t Archetype::Create(Entity e) {
   size_t idxInChunk = idx % chunkCapacity;
   byte* buffer = chunks[idx / chunkCapacity]->Data();
 
-  const auto& rtdct = entityMngr->cmptTraits;
+  const auto& rtdct = entityMngr->world->cmptTraits;
   for (const auto& type : types.data) {
     if (type.Is<Entity>()) {
       constexpr size_t size = sizeof(Entity);

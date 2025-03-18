@@ -42,7 +42,7 @@ int main() {
   w.systemMngr.Register<MoverSystem>();
   w.entityMngr.Create<Position, Velocity>();
   w.entityMngr.Create<Timer>();
-  w.entityMngr.cmptTraits.Register<Timer, Velocity, Position>();
+  w.cmptTraits.Register<Timer, Velocity, Position>();
 
   w.Update();
   std::cout << w.DumpUpdateJobGraph() << std::endl;

@@ -3,7 +3,9 @@
 //
 
 #include <MyECS/EntityMngr.h>
+
 #include <MyECS/IListener.h>
+#include <MyECS/World.h>
 
 using namespace My::MyECS;
 using namespace std;
@@ -18,6 +20,47 @@ size_t EntityMngr::RequestEntityFreeEntry() {
   size_t entry = entityTableFreeEntry.back();
   entityTableFreeEntry.pop_back();
   return entry;
+}
+
+EntityMngr::EntityMngr(const EntityMngr& em) : world{em.world} {
+  ts2a.reserve(em.ts2a.size());
+  for (const auto& [ts, a] : em.ts2a) {
+    auto [iter, success] =
+        ts2a.try_emplace(ts, std::make_unique<Archetype>(this, *a));
+    assert(success);
+  }
+  entityTableFreeEntry = em.entityTableFreeEntry;
+  entityTable.resize(em.entityTable.size());
+  for (size_t i = 0; i < em.entityTable.size(); i++) {
+    auto& dst = entityTable[i];
+    const auto& src = em.entityTable[i];
+    dst.idxInArchetype = src.idxInArchetype;
+    dst.version = src.version;
+    dst.archetype = ts2a.find(src.archetype->types)->second.get();
+  }
+  queryCache.reserve(em.queryCache.size());
+  for (const auto& [query, srcArchetypes] : em.queryCache) {
+    auto& dstArchetypes = queryCache[query];
+    for (auto archetype : srcArchetypes)
+      dstArchetypes.insert(ts2a.find(archetype->types)->second.get());
+  }
+}
+
+void EntityMngr::Swap(EntityMngr& rhs) noexcept {
+  assert(world == rhs.world);
+
+  using std::swap;
+
+  swap(ts2a, rhs.ts2a);
+  swap(entityTableFreeEntry, rhs.entityTableFreeEntry);
+  swap(entityTable, rhs.entityTable);
+  swap(queryCache, rhs.queryCache);
+
+  auto pool = std::move(sharedChunkPool);
+  sharedChunkPool.~Pool();
+  new (&sharedChunkPool) Pool<Chunk>(std::move(rhs.sharedChunkPool));
+  rhs.sharedChunkPool.~Pool();
+  new (&rhs.sharedChunkPool) Pool<Chunk>(std::move(pool));
 }
 
 void EntityMngr::RecycleEntityEntry(Entity e) {
@@ -121,8 +164,8 @@ void EntityMngr::Attach(Entity e, const CmptType* types, size_t num) {
     if (origArchetype->GetCmptTypeSet().Contains(type))
       continue;
 
-    auto target = cmptTraits.default_constructors.find(type);
-    if (target == cmptTraits.default_constructors.end())
+    auto target = world->cmptTraits.default_constructors.find(type);
+    if (target == world->cmptTraits.default_constructors.end())
       continue;
 
     target->second(info.archetype->At(type, info.idxInArchetype));
@@ -363,11 +406,11 @@ void EntityMngr::GenChunkJob(World* w, Job* job, SystemFunc* sys) const {
     assert(job != nullptr);
     for (Archetype* archetype : QueryArchetypes(sys->entityQuery)) {
       size_t chunkNum = archetype->ChunkNum();
-      SingletonsView singletonsView{singletons.data(), singletons.size()};
 
       for (size_t i = 0; i < chunkNum; i++) {
         job->emplace([=, singletons = singletons]() {
-          (*sys)(w, singletonsView, ChunkView{archetype, i});
+          (*sys)(w, SingletonsView{singletons.data(), singletons.size()},
+                 ChunkView{archetype, i});
         });
       }
     }
