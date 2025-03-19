@@ -29,11 +29,13 @@ Archetype::~Archetype() {
       }
     }
   }
-  for (Chunk* chunk : chunks)
-    entityMngr->sharedChunkPool.Recycle(chunk);
+  // FastClear by EntityMngr
+  // for (Chunk* chunk : chunks)
+  //   entityMngr->sharedChunkPool.Recycle(chunk);
 }
 
-Archetype::Archetype(EntityMngr* em, const Archetype& src) : entityMngr{em} {
+Archetype::Archetype(Pool<Chunk>* pool, const Archetype& src)
+    : chunkPool{pool} {
   types = src.types;
   cmptTraits = src.cmptTraits;
   type2offset = src.type2offset;
@@ -43,7 +45,7 @@ Archetype::Archetype(EntityMngr* em, const Archetype& src) : entityMngr{em} {
   chunks.resize(src.chunks.size(), nullptr);
   for (size_t i = 0; i < src.chunks.size(); i++) {
     auto srcChunk = src.chunks[i];
-    auto dstChunk = chunks[i] = entityMngr->sharedChunkPool.Request();
+    auto dstChunk = chunks[i] = chunkPool->Request();
     size_t num = src.EntityNumOfChunk(i);
     for (auto type : types.data) {
       auto offset = Offsetof(type);
@@ -86,32 +88,32 @@ void Archetype::SetLayout() {
     type2offset.emplace(type, layout.offsets[i++]);
 }
 
-Archetype* Archetype::New(EntityMngr* entityMngr, const CmptType* types,
-                          size_t num) {
+Archetype* Archetype::New(RTDCmptTraits& rtdCmptTraits, Pool<Chunk>* chunkPool,
+                          const CmptType* types, size_t num) {
   assert(NotContainEntity(types, num));
 
-  auto rst = new Archetype{entityMngr};
+  auto rst = new Archetype{chunkPool};
   rst->types.Insert(types, num);
   rst->types.data.insert(CmptType::Of<Entity>);
   rst->cmptTraits.Register<Entity>();
   for (size_t i = 0; i < num; i++)
-    rst->cmptTraits.Register(entityMngr->world->cmptTraits, types[i]);
+    rst->cmptTraits.Register(rtdCmptTraits, types[i]);
   rst->SetLayout();
   return rst;
 }
 
-Archetype* Archetype::Add(const Archetype* from, const CmptType* types,
-                          size_t num) {
+Archetype* Archetype::Add(RTDCmptTraits& rtdCmptTraits, const Archetype* from,
+                          const CmptType* types, size_t num) {
   assert(NotContainEntity(types, num));
   assert(!from->types.ContainsAll(types, num));
 
-  Archetype* rst = new Archetype{from->entityMngr};
+  Archetype* rst = new Archetype{from->chunkPool};
 
   rst->types = from->types;
   rst->cmptTraits = from->cmptTraits;
   rst->types.Insert(types, num);
   for (size_t i = 0; i < num; i++)
-    rst->cmptTraits.Register(rst->entityMngr->world->cmptTraits, types[i]);
+    rst->cmptTraits.Register(rtdCmptTraits, types[i]);
 
   rst->SetLayout();
 
@@ -123,7 +125,7 @@ Archetype* Archetype::Remove(const Archetype* from, const CmptType* types,
   assert(NotContainEntity(types, num));
   assert(from->types.ContainsAny(types, num));
 
-  Archetype* rst = new Archetype{from->entityMngr};
+  Archetype* rst = new Archetype{from->chunkPool};
 
   rst->types = from->types;
   rst->cmptTraits = from->cmptTraits;
@@ -136,20 +138,19 @@ Archetype* Archetype::Remove(const Archetype* from, const CmptType* types,
   return rst;
 }
 
-size_t Archetype::Create(Entity e) {
+size_t Archetype::Create(RTDCmptTraits& rtdCmptTraits, Entity e) {
   size_t idx = RequestBuffer();
   size_t idxInChunk = idx % chunkCapacity;
   byte* buffer = chunks[idx / chunkCapacity]->Data();
 
-  const auto& rtdct = entityMngr->world->cmptTraits;
   for (const auto& type : types.data) {
     if (type.Is<Entity>()) {
       constexpr size_t size = sizeof(Entity);
       size_t offset = Offsetof(type);
       memcpy(buffer + offset + idxInChunk * size, &e, size);
     } else {
-      auto target = rtdct.GetDefaultConstructors().find(type);
-      if (target == rtdct.GetDefaultConstructors().end())
+      auto target = rtdCmptTraits.GetDefaultConstructors().find(type);
+      if (target == rtdCmptTraits.GetDefaultConstructors().end())
         continue;
       const auto& ctor = target->second;
       size_t size = cmptTraits.Sizeof(type);
@@ -164,7 +165,7 @@ size_t Archetype::Create(Entity e) {
 
 size_t Archetype::RequestBuffer() {
   if (entityNum == chunks.size() * chunkCapacity) {
-    auto chunk = entityMngr->sharedChunkPool.Request();
+    auto chunk = chunkPool->Request();
     chunks.push_back(chunk);
   }
   return entityNum++;
@@ -254,7 +255,7 @@ size_t Archetype::Erase(size_t idx) {
   size_t dstIdxInChunk = idx % chunkCapacity;
   byte* dstBuffer = chunks[idx / chunkCapacity]->Data();
 
-  size_t movedIdx;
+  size_t movedIdx = size_t_invalid;
 
   if (idx != entityNum - 1) {
     size_t movedIdxInArchetype = entityNum - 1;
@@ -275,8 +276,6 @@ size_t Archetype::Erase(size_t idx) {
       cmptTraits.Destruct(type, src);
     }
   } else {
-    movedIdx = size_t_invalid;
-
     for (const auto& type : types.data) {
       size_t size = cmptTraits.Sizeof(type);
       size_t offset = Offsetof(type);
@@ -289,7 +288,7 @@ size_t Archetype::Erase(size_t idx) {
 
   if (chunks.size() * chunkCapacity - entityNum >= chunkCapacity) {
     Chunk* chunk = chunks.back();
-    entityMngr->sharedChunkPool.Recycle(chunk);
+    chunkPool->Recycle(chunk);
     chunks.pop_back();
   }
 

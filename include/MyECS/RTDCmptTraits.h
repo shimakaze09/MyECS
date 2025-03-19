@@ -10,7 +10,7 @@
 #include <unordered_map>
 
 namespace My::MyECS {
-// run-time dynamic component traits, singleton
+// run-time dynamic component traits
 // size (> 0) is necessary
 // optional
 // - alignment: alignof(std::max_align_t) as default, 8 / 16 in most cases

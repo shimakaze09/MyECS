@@ -17,7 +17,7 @@ Archetype* EntityMngr::GetOrCreateArchetypeOf() {
   if (target != ts2a.end())
     return target->second.get();
 
-  auto archetype = new Archetype(this, TypeList<Cmpts...>{});
+  auto archetype = new Archetype(sharedChunkPool.get(), TypeList<Cmpts...>{});
   ts2a.emplace(std::move(typeset), std::unique_ptr<Archetype>{archetype});
   for (auto& [query, archetypes] : queryCache) {
     if (archetype->GetCmptTypeSet().IsMatch(query))

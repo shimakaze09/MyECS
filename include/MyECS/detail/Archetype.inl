@@ -8,8 +8,8 @@
 
 namespace My::MyECS {
 template <typename... Cmpts>
-Archetype::Archetype(EntityMngr* entityMngr, TypeList<Cmpts...>)
-    : entityMngr{entityMngr}, types(GenCmptTypeSet<Cmpts...>()) {
+Archetype::Archetype(Pool<Chunk>* chunkPool, TypeList<Cmpts...>)
+    : chunkPool{chunkPool}, types(GenCmptTypeSet<Cmpts...>()) {
   static_assert(IsSet_v<TypeList<Entity, Cmpts...>>,
                 "<Cmpts>... must be different");
   cmptTraits.Register<Entity>();
@@ -24,7 +24,7 @@ Archetype* Archetype::Add(const Archetype* from) {
                 "<Cmpts>... must be different");
   assert(!(from->types.Contains(CmptType::Of<Cmpts>) && ...));
 
-  Archetype* rst = new Archetype{from->entityMngr};
+  Archetype* rst = new Archetype{from->chunkPool};
 
   rst->types = from->types;
   (rst->types.data.insert(CmptType::Of<Cmpts>), ...);

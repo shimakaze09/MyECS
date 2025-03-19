@@ -4,10 +4,6 @@
 
 #pragma once
 
-#include <MyContainer/Pool.h>
-
-#include <memory>
-
 #include "EntityQuery.h"
 #include "SystemFunc.h"
 #include "detail/Archetype.h"
@@ -32,9 +28,11 @@ class IListener;
 // - when free entries is empty, use new entity entry (version is 0)
 class EntityMngr {
  public:
-  EntityMngr(World* world) : world{world} {}
+  EntityMngr(World* world)
+      : world{world}, sharedChunkPool{std::make_unique<Pool<Chunk>>()} {}
 
   EntityMngr(const EntityMngr& em);
+  ~EntityMngr();
 
   // same world
   void Swap(EntityMngr& rhs) noexcept;
@@ -112,7 +110,6 @@ class EntityMngr {
   void Accept(IListener* listener) const;
 
  private:
-  Pool<Chunk> sharedChunkPool;  // destruct finally
   World* world;
 
   friend class World;
@@ -153,6 +150,7 @@ class EntityMngr {
   size_t RequestEntityFreeEntry();
   void RecycleEntityEntry(Entity);
 
+  std::unique_ptr<Pool<Chunk>> sharedChunkPool;
   std::unordered_map<CmptTypeSet, std::unique_ptr<Archetype>>
       ts2a;  // archetype's CmptTypeSet to archetype
 };

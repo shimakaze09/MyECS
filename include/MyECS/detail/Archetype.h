@@ -4,17 +4,20 @@
 
 #pragma once
 
+#include "../CmptLocator.h"
+#include "../CmptPtr.h"
+#include "../Entity.h"
+
+#include "Chunk.h"
+#include "CmptTypeSet.h"
+#include "RTSCmptTraits.h"
+
+#include <MyContainer/Pool.h>
+
 #include <MyTemplate/TypeID.h>
 #include <MyTemplate/Typelist.h>
 
 #include <map>
-
-#include "../CmptLocator.h"
-#include "../CmptPtr.h"
-#include "../Entity.h"
-#include "Chunk.h"
-#include "CmptTypeSet.h"
-#include "RTSCmptTraits.h"
 
 namespace My::MyECS {
 class EntityMngr;
@@ -23,24 +26,28 @@ class EntityMngr;
 // type of Entity + Components is Archetype's type
 class Archetype {
  public:
+  Archetype(Pool<Chunk>* chunkPool) : chunkPool{chunkPool} {}
+
   // argument TypeList<Cmpts...> is for type deduction
   // auto add Entity
   template <typename... Cmpts>
-  Archetype(EntityMngr*, TypeList<Cmpts...>);
+  Archetype(Pool<Chunk>* chunkPool, TypeList<Cmpts...>);
 
   // copy
-  Archetype(EntityMngr*, const Archetype&);
+  Archetype(Pool<Chunk>* chunkPool, const Archetype&);
+  Archetype(const Archetype&) = delete;
 
   ~Archetype();
 
-  // auto add Entity, use RTDCmptTraits
-  static Archetype* New(EntityMngr*, const CmptType* types, size_t num);
+  // auto add Entity
+  static Archetype* New(RTDCmptTraits&, Pool<Chunk>* chunkPool,
+                        const CmptType* types, size_t num);
 
   // auto add Entity
   template <typename... Cmpts>
   static Archetype* Add(const Archetype* from);
-  static Archetype* Add(const Archetype* from, const CmptType* types,
-                        size_t num);
+  static Archetype* Add(RTDCmptTraits&, const Archetype* from,
+                        const CmptType* types, size_t num);
 
   // auto add Entity
   static Archetype* Remove(const Archetype* from, const CmptType* types,
@@ -76,8 +83,7 @@ class Archetype {
   template <typename... Cmpts>
   std::tuple<size_t, std::tuple<Cmpts*...>> Create(Entity);
 
-  // use RTDCmptTraits's default constructor
-  size_t Create(Entity);
+  size_t Create(RTDCmptTraits&, Entity);
 
   // return index in archetype
   size_t Instantiate(Entity, size_t srcIdx);
@@ -107,8 +113,6 @@ class Archetype {
   static CmptTypeSet GenCmptTypeSet();
 
  private:
-  Archetype(EntityMngr* entityMngr) : entityMngr{entityMngr} {}
-
   // set type2alignment
   // call after setting type2size and type2offset
   void SetLayout();
@@ -120,7 +124,6 @@ class Archetype {
   static bool NotContainEntity(const CmptType* types, size_t num) noexcept;
 
   friend class EntityMngr;
-  EntityMngr* entityMngr;
 
   CmptTypeSet types;  // Entity + Components
   RTSCmptTraits cmptTraits;
@@ -128,6 +131,7 @@ class Archetype {
       type2offset;  // CmptType to offset in chunk (include Entity)
 
   size_t chunkCapacity{size_t_invalid};
+  Pool<Chunk>* chunkPool;
   std::vector<Chunk*> chunks;
 
   size_t entityNum{0};  // number of entities
