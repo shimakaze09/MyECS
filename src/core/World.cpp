@@ -13,6 +13,8 @@ using namespace std;
 World::World() : systemMngr{this}, entityMngr{this} {}
 
 void World::Update() {
+  inRunningJobGraph = true;
+
   schedule.Clear();
   for (auto job : jobs)
     jobPool.Recycle(job);
@@ -40,6 +42,7 @@ void World::Update() {
   }
 
   executor.run(jobGraph).wait();
+  inRunningJobGraph = false;
 
   RunCommands();
 }
@@ -50,8 +53,8 @@ string World::DumpUpdateJobGraph() const {
 
 void World::Run(SystemFunc* sys) {
   if (sys->IsParallel()) {
+    assert(!inRunningJobGraph);
     Job job;
-    JobExecutor executor;
     entityMngr.AutoGen(this, &job, sys);
     executor.run(job).wait();
   } else
@@ -278,6 +281,7 @@ void World::Accept(IListener* listener) const {
 }
 
 void World::AddCommand(std::function<void(World*)> command) {
+  assert(inRunningJobGraph);
   std::lock_guard<std::mutex> guard(commandBufferMutex);
   commandBuffer.push_back(std::move(command));
 }

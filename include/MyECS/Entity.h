@@ -23,7 +23,7 @@ class Entity {
     return {size_t_invalid, size_t_invalid};
   }
 
-  constexpr bool IsValid() const noexcept { return idx == size_t_invalid; }
+  constexpr bool Valid() const noexcept { return idx != size_t_invalid; }
 
   constexpr bool operator==(const Entity& rhs) const noexcept {
     return idx == rhs.idx && version == rhs.version;

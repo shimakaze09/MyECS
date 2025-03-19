@@ -1,0 +1,6 @@
+GET_TARGET_NAME(CORE "${PROJECT_SOURCE_DIR}/src/core")
+ADD_TARGET(
+        MODE EXE
+        INC_PRIVATE
+        "${PROJECT_SOURCE_DIR}/include"
+)

@@ -30,6 +30,8 @@ class World {
   // 4. run commands in main thread
   void Update();
 
+  void AddCommand(std::function<void(World*)> command);
+
   // after running Update
   // you can use graphviz to vistualize the graph
   std::string DumpUpdateJobGraph() const;
@@ -40,7 +42,8 @@ class World {
 
   void Accept(IListener*) const;
 
-  void AddCommand(std::function<void(World*)> command);
+  // you can't run several parallel jobs in parallel because there is only an executor
+  // you can't run parallel jobs in running job graph
 
   // Func's argument list:
   // World*
@@ -71,6 +74,8 @@ class World {
   void RunJob(Func&&, SingletonLocator = {});
 
  private:
+  bool inRunningJobGraph{false};
+
   mutable JobExecutor executor;
   Schedule schedule;
 
