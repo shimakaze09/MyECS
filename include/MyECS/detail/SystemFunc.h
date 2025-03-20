@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include "ChunkView.h"
-#include "CmptsView.h"
-#include "Entity.h"
-#include "EntityQuery.h"
-#include "SingletonLocator.h"
-#include "SingletonsView.h"
+#include "../ChunkView.h"
+#include "../CmptsView.h"
+#include "../Entity.h"
+#include "../EntityQuery.h"
+#include "../SingletonLocator.h"
+#include "../SingletonsView.h"
 
 #include <functional>
 
@@ -88,4 +88,4 @@ class SystemFunc {
 };
 }  // namespace My::MyECS
 
-#include "detail/SystemFunc.inl"
+#include "SystemFunc.inl"

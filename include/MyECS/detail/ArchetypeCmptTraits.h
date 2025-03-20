@@ -12,7 +12,7 @@
 
 namespace My::MyECS {
 // run-time static component traits
-class RTSCmptTraits {
+class ArchetypeCmptTraits {
  public:
   size_t Sizeof(CmptType) const;
   size_t Alignof(CmptType) const;
@@ -45,4 +45,4 @@ class RTSCmptTraits {
 };
 }  // namespace My::MyECS
 
-#include "RTSCmptTraits.inl"
+#include "ArchetypeCmptTraits.inl"

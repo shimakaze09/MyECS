@@ -5,13 +5,13 @@
 #pragma once
 
 #include "EntityQuery.h"
-#include "SystemFunc.h"
+#include "SingletonLocator.h"
 #include "detail/Archetype.h"
 #include "detail/Job.h"
 
 namespace My::MyECS {
 class World;
-
+class SystemFunc;
 class IListener;
 
 // Entity Manager of World
@@ -28,11 +28,11 @@ class IListener;
 // - when free entries is empty, use new entity entry (version is 0)
 class EntityMngr {
  public:
-  EntityMngr(World* world)
-      : world{world}, sharedChunkPool{std::make_unique<Pool<Chunk>>()} {}
-
+  EntityMngr();
   EntityMngr(const EntityMngr& em);
   ~EntityMngr();
+
+  RTDCmptTraits cmptTraits;
 
   // same world
   void Swap(EntityMngr& rhs) noexcept;
@@ -110,8 +110,6 @@ class EntityMngr {
   void Accept(IListener* listener) const;
 
  private:
-  World* world;
-
   friend class World;
   friend class Archetype;
 

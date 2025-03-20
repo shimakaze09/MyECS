@@ -65,7 +65,7 @@ inline size_t RTDCmptTraits::Sizeof(CmptType type) const {
 inline size_t RTDCmptTraits::Alignof(CmptType type) const {
   auto target = alignments.find(type);
 
-  return target != alignments.end() ? target->second : default_alignment;
+  return target != alignments.end() ? target->second : DefaultAlignment();
 }
 
 inline void RTDCmptTraits::DefaultConstruct(CmptType type, void* cmpt) const {

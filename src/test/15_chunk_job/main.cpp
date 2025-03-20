@@ -67,7 +67,7 @@ int main() {
   World w;
   w.systemMngr.Register<SAB_System>();
 
-  w.cmptTraits.Register<S, A, B>();
+  w.entityMngr.cmptTraits.Register<S, A, B>();
 
   w.entityMngr.Create<S>();
   w.entityMngr.Create<S, A>();

@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "SystemFunc.h"
 #include "detail/Job.h"
 #include "detail/SysFuncGraph.h"
+#include "detail/SystemFunc.h"
 
 #include <MyContainer/Pool.h>
 

@@ -8,9 +8,9 @@
 #include "../CmptPtr.h"
 #include "../Entity.h"
 
+#include "ArchetypeCmptTraits.h"
 #include "Chunk.h"
 #include "CmptTypeSet.h"
-#include "RTSCmptTraits.h"
 
 #include <MyContainer/Pool.h>
 
@@ -97,7 +97,9 @@ class Archetype {
   // Components + Entity
   const CmptTypeSet& GetCmptTypeSet() const noexcept { return types; }
 
-  const RTSCmptTraits& GetRTSCmptTraits() const noexcept { return cmptTraits; }
+  const ArchetypeCmptTraits& GetArchetypeCmptTraits() const noexcept {
+    return cmptTraits;
+  }
 
   size_t EntityNum() const noexcept { return entityNum; }
 
@@ -126,7 +128,7 @@ class Archetype {
   friend class EntityMngr;
 
   CmptTypeSet types;  // Entity + Components
-  RTSCmptTraits cmptTraits;
+  ArchetypeCmptTraits cmptTraits;
   std::unordered_map<CmptType, size_t>
       type2offset;  // CmptType to offset in chunk (include Entity)
 

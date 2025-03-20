@@ -22,7 +22,6 @@ class World {
 
   SystemMngr systemMngr;
   EntityMngr entityMngr;
-  RTDCmptTraits cmptTraits;
 
   // 1. schedule: run registered System's static OnUpdate(Schedule&)
   // 2. gen job graph: schedule -> graph
