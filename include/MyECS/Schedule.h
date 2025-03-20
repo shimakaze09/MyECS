@@ -5,7 +5,6 @@
 #pragma once
 
 #include "detail/Job.h"
-#include "detail/SysFuncGraph.h"
 #include "detail/SystemFunc.h"
 
 #include <MyContainer/Pool.h>
@@ -19,6 +18,7 @@ struct Compiler;
 namespace My::MyECS {
 class EntityMngr;
 class SystemMngr;
+class SysFuncGraph;
 
 // [description]
 // system infomation record

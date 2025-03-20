@@ -6,6 +6,8 @@
 
 #include <MyECS/IListener.h>
 
+#include "SysFuncGraph.h"
+
 using namespace My::MyECS;
 using namespace My;
 using namespace std;

@@ -2,7 +2,7 @@
 // Created by Admin on 4/03/2025.
 //
 
-#include <MyECS/detail/SysFuncGraph.h>
+#include "SysFuncGraph.h"
 
 #include <queue>
 #include <stack>

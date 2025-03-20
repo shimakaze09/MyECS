@@ -6,7 +6,7 @@
 
 #include <MyContainer/Algorithm.h>
 
-#include <MyECS/World.h>
+#include "SysFuncGraph.h"
 
 using namespace My::MyECS;
 using namespace std;
