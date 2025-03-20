@@ -19,32 +19,35 @@ inline RTDCmptTraits& RTDCmptTraits::RegisterAlignment(CmptType type,
 }
 
 inline RTDCmptTraits& RTDCmptTraits::RegisterDefaultConstructor(
-    CmptType type, std::function<void(void*)> f) {
-  default_constructors.emplace(type, std::move(f));
+    CmptType type, void (*f)(void*)) {
+  default_constructors.emplace(type, f);
   return *this;
 }
 
-inline RTDCmptTraits& RTDCmptTraits::RegisterCopyConstructor(
-    CmptType type, std::function<void(void*, void*)> f) {
-  copy_constructors.emplace(type, std::move(f));
+inline RTDCmptTraits& RTDCmptTraits::RegisterCopyConstructor(CmptType type,
+                                                             void (*f)(void*,
+                                                                       void*)) {
+  copy_constructors.emplace(type, f);
   return *this;
 }
 
-inline RTDCmptTraits& RTDCmptTraits::RegisterMoveConstructor(
-    CmptType type, std::function<void(void*, void*)> f) {
-  move_constructors.emplace(type, move(f));
+inline RTDCmptTraits& RTDCmptTraits::RegisterMoveConstructor(CmptType type,
+                                                             void (*f)(void*,
+                                                                       void*)) {
+  move_constructors.emplace(type, f);
   return *this;
 }
 
-inline RTDCmptTraits& RTDCmptTraits::RegisterMoveAssignment(
-    CmptType type, std::function<void(void*, void*)> f) {
-  move_assignments.emplace(type, std::move(f));
+inline RTDCmptTraits& RTDCmptTraits::RegisterMoveAssignment(CmptType type,
+                                                            void (*f)(void*,
+                                                                      void*)) {
+  move_assignments.emplace(type, f);
   return *this;
 }
 
-inline RTDCmptTraits& RTDCmptTraits::RegisterDestructor(
-    CmptType type, std::function<void(void*)> f) {
-  destructors.emplace(type, std::move(f));
+inline RTDCmptTraits& RTDCmptTraits::RegisterDestructor(CmptType type,
+                                                        void (*f)(void*)) {
+  destructors.emplace(type, f);
   return *this;
 }
 
@@ -60,8 +63,9 @@ inline size_t RTDCmptTraits::Sizeof(CmptType type) const {
 }
 
 inline size_t RTDCmptTraits::Alignof(CmptType type) const {
-  assert(alignments.find(type) != alignments.end());
-  return alignments.find(type)->second;
+  auto target = alignments.find(type);
+
+  return target != alignments.end() ? target->second : default_alignment;
 }
 
 inline void RTDCmptTraits::DefaultConstruct(CmptType type, void* cmpt) const {
