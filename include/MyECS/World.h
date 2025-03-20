@@ -32,7 +32,7 @@ class World {
   // 4. run commands in main thread
   void Update();
 
-  void AddCommand(std::function<void()> command);
+  void AddCommand(std::function<void()> command, size_t layer = 0);
 
   // after running Update()
   // you can use graphviz to vistualize the graph
@@ -86,7 +86,7 @@ class World {
   Pool<Job> jobPool;
 
   // command
-  std::vector<std::function<void()>> commandBuffer;
+  std::map<size_t, std::vector<std::function<void()>>> commandBuffer;
   std::mutex commandBufferMutex;
   void RunCommands();
 

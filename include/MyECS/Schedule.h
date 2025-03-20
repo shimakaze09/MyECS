@@ -62,6 +62,10 @@ class Schedule {
   const SystemFunc* RegisterJob(Func&&, std::string name,
                                 SingletonLocator = {});
 
+  void RegisterCommand(std::function<void(World*)> command, size_t layer = 0) {
+    commandBuffer[layer].push_back(std::move(command));
+  }
+
   Schedule& Order(std::string_view x, std::string_view y);
 
   Schedule& LockFilter(std::string_view sys);
@@ -99,6 +103,8 @@ class Schedule {
 
   std::unordered_map<size_t, FilterChange> sysFilterChange;
   std::unordered_set<size_t> sysLockFilter;
+
+  std::map<size_t, std::vector<std::function<void(World*)>>> commandBuffer;
 
   Pool<SystemFunc> sysFuncPool;
   friend class World;
