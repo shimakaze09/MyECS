@@ -15,8 +15,7 @@ class Schedule;
 
 class SystemMngr {
  public:
-  const std::vector<std::function<void(Schedule&)>>& GetSystems()
-      const noexcept {
+  const std::vector<void (*)(Schedule&)>& GetSystems() const noexcept {
     return systems;
   }
 
@@ -37,7 +36,7 @@ class SystemMngr {
 
   void Clear();
 
-  size_t Register(std::string name, std::function<void(Schedule&)> func);
+  size_t Register(std::string name, void (*)(Schedule&));
   // name: nameof::nameof_type<System>
   // func: static void System::OnUpdate(Schedule&);
   template <typename System>
@@ -47,7 +46,7 @@ class SystemMngr {
   void Deactivate(size_t index);
 
  private:
-  std::vector<std::function<void(Schedule&)>> systems;
+  std::vector<void (*)(Schedule&)> systems;
   std::map<std::string, size_t, std::less<>> name2idx;
   std::set<size_t> activeSystemIndices;
 };
