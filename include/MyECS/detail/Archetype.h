@@ -90,7 +90,7 @@ class Archetype {
 
   // erase idx-th entity
   // if idx != num-1, back entity will put at idx, return moved Entity's index
-  // else return size_t_invalid
+  // else return static_cast<size_t>(-1)
   // move-assignment + destructor
   size_t Erase(size_t idx);
 
@@ -119,9 +119,7 @@ class Archetype {
   // call after setting type2size and type2offset
   void SetLayout();
 
-  size_t Offsetof(CmptType type) const {
-    return type2offset.find(type)->second;
-  }
+  size_t Offsetof(CmptType type) const { return type2offset.at(type); }
 
   static bool NotContainEntity(const CmptType* types, size_t num) noexcept;
 
@@ -132,7 +130,7 @@ class Archetype {
   std::unordered_map<CmptType, size_t>
       type2offset;  // CmptType to offset in chunk (include Entity)
 
-  size_t chunkCapacity{size_t_invalid};
+  size_t chunkCapacity{static_cast<size_t>(-1)};
   Pool<Chunk>* chunkPool;
   std::vector<Chunk*> chunks;
 

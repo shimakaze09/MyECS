@@ -9,11 +9,8 @@
 using namespace My::MyECS;
 using namespace std;
 
-class RTDSystem : public System {
- public:
-  using System::System;
-
-  virtual void OnUpdate(Schedule& schedule) override {
+struct RTDSystem {
+  static void OnUpdate(Schedule& schedule) {
     std::array cmpts_write = {CmptAccessType{"LuaCmpt", AccessMode::WRITE}};
     std::array cmpts_read = {CmptAccessType{"LuaCmpt", AccessMode::LATEST}};
 
@@ -46,7 +43,7 @@ int main() {
   // }
 
   World w;
-  w.systemMngr.Register<RTDSystem>();
+  auto rtdSystem = w.systemMngr.Register<RTDSystem>();
   w.entityMngr.cmptTraits.RegisterSize(type, 8)
       .RegisterDefaultConstructor(type,
                                   [](void*) { cout << "construct" << endl; })
@@ -54,7 +51,7 @@ int main() {
 
   auto [e] = w.entityMngr.Create();
   w.entityMngr.Attach(e, &type, 1);
-
+  w.systemMngr.Activate(rtdSystem);
   w.Update();
 
   cout << w.DumpUpdateJobGraph() << endl;

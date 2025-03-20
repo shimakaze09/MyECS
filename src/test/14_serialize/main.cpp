@@ -44,40 +44,6 @@ class Dumper : public IListener {
     cout << "}";
   }
 
-  virtual void EnterSystemMngr(const SystemMngr* sm) override {
-    PrintIndent();
-    cout << "\"systemMngr\" : {" << endl;
-    indent++;
-    PrintIndent();
-    cout << "\"type\" : \"SystemMngr\"," << endl;
-    PrintIndent();
-    cout << "\"systems\" : [";
-    indent++;
-    firstSystem = true;
-  }
-
-  virtual void ExistSystemMngr(const SystemMngr* sm) override {
-    cout << endl;
-    indent--;
-    PrintIndent();
-    cout << "]" << endl;
-    indent--;
-    PrintIndent();
-    cout << "}," << endl;
-  }
-
-  virtual void EnterSystem(const System* s) override {
-    if (!firstSystem)
-      cout << ",";
-    else
-      firstSystem = false;
-    cout << endl;
-    PrintIndent();
-    cout << "\"" << s->GetName() << "\"";
-  }
-
-  virtual void ExistSystem(const System* s) override {}
-
   virtual void EnterEntityMngr(const EntityMngr* em) override {
     PrintIndent();
     cout << "\"entityMngr\" : {" << endl;
@@ -100,7 +66,7 @@ class Dumper : public IListener {
     cout << "}" << endl;
   }
 
-  virtual void EnterEntity(const Entity* e) override {
+  virtual void EnterEntity(Entity e) override {
     if (!firstEntity)
       cout << ",";
     else
@@ -117,7 +83,7 @@ class Dumper : public IListener {
     firstCmpt = true;
   }
 
-  virtual void ExistEntity(const Entity* e) override {
+  virtual void ExistEntity(Entity e) override {
     cout << endl;
     indent--;
     PrintIndent();
@@ -127,7 +93,7 @@ class Dumper : public IListener {
     cout << "}";
   }
 
-  virtual void EnterCmptPtr(const CmptPtr* cmpt) override {
+  virtual void EnterCmpt(CmptPtr cmpt) override {
     if (!firstCmpt)
       cout << ",";
     else
@@ -137,22 +103,22 @@ class Dumper : public IListener {
     cout << "{" << endl;
     indent++;
     PrintIndent();
-    cout << "\"type\" : \"" << w->entityMngr.cmptTraits.Nameof(cmpt->Type())
+    cout << "\"type\" : \"" << w->entityMngr.cmptTraits.Nameof(cmpt.Type())
          << "\"";
-    if (cmpt->Type().Is<Velocity>()) {
-      auto v = cmpt->As<Velocity>();
+    if (cmpt.Type().Is<Velocity>()) {
+      auto v = cmpt.As<Velocity>();
       cout << "," << endl;
       PrintIndent();
       cout << "\"val\" : " << v->val;
-    } else if (cmpt->Type().Is<Position>()) {
-      auto p = cmpt->As<Position>();
+    } else if (cmpt.Type().Is<Position>()) {
+      auto p = cmpt.As<Position>();
       cout << "," << endl;
       PrintIndent();
       cout << "\"val\" : " << p->val;
     }
   }
 
-  virtual void ExistCmptPtr(const CmptPtr* cmpt) override {
+  virtual void ExistCmpt(CmptPtr cmpt) override {
     cout << endl;
     indent--;
     PrintIndent();
@@ -160,11 +126,8 @@ class Dumper : public IListener {
   }
 };
 
-class MoverSystem : public System {
- public:
-  using System::System;
-
-  virtual void OnUpdate(Schedule& schedule) override {
+struct MoverSystem {
+  static void OnUpdate(Schedule& schedule) {
     schedule.RegisterEntityJob(
         [](const Velocity* v, Position* p) { p->val += v->val; }, "Mover");
   }
@@ -173,7 +136,8 @@ class MoverSystem : public System {
 int main() {
   World w;
   w.entityMngr.cmptTraits.Register<Position, Velocity>();
-  w.systemMngr.Register<MoverSystem>();
+  auto moverSystem = w.systemMngr.Register<MoverSystem>();
+  w.systemMngr.Activate(moverSystem);
   w.entityMngr.Create<Position, Velocity>();
   w.entityMngr.Create<Position>();
   w.entityMngr.Create<Velocity>();

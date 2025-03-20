@@ -34,9 +34,6 @@ class EntityMngr {
 
   RTDCmptTraits cmptTraits;
 
-  // same world
-  void Swap(EntityMngr& rhs) noexcept;
-
   template <typename... Cmpts>
   std::tuple<Entity, Cmpts*...> Create();
 
@@ -139,7 +136,7 @@ class EntityMngr {
 
   struct EntityInfo {
     Archetype* archetype{nullptr};
-    size_t idxInArchetype{size_t_invalid};
+    size_t idxInArchetype{static_cast<size_t>(-1)};
     size_t version{0};  // version
   };
 

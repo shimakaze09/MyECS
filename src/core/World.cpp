@@ -10,7 +10,8 @@ using namespace My::MyECS;
 using namespace My;
 using namespace std;
 
-World::World() : systemMngr{this} {}
+World::World(const World& w)
+    : entityMngr{w.entityMngr}, systemMngr{w.systemMngr} {}
 
 void World::Update() {
   inRunningJobGraph = true;
@@ -21,8 +22,8 @@ void World::Update() {
   jobs.clear();
   jobGraph.clear();
 
-  for (auto& [id, system] : systemMngr.systems)
-    system->OnUpdate(schedule);
+  for (auto id : systemMngr.GetActiveSystemIndices())
+    systemMngr.GetSystems().at(id)(schedule);
 
   auto graph = schedule.GenSysFuncGraph();
 
@@ -264,8 +265,8 @@ MyGraphviz::Graph World::GenUpdateFrameGraph() const {
   }
 
   for (const auto& [from, to] : schedule.sysFuncOrder) {
-    auto fromIdx = sysFuncHashcode2idx.find(from)->second;
-    auto toIdx = sysFuncHashcode2idx.find(to)->second;
+    auto fromIdx = sysFuncHashcode2idx.at(from);
+    auto toIdx = sysFuncHashcode2idx.at(to);
     auto edgeIdx = registry.RegisterEdge(fromIdx, toIdx);
     subgraph_order.AddEdge(edgeIdx);
   }
@@ -275,12 +276,11 @@ MyGraphviz::Graph World::GenUpdateFrameGraph() const {
 
 void World::Accept(IListener* listener) const {
   listener->EnterWorld(this);
-  systemMngr.Accept(listener);
   entityMngr.Accept(listener);
   listener->ExistWorld(this);
 }
 
-void World::AddCommand(std::function<void(World*)> command) {
+void World::AddCommand(std::function<void()> command) {
   assert(inRunningJobGraph);
   std::lock_guard<std::mutex> guard(commandBufferMutex);
   commandBuffer.push_back(std::move(command));
@@ -288,6 +288,6 @@ void World::AddCommand(std::function<void(World*)> command) {
 
 void World::RunCommands() {
   for (const auto& command : commandBuffer)
-    command(this);
+    command();
   commandBuffer.clear();
 }

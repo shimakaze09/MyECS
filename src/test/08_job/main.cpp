@@ -13,41 +13,43 @@ struct Data {
   size_t value;
 };
 
-class MySystem : public System {
- public:
-  using System::System;
-
-  virtual void OnUpdate(Schedule& schedule) override {
+struct MySystem {
+  static void OnUpdate(Schedule& schedule) {
     auto buffer = std::make_shared<std::vector<size_t>>();
     auto f = schedule.RegisterEntityJob(
         [buffer](size_t idxInQuery, const Data* data) {
           buffer->at(idxInQuery) = data->value;
         },
-        "system function");
-    schedule.RegisterEntityJob(
+        "use");
+    schedule.RegisterJob(
         [buffer]() {
           size_t sum = 0;
           for (size_t i : *buffer)
             sum += i;
           cout << sum << endl;
         },
-        "job");
-    schedule.Order("system function", "job");
-
-    size_t num = GetWorld()->entityMngr.EntityNum(f->entityQuery);
-    buffer->resize(num);
+        "print");
+    schedule.RegisterJob(
+        [buffer, f](World* w) {
+          size_t num = w->entityMngr.EntityNum(f->entityQuery);
+          buffer->resize(num);
+        },
+        "allocate");
+    schedule.Order("allocate", "use");
+    schedule.Order("use", "print");
   }
 };
 
 int main() {
   World w;
-  w.systemMngr.Register<MySystem>();
+  auto mySystem = w.systemMngr.Register<MySystem>();
 
   for (size_t i = 1; i <= 100; i++) {
     auto [e] = w.entityMngr.Create();
     w.entityMngr.Emplace<Data>(e, i);
   }
 
+  w.systemMngr.Activate(mySystem);
   w.Update();
 
   cout << w.DumpUpdateJobGraph() << endl;

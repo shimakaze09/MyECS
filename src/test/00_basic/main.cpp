@@ -14,11 +14,8 @@ struct Velocity {
   float val;
 };
 
-class MoverSystem : public System {
- public:
-  using System::System;
-
-  virtual void OnUpdate(Schedule& schedule) override {
+struct MoverSystem {
+  static void OnUpdate(Schedule& schedule) {
     schedule.RegisterEntityJob(
         [](const Velocity* v, Position* p) { p->val += v->val; }, "Mover");
   }
@@ -26,7 +23,8 @@ class MoverSystem : public System {
 
 int main() {
   World w;
-  w.systemMngr.Register<MoverSystem>();
+  auto move = w.systemMngr.Register<MoverSystem>();
   w.entityMngr.Create<Position, Velocity>();
+  w.systemMngr.Activate(move);
   w.Update();
 }

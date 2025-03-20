@@ -11,11 +11,8 @@ using namespace std;
 
 struct Data {};
 
-class DataSystem : public System {
- public:
-  using System::System;
-
-  virtual void OnUpdate(Schedule& schedule) override {
+struct DataSystem {
+  static void OnUpdate(Schedule& schedule) {
     schedule.RegisterEntityJob(
         [](LastFrame<Data> d) { cout << "lastFrame_sys0" << endl; },
         "lastFrame_sys0");
@@ -37,10 +34,11 @@ class DataSystem : public System {
 
 int main() {
   World w;
-  w.systemMngr.Register<DataSystem>();
+  auto dataSystem = w.systemMngr.Register<DataSystem>();
 
   w.entityMngr.Create<Data>();
 
+  w.systemMngr.Activate(dataSystem);
   w.Update();
 
   cout << w.DumpUpdateJobGraph() << endl;

@@ -85,11 +85,11 @@ class CmptAccessPtr {
     else if constexpr (mode == AccessMode::LATEST)
       return Latest<Cmpt>(p);
     else if constexpr (mode == AccessMode::LAST_FRAME_SINGLETON)
-      return LastFrame<Singleton<Cmpt>>{};
+      return LastFrame<Singleton<Cmpt>>();
     else if constexpr (mode == AccessMode::WRITE_SINGLETON)
-      return Write<Singleton<Cmpt>>{};
+      return Write<Singleton<Cmpt>>();
     else if constexpr (mode == AccessMode::LATEST_SINGLETON)
-      return Latest<Singleton<Cmpt>>{};
+      return Latest<Singleton<Cmpt>>();
     else
       static_assert(false);
   }

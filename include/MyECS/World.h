@@ -6,6 +6,7 @@
 
 #include "Entity.h"
 #include "EntityMngr.h"
+#include "Schedule.h"
 #include "SystemMngr.h"
 
 #include <MyGraphviz/MyGraphviz.h>
@@ -18,7 +19,9 @@ class IListener;
 // SystemMngr + EntityMngr
 class World {
  public:
-  World();
+  World() = default;
+  // not copy schedule, so you can't use DumpUpdateJobGraph() and GenUpdateFrameGraph() before Update()
+  World(const World&);
 
   SystemMngr systemMngr;
   EntityMngr entityMngr;
@@ -29,20 +32,20 @@ class World {
   // 4. run commands in main thread
   void Update();
 
-  void AddCommand(std::function<void(World*)> command);
+  void AddCommand(std::function<void()> command);
 
-  // after running Update
+  // after running Update()
   // you can use graphviz to vistualize the graph
   std::string DumpUpdateJobGraph() const;
 
-  // after running Update
+  // after running Update()
   // use RTDCmptTraits' registered component name
   MyGraphviz::Graph GenUpdateFrameGraph() const;
 
   void Accept(IListener*) const;
 
   // you can't run several parallel jobs in parallel because there is only an executor
-  // you can't run parallel jobs in running job graph
+  // you can't run parallel jobs in runing job graph
 
   // Func's argument list:
   // World*
@@ -83,17 +86,17 @@ class World {
   Pool<Job> jobPool;
 
   // command
-  std::vector<std::function<void(World*)>> commandBuffer;
+  std::vector<std::function<void()>> commandBuffer;
   std::mutex commandBufferMutex;
   void RunCommands();
 
   void Run(SystemFunc*);
 
   // ==================================================
-  World(const World& world) = delete;
-  World(World&& world) = delete;
-  World& operator==(World&& world) = delete;
-  World& operator=(const World& world) = delete;
+  // World(const World& world) = delete;
+  // World(World&& world) = delete;
+  // World& operator==(World&& world) = delete;
+  // World& operator=(const World& world) = delete;
 };
 }  // namespace My::MyECS
 

@@ -4,10 +4,6 @@
 
 #include <MyECS/detail/Archetype.h>
 
-#include <MyECS/World.h>
-
-#include <MyECS/EntityMngr.h>
-
 using namespace My::MyECS;
 using namespace std;
 
@@ -255,7 +251,7 @@ size_t Archetype::Erase(size_t idx) {
   size_t dstIdxInChunk = idx % chunkCapacity;
   byte* dstBuffer = chunks[idx / chunkCapacity]->Data();
 
-  size_t movedIdx = size_t_invalid;
+  size_t movedIdx = static_cast<size_t>(-1);
 
   if (idx != entityNum - 1) {
     size_t movedIdxInArchetype = entityNum - 1;

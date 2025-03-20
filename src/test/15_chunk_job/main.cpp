@@ -24,11 +24,8 @@ struct B {
 
 constexpr float dt = 0.003f;
 
-class SAB_System : public System {
- public:
-  using System::System;
-
-  virtual void OnUpdate(Schedule& schedule) override {
+struct SAB_System {
+  static void OnUpdate(Schedule& schedule) {
     ArchetypeFilter filter;
     filter.all = {CmptAccessType::Of<Write<S>>};
     filter.any = {CmptAccessType::Of<Latest<A>>, CmptAccessType::Of<Latest<B>>};
@@ -65,7 +62,9 @@ class SAB_System : public System {
 
 int main() {
   World w;
-  w.systemMngr.Register<SAB_System>();
+  auto sabSystem = w.systemMngr.Register<SAB_System>();
+
+  w.systemMngr.Activate(sabSystem);
 
   w.entityMngr.cmptTraits.Register<S, A, B>();
 

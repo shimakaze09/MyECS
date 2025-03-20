@@ -14,7 +14,8 @@ using namespace std;
 EntityMngr::EntityMngr() : sharedChunkPool{std::make_unique<Pool<Chunk>>()} {}
 
 EntityMngr::EntityMngr(const EntityMngr& em)
-    : sharedChunkPool{std::make_unique<Pool<Chunk>>()} {
+    : sharedChunkPool{std::make_unique<Pool<Chunk>>()},
+      cmptTraits{em.cmptTraits} {
   ts2a.reserve(em.ts2a.size());
   for (const auto& [ts, a] : em.ts2a) {
     auto [iter, success] = ts2a.try_emplace(
@@ -29,13 +30,13 @@ EntityMngr::EntityMngr(const EntityMngr& em)
     dst.idxInArchetype = src.idxInArchetype;
     dst.version = src.version;
     if (src.archetype)
-      dst.archetype = ts2a.find(src.archetype->types)->second.get();
+      dst.archetype = ts2a.at(src.archetype->types).get();
   }
   queryCache.reserve(em.queryCache.size());
   for (const auto& [query, srcArchetypes] : em.queryCache) {
     auto& dstArchetypes = queryCache[query];
     for (auto archetype : srcArchetypes)
-      dstArchetypes.insert(ts2a.find(archetype->types)->second.get());
+      dstArchetypes.insert(ts2a.at(archetype->types).get());
   }
 }
 
@@ -56,23 +57,12 @@ size_t EntityMngr::RequestEntityFreeEntry() {
   return entry;
 }
 
-void EntityMngr::Swap(EntityMngr& rhs) noexcept {
-  using std::swap;
-
-  swap(ts2a, rhs.ts2a);
-  swap(cmptTraits, rhs.cmptTraits);
-  swap(entityTableFreeEntry, rhs.entityTableFreeEntry);
-  swap(entityTable, rhs.entityTable);
-  swap(queryCache, rhs.queryCache);
-  swap(sharedChunkPool, rhs.sharedChunkPool);
-}
-
 void EntityMngr::RecycleEntityEntry(Entity e) {
   assert(Exist(e));
 
   auto& info = entityTable[e.Idx()];
   info.archetype = nullptr;
-  info.idxInArchetype = size_t_invalid;
+  info.idxInArchetype = static_cast<size_t>(-1);
   info.version++;
 
   entityTableFreeEntry.push_back(e.Idx());
@@ -152,7 +142,7 @@ Archetype* EntityMngr::AttachWithoutInit(Entity e, const CmptType* types,
 
   // erase
   auto srcMovedEntityIndex = srcArchetype->Erase(srcIdxInArchetype);
-  if (srcMovedEntityIndex != size_t_invalid)
+  if (srcMovedEntityIndex != static_cast<size_t>(-1))
     entityTable[srcMovedEntityIndex].idxInArchetype = srcIdxInArchetype;
 
   info.archetype = dstArchetype;
@@ -223,7 +213,7 @@ void EntityMngr::Detach(Entity e, const CmptType* types, size_t num) {
   // erase
   auto srcMovedEntityIndex =
       srcArchetype->Erase(srcIdxInArchetype);  // call destructor
-  if (srcMovedEntityIndex != size_t_invalid)
+  if (srcMovedEntityIndex != static_cast<size_t>(-1))
     entityTable[srcMovedEntityIndex].idxInArchetype = srcIdxInArchetype;
 
   info.archetype = dstArchetype;
@@ -302,7 +292,7 @@ void EntityMngr::Destroy(Entity e) {
 
   auto movedEntityIndex = archetype->Erase(idxInArchetype);
 
-  if (movedEntityIndex != size_t_invalid)
+  if (movedEntityIndex != static_cast<size_t>(-1))
     entityTable[movedEntityIndex].idxInArchetype = idxInArchetype;
 
   RecycleEntityEntry(e);
@@ -473,14 +463,15 @@ void EntityMngr::AutoGen(World* w, Job* job, SystemFunc* sys) const {
 }
 
 void EntityMngr::Accept(IListener* listener) const {
+  // TODO : speed up
   listener->EnterEntityMngr(this);
   for (const auto& [ts, a] : ts2a) {
     for (size_t i = 0; i < a->EntityNum(); i++) {
-      auto e = a->At<Entity>(i);
+      auto e = *a->At<Entity>(i);
       listener->EnterEntity(e);
       for (const auto& cmpt : a->Components(i)) {
-        listener->EnterCmptPtr(&cmpt);
-        listener->ExistCmptPtr(&cmpt);
+        listener->EnterCmpt(cmpt);
+        listener->ExistCmpt(cmpt);
       }
       listener->ExistEntity(e);
     }

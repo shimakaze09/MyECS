@@ -30,10 +30,12 @@ class CmptType {
   constexpr size_t HashCode() const noexcept { return hashcode; }
 
   static constexpr CmptType Invalid() noexcept {
-    return CmptType{size_t_invalid};
+    return CmptType{static_cast<size_t>(-1)};
   }
 
-  constexpr bool Valid() const noexcept { return hashcode == size_t_invalid; }
+  constexpr bool Valid() const noexcept {
+    return hashcode == static_cast<size_t>(-1);
+  }
 
   template <typename Cmpt>
   constexpr bool Is() const noexcept;
@@ -97,7 +99,7 @@ class CmptAccessType {
   constexpr operator CmptType() const noexcept { return type; }
 
   static constexpr CmptAccessType Invalid() noexcept {
-    return CmptAccessType{size_t_invalid, AccessMode::LATEST};
+    return CmptAccessType{static_cast<size_t>(-1), AccessMode::LATEST};
   }
 
   constexpr bool Valid() const noexcept { return type.Valid(); }

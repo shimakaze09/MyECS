@@ -15,14 +15,11 @@ struct B {};
 
 struct C {};
 
-class MySystem : public System {
- public:
-  using System::System;
-
-  virtual void OnUpdate(Schedule& schedule) override {
+struct MySystem {
+  static void OnUpdate(Schedule& schedule) {
     schedule.RegisterEntityJob(
         [](World* w, Entity e, const A* a, const B* b) {
-          w->AddCommand([e](World* w) {
+          w->AddCommand([e, w]() {
             if (!w->entityMngr.Have(e, CmptType::Of<C>)) {
               cout << "Attach C" << endl;
               w->entityMngr.Attach<C>(e);
@@ -32,7 +29,7 @@ class MySystem : public System {
         "AB");
     schedule.RegisterEntityJob(
         [](World* w, Entity e, const A* a, const B* b, const C* c) {
-          w->AddCommand([e](World* w) {
+          w->AddCommand([e, w]() {
             if (w->entityMngr.Have(e, CmptType::Of<C>)) {
               cout << "Dettach C" << endl;
               w->entityMngr.Detach(e, &CmptType::Of<C>, 1);
@@ -45,10 +42,11 @@ class MySystem : public System {
 
 int main() {
   World w;
-  w.systemMngr.Register<MySystem>();
+  auto mySystem = w.systemMngr.Register<MySystem>();
 
   w.entityMngr.Create<A, B>();
 
+  w.systemMngr.Activate(mySystem);
   w.Update();
   w.Update();
   w.Update();

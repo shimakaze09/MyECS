@@ -13,11 +13,8 @@ struct Data1 {};
 
 struct Data2 {};
 
-class DataSystem : public System {
- public:
-  using System::System;
-
-  virtual void OnUpdate(Schedule& schedule) noexcept {
+struct DataSystem {
+  static void OnUpdate(Schedule& schedule) {
     schedule.RegisterEntityJob(
         [](Data1* d1, Data2* d2) { cout << "writer_sys0" << endl; },
         "writer_sys0");
@@ -36,12 +33,13 @@ class DataSystem : public System {
 
 int main() {
   World w;
-  w.systemMngr.Register<DataSystem>();
+  auto dataSystem = w.systemMngr.Register<DataSystem>();
 
   w.entityMngr.cmptTraits.Register<Data1, Data2>();
 
   w.entityMngr.Create<Data1, Data2>();
 
+  w.systemMngr.Activate(dataSystem);
   w.Update();
 
   cout << w.DumpUpdateJobGraph() << endl;

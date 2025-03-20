@@ -24,11 +24,8 @@ struct F {};
 
 struct G {};
 
-class MySystem : public System {
- public:
-  using System::System;
-
-  virtual void OnUpdate(Schedule& schedule) override {
+struct MySystem {
+  static void OnUpdate(Schedule& schedule) {
     ArchetypeFilter filter;
     filter.all = {CmptAccessType::Of<D>};
     filter.any = {CmptAccessType::Of<E>, CmptAccessType::Of<F>};
@@ -40,7 +37,7 @@ class MySystem : public System {
 
 int main() {
   World w;
-  w.systemMngr.Register<MySystem>();
+  auto muSystem = w.systemMngr.Register<MySystem>();
 
   w.entityMngr.cmptTraits.RegisterName(CmptType::Of<A>, "A")
       .RegisterName(CmptType::Of<B>, "B")
@@ -51,7 +48,7 @@ int main() {
       .RegisterName(CmptType::Of<G>, "G");
 
   w.entityMngr.Create<A, B, C, D, E>();
-
+  w.systemMngr.Activate(muSystem);
   w.Update();
 
   cout << w.DumpUpdateJobGraph() << endl;
