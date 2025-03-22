@@ -14,9 +14,10 @@ void SystemFunc::operator()(World* w, SingletonsView singletonsView, Entity e,
 }
 
 void SystemFunc::operator()(World* w, SingletonsView singletonsView,
+                            size_t entityBeginIndexInQuery,
                             ChunkView chunkView) {
   assert(mode == Mode::Chunk);
-  return func(w, singletonsView, Entity::Invalid(), static_cast<size_t>(-1),
+  return func(w, singletonsView, Entity::Invalid(), entityBeginIndexInQuery,
               CmptsView{nullptr, 0}, chunkView);
 }
 

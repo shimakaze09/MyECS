@@ -6,8 +6,6 @@
 
 #include "CmptType.h"
 
-#include <MyTemplate/TypeList.h>
-
 #include <set>
 
 namespace My::MyECS {
@@ -18,6 +16,8 @@ struct ArchetypeFilter {
   std::set<CmptType> none;
 
   size_t HashCode() const noexcept;
+
+  bool HaveWriteCmptType() const noexcept;
 
   bool operator==(const ArchetypeFilter& rhs) const;
 };

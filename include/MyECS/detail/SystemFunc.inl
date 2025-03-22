@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <MyTemplate/Func.h>
-
 #include <_deps/nameof.hpp>
+
+#include <MyTemplate/Func.h>
 
 namespace My::MyECS::detail {
 template <typename Func>
@@ -57,9 +57,17 @@ SystemFunc::SystemFunc(Func&& func, std::string name,
 
   static_assert(Length_v<Filter_t<ArgList, IsWriteSingleton>> == 0,
                 "(Mode::Chunk) SystemFunc can't write singletons, use "
-                "{Latest|LastFrame}Singleton<Cmpt> instead");
+                "{Latest|LastFrame}Singleton<Cmpt>");
 
   static_assert(Contain_v<ArgList, ChunkView>);
+
+  static_assert(!Contain_v<ArgList, Entity>,
+                "(Mode::Chunk) SystemFunc can't use Entity directly, use "
+                "ChunkView::GetEntityArray()");
+
+  static_assert(
+      !Contain_v<ArgList, CmptsView>,
+      "(Mode::Chunk) SystemFunc's argument list cann't have CmptsView");
 
   static_assert(
       Length_v<Filter_t<ArgList, IsNonSingleton>> == 0,
@@ -67,7 +75,7 @@ SystemFunc::SystemFunc(Func&& func, std::string name,
 
   assert(
       "(Mode::Chunk) SystemFunc can't write singletons, use "
-      "{Latest|LastFrame}Singleton<Cmpt> instead" &&
+      "{Latest|LastFrame}Singleton<Cmpt>" &&
       !singletonLocator.HasWriteSingletonType());
 }
 
@@ -87,9 +95,10 @@ SystemFunc::SystemFunc(Func&& func, std::string name,
                 "(Mode::Job) SystemFunc can't access entities' components");
 
   static_assert(!Contain_v<ArgList, Entity> && !Contain_v<ArgList, size_t> &&
+                    !Contain_v<ArgList, CmptsView> &&
                     !Contain_v<ArgList, ChunkView>,
                 "(Mode::Job) SystemFunc's argument list cann't have Entity, "
-                "indexInQuery or ChunkView");
+                "indexInQuery CmptsView or ChunkView");
 }
 }  // namespace My::MyECS
 
@@ -134,7 +143,7 @@ template <typename Func>
 auto Pack(Func&& func) noexcept {
   using ArgList = FuncTraits_ArgList<Func>;
 
-  using DecayedArgList = Transform_t<ArgList, DecayTag>;
+  using DecayedArgList = Transform_t<ArgList, DecayArg>;
   static_assert(IsSet_v<DecayedArgList>,
                 "detail::System_::Pack: <Func>'s argument types must be a set");
 

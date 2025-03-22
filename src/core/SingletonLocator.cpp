@@ -6,15 +6,15 @@
 
 #include <MyECS/detail/Util.h>
 
-#include <MyContainer/Algorithm.h>
-
 using namespace My::MyECS;
 using namespace std;
 
 SingletonLocator::SingletonLocator(const CmptAccessType* types, size_t num) {
   assert(types || num == 0);
-  for (size_t i = 0; i < num; i++)
+  for (size_t i = 0; i < num; i++) {
+    assert(AccessMode_IsSingleton(types[i].GetAccessMode()));
     singletonTypes.insert(types[i]);
+  }
 }
 
 bool SingletonLocator::HasWriteSingletonType() const noexcept {

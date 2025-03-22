@@ -30,7 +30,7 @@ class SysFuncGraph;
 class Schedule {
  public:
   // Func's argument list:
-  // World*
+  // [const] World*
   // {LastFrame|Latest}<Singleton<Cmpt>>
   // SingletonsView
   // Entity
@@ -44,7 +44,7 @@ class Schedule {
                                       SingletonLocator = {});
 
   // Func's argument list:
-  // World*
+  // [const] World*
   // {LastFrame|Latest}<Singleton<Cmpt>>
   // SingletonsView
   // ChunkView (necessary)
@@ -55,7 +55,7 @@ class Schedule {
                                      SingletonLocator = {});
 
   // Func's argument list:
-  // World*
+  // [const] World*
   // {LastFrame|Write|Latest}<Singleton<Cmpt>>
   // SingletonsView
   template <typename Func>
