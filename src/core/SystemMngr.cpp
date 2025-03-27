@@ -4,8 +4,6 @@
 
 #include <MyECS/SystemMngr.h>
 
-#include <MyECS/IListener.h>
-
 #include <cassert>
 
 using namespace My::MyECS;
@@ -24,7 +22,7 @@ SystemMngr::SystemMngr(const SystemMngr& mngr)
   }
 }
 
-void SystemMngr::Clear() {
+void SystemMngr::Clear() noexcept {
   frees.clear();
   activeSystemIndices.clear();
   name2idx.clear();
@@ -81,7 +79,7 @@ void SystemMngr::Activate(size_t index) {
   activeSystemIndices.insert(index);
 }
 
-void SystemMngr::Deactivate(size_t index) {
+void SystemMngr::Deactivate(size_t index) noexcept {
   assert(index < systems.size());
   activeSystemIndices.erase(index);
 }

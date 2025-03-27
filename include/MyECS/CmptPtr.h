@@ -23,7 +23,9 @@ class CmptPtr {
 
   constexpr CmptType Type() const noexcept { return type; }
 
-  static constexpr CmptPtr Invalid() { return {CmptType::Invalid(), nullptr}; };
+  static constexpr CmptPtr Invalid() noexcept {
+    return {CmptType::Invalid(), nullptr};
+  };
 
   constexpr bool Valid() const noexcept { return p != nullptr && type.Valid(); }
 
@@ -66,7 +68,7 @@ class CmptAccessPtr {
 
   constexpr CmptAccessType AccessType() const noexcept { return accessType; }
 
-  static constexpr CmptAccessPtr Invalid() {
+  static constexpr CmptAccessPtr Invalid() noexcept {
     return {CmptAccessType::Invalid(), nullptr};
   };
 
@@ -81,15 +83,15 @@ class CmptAccessPtr {
     if constexpr (mode == AccessMode::LAST_FRAME)
       return LastFrame<Cmpt>{p};
     else if constexpr (mode == AccessMode::WRITE)
-      return Write<Cmpt>(p);
+      return Write<Cmpt>{p};
     else if constexpr (mode == AccessMode::LATEST)
-      return Latest<Cmpt>(p);
+      return Latest<Cmpt>{p};
     else if constexpr (mode == AccessMode::LAST_FRAME_SINGLETON)
-      return LastFrame<Singleton<Cmpt>>();
+      return LastFrame<Singleton<Cmpt>>{p};
     else if constexpr (mode == AccessMode::WRITE_SINGLETON)
-      return Write<Singleton<Cmpt>>();
+      return Write<Singleton<Cmpt>>{p};
     else if constexpr (mode == AccessMode::LATEST_SINGLETON)
-      return Latest<Singleton<Cmpt>>();
+      return Latest<Singleton<Cmpt>>{p};
     else
       static_assert(false);
   }

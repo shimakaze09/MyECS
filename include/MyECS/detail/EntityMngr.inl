@@ -107,6 +107,17 @@ std::tuple<Cmpts*...> EntityMngr::Attach(Entity e) {
   return cmpts;
 }
 
+template <typename... Cmpts>
+void EntityMngr::Detach(Entity e) {
+  constexpr std::array types{CmptType::Of<Cmpts>...};
+  Detach(e, types.data, types.size());
+}
+
+template <typename Cmpt>
+bool EntityMngr::Have(Entity e) const {
+  return Have(e, CmptType::Of<Cmpt>);
+}
+
 template <typename Cmpt, typename... Args>
 Cmpt* EntityMngr::Emplace(Entity e, Args&&... args) {
   static_assert(std::is_constructible_v<Cmpt, Args...> ||

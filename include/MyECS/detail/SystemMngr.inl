@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <_deps/nameof.hpp>
+#include <nameof.hpp>
 
 namespace My::MyECS {
 template <typename System>

@@ -12,7 +12,7 @@ constexpr size_t hash_combine(size_t x, size_t y) noexcept {
 }
 
 template <size_t N>
-inline constexpr size_t hash_combine(
+constexpr size_t hash_combine(
     const std::array<size_t, N>& arr) noexcept {
   static_assert(N >= 2);
   size_t rst = arr[0];
@@ -36,7 +36,7 @@ size_t hash_combine(const Container& container) noexcept {
 }
 
 // fnv1a
-inline constexpr size_t hash_string(std::string_view str) noexcept {
+constexpr size_t hash_string(std::string_view str) noexcept {
   return RuntimeTypeID(str);
 }
 }  // namespace My::MyECS

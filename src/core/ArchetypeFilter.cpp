@@ -35,6 +35,6 @@ bool ArchetypeFilter::HaveWriteCmptType() const noexcept {
   return false;
 }
 
-bool ArchetypeFilter::operator==(const ArchetypeFilter& rhs) const {
+bool ArchetypeFilter::operator==(const ArchetypeFilter& rhs) const noexcept {
   return all == rhs.all && any == rhs.any && none == rhs.none;
 }

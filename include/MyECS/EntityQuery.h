@@ -22,7 +22,7 @@ class EntityQuery {
     return hash_combine(filter.HashCode(), locator.HashCode());
   }
 
-  bool operator==(const EntityQuery& query) const {
+  bool operator==(const EntityQuery& query) const noexcept {
     return filter == query.filter && locator == query.locator;
   }
 };

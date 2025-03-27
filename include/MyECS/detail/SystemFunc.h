@@ -65,10 +65,10 @@ class SystemFunc {
   size_t HashCode() const noexcept { return hashCode; }
 
   void operator()(World*, SingletonsView, Entity, size_t entityIndexInQuery,
-                  CmptsView);
+                  CmptsView) const;
   void operator()(World*, SingletonsView, size_t entityBeginIndexInQuery,
-                  ChunkView);
-  void operator()(World*, SingletonsView);
+                  ChunkView) const;
+  void operator()(World*, SingletonsView) const;
 
   Mode GetMode() const noexcept { return mode; }
 
@@ -79,14 +79,13 @@ class SystemFunc {
   }
 
  private:
+  Mode mode;
+  std::string name;
+  size_t hashCode;  // after name
+  bool isParallel;
   std::function<void(World*, SingletonsView, Entity, size_t, CmptsView,
                      ChunkView)>
       func;
-
-  std::string name;
-  Mode mode;
-  size_t hashCode;  // after name
-  bool isParallel;
 };
 }  // namespace My::MyECS
 

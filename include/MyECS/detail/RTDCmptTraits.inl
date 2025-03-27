@@ -145,22 +145,22 @@ void RTDCmptTraits::RegisterOne() {
     default_constructors.emplace(type, [](void* cmpt) { new (cmpt) Cmpt; });
   }
   if constexpr (!std::is_trivially_destructible_v<Cmpt>) {
-    destructors.emplace(
-        type, [](void* cmpt) { reinterpret_cast<Cmpt*>(cmpt)->~Cmpt(); });
+    destructors.emplace(type,
+                        [](void* cmpt) { static_cast<Cmpt*>(cmpt)->~Cmpt(); });
   }
   if constexpr (!std::is_trivially_move_constructible_v<Cmpt>) {
     move_constructors.emplace(type, [](void* dst, void* src) {
-      new (dst) Cmpt(std::move(*reinterpret_cast<Cmpt*>(src)));
+      new (dst) Cmpt(std::move(*static_cast<Cmpt*>(src)));
     });
   }
   if constexpr (!std::is_trivially_move_assignable_v<Cmpt>) {
     move_assignments.emplace(type, [](void* dst, void* src) {
-      *reinterpret_cast<Cmpt*>(dst) = std::move(*reinterpret_cast<Cmpt*>(src));
+      *static_cast<Cmpt*>(dst) = std::move(*static_cast<Cmpt*>(src));
     });
   }
   if constexpr (!std::is_trivially_copy_constructible_v<Cmpt>) {
     copy_constructors.emplace(type, [](void* dst, void* src) {
-      new (dst) Cmpt(*reinterpret_cast<Cmpt*>(src));
+      new (dst) Cmpt(*static_cast<Cmpt*>(src));
     });
   }
 }

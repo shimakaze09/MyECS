@@ -16,10 +16,10 @@ namespace My::MyECS {
 struct CmptTypeSet {
   std::set<CmptType> data;
 
-  size_t HashCode() const;
+  size_t HashCode() const noexcept;
 
   void Insert(const CmptType* types, size_t num);
-  void Erase(const CmptType* types, size_t num);
+  void Erase(const CmptType* types, size_t num) noexcept;
   bool Contains(CmptType type) const;
 
   bool ContainsAll(const CmptType* types, size_t num) const;
@@ -39,7 +39,9 @@ struct CmptTypeSet {
 
   bool IsMatch(const EntityQuery& query) const;
 
-  bool operator==(const CmptTypeSet& rhs) const { return data == rhs.data; }
+  bool operator==(const CmptTypeSet& rhs) const noexcept {
+    return data == rhs.data;
+  }
 };
 }  // namespace My::MyECS
 

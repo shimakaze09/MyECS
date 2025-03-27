@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <_deps/nameof.hpp>
-
 #include <MyTemplate/Func.h>
 
 namespace My::MyECS::detail {
@@ -19,14 +17,14 @@ template <typename Func>
 SystemFunc::SystemFunc(Func&& func, std::string name,
                        ArchetypeFilter archetypeFilter, CmptLocator cmptLocator,
                        SingletonLocator singletonLocator, bool isParallel)
-    : mode{Mode::Entity},
-      func{detail::Pack(std::forward<Func>(func))},
-      entityQuery{std::move(archetypeFilter),
+    : entityQuery{std::move(archetypeFilter),
                   std::move(cmptLocator.Combine<decltype(func)>())},
       singletonLocator{std::move(singletonLocator.Combine<decltype(func)>())},
+      mode{Mode::Entity},
       name{std::move(name)},
       hashCode{HashCode(this->name)},
-      isParallel{isParallel} {
+      isParallel{isParallel},
+      func{detail::Pack(std::forward<Func>(func))} {
   using ArgList = FuncTraits_ArgList<std::decay_t<Func>>;
 
   static_assert(Length_v<Filter_t<ArgList, IsWriteSingleton>> == 0,
@@ -46,13 +44,13 @@ template <typename Func>
 SystemFunc::SystemFunc(Func&& func, std::string name,
                        ArchetypeFilter archetypeFilter,
                        SingletonLocator singletonLocator, bool isParallel)
-    : mode{Mode::Chunk},
-      func{detail::Pack(std::forward<Func>(func))},
-      entityQuery{std::move(archetypeFilter)},
+    : entityQuery{std::move(archetypeFilter)},
       singletonLocator{std::move(singletonLocator.Combine<decltype(func)>())},
+      mode{Mode::Chunk},
       name{std::move(name)},
       hashCode{HashCode(this->name)},
-      isParallel{isParallel} {
+      isParallel{isParallel},
+      func{detail::Pack(std::forward<Func>(func))} {
   using ArgList = FuncTraits_ArgList<std::decay_t<Func>>;
 
   static_assert(Length_v<Filter_t<ArgList, IsWriteSingleton>> == 0,
@@ -83,12 +81,12 @@ SystemFunc::SystemFunc(Func&& func, std::string name,
 template <typename Func>
 SystemFunc::SystemFunc(Func&& func, std::string name,
                        SingletonLocator singletonLocator)
-    : mode{Mode::Job},
-      func{detail::Pack(std::forward<Func>(func))},
-      singletonLocator{std::move(singletonLocator.Combine<decltype(func)>())},
+    : singletonLocator{std::move(singletonLocator.Combine<decltype(func)>())},
+      mode{Mode::Job},
       name{std::move(name)},
       hashCode{HashCode(this->name)},
-      isParallel{false} {
+      isParallel{false},
+      func{detail::Pack(std::forward<Func>(func))} {
   using ArgList = FuncTraits_ArgList<std::decay_t<Func>>;
 
   static_assert(Length_v<Filter_t<ArgList, IsNonSingleton>> == 0,

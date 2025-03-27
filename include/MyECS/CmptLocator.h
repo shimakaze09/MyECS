@@ -30,7 +30,7 @@ class CmptLocator {
     return cmptTypes;
   }
 
-  bool operator==(const CmptLocator& rhs) const;
+  bool operator==(const CmptLocator& rhs) const noexcept;
 
   bool HasWriteCmptType() const noexcept;
 

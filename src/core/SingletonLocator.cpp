@@ -4,8 +4,6 @@
 
 #include <MyECS/SingletonLocator.h>
 
-#include <MyECS/detail/Util.h>
-
 using namespace My::MyECS;
 using namespace std;
 

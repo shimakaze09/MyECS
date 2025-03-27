@@ -41,7 +41,7 @@ class SystemMngr {
   template <typename System>
   size_t GetIndex() const;
 
-  void Clear();
+  void Clear() noexcept;
 
   size_t Register(std::string name, Func);
   // name: nameof::nameof_type<System>
@@ -55,7 +55,7 @@ class SystemMngr {
   void Unregister();
 
   void Activate(size_t index);
-  void Deactivate(size_t index);
+  void Deactivate(size_t index) noexcept;
 
  private:
   std::vector<SystemInfo> systems;
