@@ -231,13 +231,13 @@ unordered_map<CmptType, Schedule::CmptSysFuncs> Schedule::GenCmptSysFuncsMap()
     }
     for (const auto& type : sysFunc->singletonLocator.SingletonTypes()) {
       switch (type.GetAccessMode()) {
-        case My::MyECS::AccessMode::LAST_FRAME_SINGLETON:
+        case My::MyECS::AccessMode::LAST_FRAME:
           rst[type].lastFrameSysFuncs.push_back(sysFunc);
           break;
-        case My::MyECS::AccessMode::WRITE_SINGLETON:
+        case My::MyECS::AccessMode::WRITE:
           rst[type].writeSysFuncs.push_back(sysFunc);
           break;
-        case My::MyECS::AccessMode::LATEST_SINGLETON:
+        case My::MyECS::AccessMode::LATEST:
           rst[type].latestSysFuncs.push_back(sysFunc);
           break;
         default:
