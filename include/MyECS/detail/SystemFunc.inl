@@ -16,10 +16,12 @@ namespace My::MyECS {
 template <typename Func>
 SystemFunc::SystemFunc(Func&& func, std::string name,
                        ArchetypeFilter archetypeFilter, CmptLocator cmptLocator,
-                       SingletonLocator singletonLocator, bool isParallel)
+                       SingletonLocator singletonLocator,
+                       RandomAccessor randomAccessor, bool isParallel)
     : entityQuery{std::move(archetypeFilter),
                   std::move(cmptLocator.Combine<decltype(func)>())},
       singletonLocator{std::move(singletonLocator.Combine<decltype(func)>())},
+      randomAccessor{std::move(randomAccessor)},
       mode{Mode::Entity},
       name{std::move(name)},
       hashCode{HashCode(this->name)},
@@ -43,9 +45,11 @@ SystemFunc::SystemFunc(Func&& func, std::string name,
 template <typename Func>
 SystemFunc::SystemFunc(Func&& func, std::string name,
                        ArchetypeFilter archetypeFilter,
-                       SingletonLocator singletonLocator, bool isParallel)
+                       SingletonLocator singletonLocator,
+                       RandomAccessor randomAccessor, bool isParallel)
     : entityQuery{std::move(archetypeFilter)},
       singletonLocator{std::move(singletonLocator.Combine<decltype(func)>())},
+      randomAccessor{std::move(randomAccessor)},
       mode{Mode::Chunk},
       name{std::move(name)},
       hashCode{HashCode(this->name)},
@@ -80,8 +84,10 @@ SystemFunc::SystemFunc(Func&& func, std::string name,
 // Mode::Job
 template <typename Func>
 SystemFunc::SystemFunc(Func&& func, std::string name,
-                       SingletonLocator singletonLocator)
+                       SingletonLocator singletonLocator,
+                       RandomAccessor randomAccessor)
     : singletonLocator{std::move(singletonLocator.Combine<decltype(func)>())},
+      randomAccessor{std::move(randomAccessor)},
       mode{Mode::Job},
       name{std::move(name)},
       hashCode{HashCode(this->name)},

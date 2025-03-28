@@ -8,6 +8,7 @@
 #include "../CmptsView.h"
 #include "../Entity.h"
 #include "../EntityQuery.h"
+#include "../RandomAccessor.h"
 #include "../SingletonLocator.h"
 #include "../SingletonsView.h"
 
@@ -41,20 +42,21 @@ class SystemFunc {
 
   EntityQuery entityQuery;
   SingletonLocator singletonLocator;
+  RandomAccessor randomAccessor;
 
   // Mode::Entity
   template <typename Func>
   SystemFunc(Func&&, std::string name, ArchetypeFilter, CmptLocator,
-             SingletonLocator, bool isParallel);
+             SingletonLocator, RandomAccessor, bool isParallel);
 
   // Mode::Chunk
   template <typename Func>
   SystemFunc(Func&&, std::string name, ArchetypeFilter, SingletonLocator,
-             bool isParallel);
+             RandomAccessor, bool isParallel);
 
   // Mode::Job
   template <typename Func>
-  SystemFunc(Func&&, std::string name, SingletonLocator);
+  SystemFunc(Func&&, std::string name, SingletonLocator, RandomAccessor);
 
   const std::string& Name() const noexcept { return name; }
 

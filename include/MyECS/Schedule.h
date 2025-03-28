@@ -41,7 +41,8 @@ class Schedule {
   const SystemFunc* RegisterEntityJob(Func&&, std::string name,
                                       bool isParallel = true,
                                       ArchetypeFilter = {}, CmptLocator = {},
-                                      SingletonLocator = {});
+                                      SingletonLocator = {},
+                                      RandomAccessor = {});
 
   // Func's argument list:
   // [const] World*
@@ -52,17 +53,18 @@ class Schedule {
   const SystemFunc* RegisterChunkJob(Func&&, std::string name,
                                      ArchetypeFilter = {},
                                      bool isParallel = true,
-                                     SingletonLocator = {});
+                                     SingletonLocator = {},
+                                     RandomAccessor = {});
 
   // Func's argument list:
   // [const] World*
   // {LastFrame|Write|Latest}<Singleton<Cmpt>>
   // SingletonsView
   template <typename Func>
-  const SystemFunc* RegisterJob(Func&&, std::string name,
-                                SingletonLocator = {});
+  const SystemFunc* RegisterJob(Func&&, std::string name, SingletonLocator = {},
+                                RandomAccessor = {});
 
-  void RegisterCommand(std::function<void(World*)> command, size_t layer = 0) {
+  void RegisterCommand(std::function<void(World*)> command, int layer = 0) {
     commandBuffer[layer].push_back(std::move(command));
   }
 
@@ -104,7 +106,7 @@ class Schedule {
   std::unordered_map<size_t, FilterChange> sysFilterChange;
   std::unordered_set<size_t> sysLockFilter;
 
-  std::map<size_t, std::vector<std::function<void(World*)>>> commandBuffer;
+  std::map<int, std::vector<std::function<void(World*)>>> commandBuffer;
 
   Pool<SystemFunc> sysFuncPool;
   friend class World;

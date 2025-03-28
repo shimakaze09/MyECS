@@ -77,17 +77,17 @@ class CmptType {
 // CmptType with AccessMode
 class CmptAccessType {
  public:
-  constexpr CmptAccessType(size_t id, AccessMode mode) noexcept
+  constexpr CmptAccessType(size_t id,
+                           AccessMode mode = AccessMode::WRITE) noexcept
       : type{id}, mode{mode} {}
 
-  constexpr CmptAccessType(std::string_view type_name, AccessMode mode) noexcept
+  constexpr CmptAccessType(std::string_view type_name,
+                           AccessMode mode = AccessMode::WRITE) noexcept
       : type{RuntimeTypeID(type_name)}, mode{mode} {}
 
-  constexpr CmptAccessType(CmptType type, AccessMode mode) noexcept
+  constexpr CmptAccessType(CmptType type,
+                           AccessMode mode = AccessMode::WRITE) noexcept
       : type{type}, mode{mode} {}
-
-  explicit constexpr CmptAccessType(CmptType type) noexcept
-      : CmptAccessType{type, AccessMode::LATEST} {}
 
   explicit constexpr CmptAccessType() noexcept : CmptAccessType{Invalid()} {}
 
