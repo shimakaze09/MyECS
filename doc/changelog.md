@@ -1,5 +1,8 @@
 # Change Log
 
+- 0.14.3
+    - `CmptsView`, `SingletonsView` use `Span`
+    - API with `const CmptType* types, size_t num` use `Span<CmptType> types` as instead
 - 0.14.2
     - Added `RandomAccessor` for accessing components from other entities
         - Enhanced `SystemFunc` with additional member

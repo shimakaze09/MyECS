@@ -6,7 +6,6 @@
 
 #include <array>
 #include <cstdint>
-#include <tuple>
 #include <vector>
 
 #include "../config.h"

@@ -6,12 +6,14 @@
 
 #include "CmptType.h"
 
+#include <MyContainer/Span.h>
+
 #include <set>
 
 namespace My::MyECS {
 class SingletonLocator {
  public:
-  SingletonLocator(const CmptAccessType* types, size_t num);
+  SingletonLocator(Span<const CmptAccessType> types);
   SingletonLocator() = default;
 
   template <typename Func>

@@ -39,7 +39,7 @@ class EntityMngr {
   std::tuple<Entity, Cmpts*...> Create();
 
   // use RTDCmptTraits
-  Entity Create(const CmptType* types, size_t num);
+  Entity Create(Span<const CmptType> types);
 
   Entity Instantiate(Entity);
 
@@ -49,7 +49,7 @@ class EntityMngr {
   std::tuple<Cmpts*...> Attach(Entity);
 
   // use RTDCmptTraits
-  void Attach(Entity, const CmptType* types, size_t num);
+  void Attach(Entity, Span<const CmptType> types);
 
   template <typename Cmpt, typename... Args>
   Cmpt* Emplace(Entity, Args&&...);
@@ -57,7 +57,7 @@ class EntityMngr {
   // use Detach(Entity, const CmptType*, size_t)
   template <typename... Cmpts>
   void Detach(Entity);
-  void Detach(Entity, const CmptType* types, size_t num);
+  void Detach(Entity, Span<const CmptType> types);
 
   // use Have(Entity, CmptType)
   template <typename Cmpt>
@@ -116,17 +116,17 @@ class EntityMngr {
   friend class World;
   friend class Archetype;
 
-  static bool IsSet(const CmptType* types, size_t num) noexcept;
+  static bool IsSet(Span<const CmptType> types) noexcept;
 
   template <typename... Cmpts>
   Archetype* GetOrCreateArchetypeOf();
   // types not contain Entity
-  Archetype* GetOrCreateArchetypeOf(const CmptType* types, size_t num);
+  Archetype* GetOrCreateArchetypeOf(Span<const CmptType> types);
 
   // return original archetype
   template <typename... Cmpts>
   Archetype* AttachWithoutInit(Entity);
-  Archetype* AttachWithoutInit(Entity, const CmptType* types, size_t num);
+  Archetype* AttachWithoutInit(Entity, Span<const CmptType> types);
 
   const std::set<Archetype*>& QueryArchetypes(const EntityQuery&) const;
   mutable std::unordered_map<EntityQuery, std::set<Archetype*>> queryCache;

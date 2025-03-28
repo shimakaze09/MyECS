@@ -30,6 +30,7 @@ template <typename Func>
 CmptLocator& CmptLocator::Combine() {
   CmptLocator funcLocator = Generate<Func>();
   cmptTypes = SetUnion(cmptTypes, funcLocator.cmptTypes);
+  UpdateHashCode();
   return *this;
 }
 }  // namespace My::MyECS

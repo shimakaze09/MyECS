@@ -5,10 +5,8 @@
 #pragma once
 
 #include "../EntityQuery.h"
-#include "Util.h"
 
-#include <MyTemplate/TemplateList.h>
-#include <MyTemplate/TypeID.h>
+#include <MyContainer/Span.h>
 
 #include <set>
 
@@ -18,15 +16,15 @@ struct CmptTypeSet {
 
   size_t HashCode() const noexcept;
 
-  void Insert(const CmptType* types, size_t num);
-  void Erase(const CmptType* types, size_t num) noexcept;
+  void Insert(Span<const CmptType> types);
+  void Erase(Span<const CmptType> types) noexcept;
   bool Contains(CmptType type) const;
 
-  bool ContainsAll(const CmptType* types, size_t num) const;
+  bool ContainsAll(Span<const CmptType> types) const;
   template <typename CmptTypeContainer>
   bool ContainsAll(const CmptTypeContainer& types) const;
 
-  bool ContainsAny(const CmptType* types, size_t num) const;
+  bool ContainsAny(Span<const CmptType> types) const;
   template <typename CmptTypeContainer>
   bool ContainsAny(const CmptTypeContainer& types) const;
 

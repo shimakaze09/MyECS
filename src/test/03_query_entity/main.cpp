@@ -31,8 +31,8 @@ struct MySystem {
         [](World* w, Entity e, const A* a, const B* b, const C* c) {
           w->AddCommand([e, w]() {
             if (w->entityMngr.Have(e, CmptType::Of<C>)) {
-              cout << "Dettach C" << endl;
-              w->entityMngr.Detach(e, &CmptType::Of<C>, 1);
+              cout << "Detach C" << endl;
+              w->entityMngr.Detach<C>(e);
             }
           });
         },

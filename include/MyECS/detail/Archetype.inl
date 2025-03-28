@@ -66,8 +66,8 @@ CmptTypeSet Archetype::GenCmptTypeSet() {
                   "<Cmpts>... must be different");
 
     constexpr std::array types = {CmptType::Of<Cmpts>...};
-    return GenCmptTypeSet(types.data(), types.size());
+    return GenCmptTypeSet(types);
   } else
-    return GenCmptTypeSet(nullptr, 0);
+    return GenCmptTypeSet({});
 }
 }  // namespace My::MyECS
