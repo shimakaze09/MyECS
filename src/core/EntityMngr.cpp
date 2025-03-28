@@ -336,8 +336,9 @@ void EntityMngr::GenEntityJob(World* w, Job* job, SystemFunc* sys) const {
           size_t idxOffsetInChunk = i * chunkCapacity;
           size_t indexOffsetInQueryChunk =
               indexOffsetInQuery + idxOffsetInChunk;
-          CmptsView chunkView{cmpts.data(), cmpts.size()};
-          SingletonsView singletonsView{singletons.data(), singletons.size()};
+          CmptsView chunkView{Span{cmpts.data(), cmpts.size()}};
+          SingletonsView singletonsView{
+              Span{singletons.data(), singletons.size()}};
 
           size_t J = min(chunkCapacity, num - idxOffsetInChunk);
           for (size_t j = 0; j < J; j++) {
@@ -366,8 +367,9 @@ void EntityMngr::GenEntityJob(World* w, Job* job, SystemFunc* sys) const {
           size_t idxOffsetInChunk = i * chunkCapacity;
           size_t indexOffsetInQueryChunk =
               indexOffsetInQuery + idxOffsetInChunk;
-          CmptsView chunkView{chunkCmpts[i].data(), chunkCmpts[i].size()};
-          SingletonsView singletonsView{singletons.data(), singletons.size()};
+          CmptsView chunkView{Span{chunkCmpts[i].data(), chunkCmpts[i].size()}};
+          SingletonsView singletonsView{
+              Span{singletons.data(), singletons.size()}};
 
           size_t J = min(chunkCapacity, num - idxOffsetInChunk);
           for (size_t j = 0; j < J; j++) {
@@ -408,7 +410,7 @@ void EntityMngr::GenChunkJob(World* w, Job* job, SystemFunc* sys) const {
         size_t idxOffsetInChunk = i * chunkCapacity;
         size_t indexOffsetInQueryChunk = indexOffsetInQuery + idxOffsetInChunk;
         job->emplace([=, singletons = singletons]() {
-          (*sys)(w, SingletonsView{singletons.data(), singletons.size()},
+          (*sys)(w, SingletonsView{Span{singletons.data(), singletons.size()}},
                  indexOffsetInQueryChunk, ChunkView{archetype, i});
         });
       }
@@ -417,7 +419,7 @@ void EntityMngr::GenChunkJob(World* w, Job* job, SystemFunc* sys) const {
     }
   } else {
     auto work = [this, w, sys, singletons = std::move(singletons)]() {
-      SingletonsView singletonsView{singletons.data(), singletons.size()};
+      SingletonsView singletonsView{Span{singletons.data(), singletons.size()}};
 
       size_t indexOffsetInQuery = 0;
       for (Archetype* archetype : QueryArchetypes(sys->entityQuery)) {
@@ -450,7 +452,7 @@ void EntityMngr::GenJob(World* w, Job* job, SystemFunc* sys) const {
     return;
 
   auto work = [=, singletons = std::move(singletons)]() {
-    (*sys)(w, SingletonsView{singletons.data(), singletons.size()});
+    (*sys)(w, SingletonsView{Span{singletons.data(), singletons.size()}});
   };
 
   if (job)

@@ -4,22 +4,19 @@
 
 #pragma once
 
+#include <MyContainer/Span.h>
 #include "CmptPtr.h"
 
 namespace My::MyECS {
 class CmptsView {
  public:
-  CmptsView(const CmptAccessPtr* cmpts, size_t num) noexcept
-      : cmpts{cmpts}, num{num} {}
+  CmptsView(Span<const CmptAccessPtr> cmpts) noexcept : cmpts{cmpts} {}
 
   CmptAccessPtr GetCmpt(CmptAccessType) const noexcept;
 
-  const CmptAccessPtr* Components() const noexcept { return cmpts; }
-
-  size_t NumberOfComponents() const noexcept { return num; }
+  Span<const CmptAccessPtr> Components() const noexcept { return cmpts; }
 
  private:
-  const CmptAccessPtr* cmpts;
-  size_t num;
+  Span<const CmptAccessPtr> cmpts;
 };
 }  // namespace My::MyECS
