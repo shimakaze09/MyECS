@@ -19,9 +19,12 @@ class IListener;
 // SystemMngr + EntityMngr
 class World {
  public:
-  World() = default;
+  World() : systemMngr{this} {}
+
   // not copy schedule, so you can't use DumpUpdateJobGraph() and GenUpdateFrameGraph() before Update()
   World(const World&);
+  World(World&&) noexcept;
+  ~World();
 
   SystemMngr systemMngr;
   EntityMngr entityMngr;

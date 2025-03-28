@@ -5,7 +5,6 @@
 #include <MyECS/EntityMngr.h>
 
 #include <MyECS/IListener.h>
-#include <MyECS/World.h>
 #include <MyECS/detail/SystemFunc.h>
 
 using namespace My::MyECS;

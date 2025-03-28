@@ -33,7 +33,7 @@ struct DataSystem {
 
 int main() {
   World w;
-  auto [dataSystem] = w.systemMngr.Register<DataSystem>();
+  auto [dataSystem] = w.systemMngr.systemTraits.Register<DataSystem>();
 
   w.entityMngr.cmptTraits.Register<Data1, Data2>();
 

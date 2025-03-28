@@ -1,5 +1,5 @@
 //
-// Created by Admin on 26/12/2024.
+// Created by Admin on 28/03/2025.
 //
 
 #include <MyECS/World.h>
@@ -15,10 +15,21 @@ struct Velocity {
 };
 
 struct MoverSystem {
+  static void OnCreate(World* w) { std::cout << "OnCreate" << std::endl; }
+
+  static void OnActivate(World* w) { std::cout << "OnActivate" << std::endl; }
+
   static void OnUpdate(Schedule& schedule) {
+    std::cout << "OnUpdate" << std::endl;
     schedule.RegisterEntityJob(
         [](const Velocity* v, Position* p) { p->val += v->val; }, "Mover");
   }
+
+  static void OnDeactivate(World* w) {
+    std::cout << "OnDeactivate" << std::endl;
+  }
+
+  static void OnDestroy(World* w) { std::cout << "OnDestroy" << std::endl; }
 };
 
 int main() {

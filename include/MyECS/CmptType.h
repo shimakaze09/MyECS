@@ -38,7 +38,13 @@ class CmptType {
   }
 
   template <typename Cmpt>
-  constexpr bool Is() const noexcept;
+  constexpr bool Is() const noexcept {
+    return operator==(Of<Cmpt>);
+  }
+
+  constexpr bool Is(std::string_view type_name) const noexcept {
+    return operator==(CmptType{type_name});
+  }
 
   constexpr bool operator<(const CmptType& rhs) const noexcept {
     return hashcode < rhs.hashcode;

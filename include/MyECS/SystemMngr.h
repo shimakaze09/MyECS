@@ -4,65 +4,60 @@
 
 #pragma once
 
-#include <functional>
-#include <map>
-#include <set>
-#include <string>
-#include <vector>
+#include "SystemTraits.h"
+
+#include <unordered_set>
 
 namespace My::MyECS {
 class Schedule;
 
 class SystemMngr {
  public:
-  SystemMngr() = default;
-  SystemMngr(const SystemMngr&);
+  SystemTraits systemTraits;
 
-  using Func = std::function<void(Schedule&)>;
+  SystemMngr(World* w) : w{w} {}
 
-  struct SystemInfo {
-    Func func;
-    std::string name;
-  };
+  SystemMngr(const SystemMngr& mngr, World* w)
+      : systemTraits{mngr.systemTraits}, w{w} {}
 
-  const std::vector<SystemInfo>& GetSystems() const noexcept { return systems; }
+  SystemMngr(SystemMngr&& mngr, World* w) noexcept
+      : systemTraits{std::move(mngr.systemTraits)}, w{w} {}
 
-  const std::set<size_t>& GetActiveSystemIndices() const noexcept {
-    return activeSystemIndices;
-  }
+  ~SystemMngr();
 
-  const std::map<std::string_view, size_t>& GetNameToIndexMap() const noexcept {
-    return name2idx;
-  }
+  // not alive -> create
+  void Create(size_t systemID);
 
-  // if unregister, return static_cast<size_t>(-1)
-  size_t GetIndex(std::string_view name) const;
-  // name: nameof::nameof_type<System>
-  template <typename System>
-  size_t GetIndex() const;
+  // 1. not alive create -> create and activate
+  // 2. not active -> then activate
+  void Activate(size_t systemID);
 
-  void Clear() noexcept;
+  // active -> deactavate
+  void Deactivate(size_t systemID);
 
-  size_t Register(std::string name, Func);
-  // name: nameof::nameof_type<System>
-  // func: static void System::OnUpdate(Schedule&);
-  template <typename... Systems>
-  std::array<size_t, sizeof...(Systems)> Register();
-  void Unregister(size_t idx);
-  void Unregister(std::string_view name);
-  // name: nameof::nameof_type<System>
-  template <typename System>
-  void Unregister();
+  // 1. active -> deactavite
+  // 2. alive -> destroy
+  void Destroy(size_t systemID);
 
-  void Activate(size_t index);
-  void Deactivate(size_t index) noexcept;
+  bool IsAlive(size_t systemID) const;
+  bool IsActive(size_t systemID) const;
+
+  const auto& GetAliveSystemIDs() const noexcept { return aliveSystemIDs; }
+
+  const auto& GetActiveSystemsIDs() const noexcept { return activeSystemIDs; }
+
+  SystemMngr(const SystemMngr&) = delete;
+  SystemMngr(SystemMngr&&) noexcept = delete;
+  SystemMngr& operator=(const SystemMngr&) = delete;
+  SystemMngr& operator=(SystemMngr&&) noexcept = delete;
 
  private:
-  std::vector<SystemInfo> systems;
-  std::vector<size_t> frees;
-  std::map<std::string_view, size_t> name2idx;
-  std::set<size_t> activeSystemIndices;
+  friend class World;
+  World* w;
+  void Update(size_t systemID, Schedule&) const;
+  void Clear();
+
+  std::unordered_set<size_t> aliveSystemIDs;
+  std::unordered_set<size_t> activeSystemIDs;
 };
 }  // namespace My::MyECS
-
-#include "detail/SystemMngr.inl"
