@@ -15,6 +15,7 @@ namespace My::MyECS {
 class CmptLocator {
  public:
   CmptLocator(Span<const CmptAccessType> types);
+  CmptLocator(CmptAccessTypeSet types);
 
   CmptLocator();
 

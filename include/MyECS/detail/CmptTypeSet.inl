@@ -21,7 +21,7 @@ inline bool CmptTypeSet::Contains(CmptType type) const {
 
 inline bool CmptTypeSet::ContainsAll(Span<const CmptType> types) const {
   for (const auto& type : types) {
-    if (Contains(type))
+    if (!Contains(type))
       return false;
   }
   return true;
@@ -38,7 +38,7 @@ bool CmptTypeSet::ContainsAll(const CmptTypeContainer& types) const {
 
 inline bool CmptTypeSet::ContainsAny(Span<const CmptType> types) const {
   for (const auto& type : types) {
-    if (!Contains(type))
+    if (Contains(type))
       return true;
   }
   return false;

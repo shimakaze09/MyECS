@@ -289,7 +289,7 @@ void EntityMngr::Destroy(Entity e) {
   RecycleEntityEntry(e);
 }
 
-tuple<bool, vector<CmptAccessPtr>> EntityMngr::LocateSingletons(
+vector<CmptAccessPtr> EntityMngr::LocateSingletons(
     const SingletonLocator& locator) const {
   size_t numSingletons = 0;
   vector<CmptAccessPtr> rst;
@@ -297,17 +297,17 @@ tuple<bool, vector<CmptAccessPtr>> EntityMngr::LocateSingletons(
   for (const auto& t : locator.SingletonTypes()) {
     auto ptr = GetSingleton(t);
     if (ptr.Ptr() == nullptr)
-      return {false, {}};
+      return {};
     rst.emplace_back(ptr, t.GetAccessMode());
   }
-  return {true, rst};
+  return rst;
 }
 
 void EntityMngr::GenEntityJob(World* w, Job* job, SystemFunc* sys) const {
   assert(sys->GetMode() == SystemFunc::Mode::Entity);
 
-  auto [success, singletons] = LocateSingletons(sys->singletonLocator);
-  if (!success)
+  auto singletons = LocateSingletons(sys->singletonLocator);
+  if (!sys->singletonLocator.SingletonTypes().empty() && singletons.empty())
     return;
 
   if (sys->IsParallel()) {
@@ -386,8 +386,8 @@ void EntityMngr::GenEntityJob(World* w, Job* job, SystemFunc* sys) const {
 void EntityMngr::GenChunkJob(World* w, Job* job, SystemFunc* sys) const {
   assert(sys->GetMode() == SystemFunc::Mode::Chunk);
 
-  auto [success, singletons] = LocateSingletons(sys->singletonLocator);
-  if (!success)
+  auto singletons = LocateSingletons(sys->singletonLocator);
+  if (!sys->singletonLocator.SingletonTypes().empty() && singletons.empty())
     return;
 
   if (sys->IsParallel()) {
@@ -439,8 +439,8 @@ void EntityMngr::GenChunkJob(World* w, Job* job, SystemFunc* sys) const {
 void EntityMngr::GenJob(World* w, Job* job, SystemFunc* sys) const {
   assert(sys->GetMode() == SystemFunc::Mode::Job);
 
-  auto [success, singletons] = LocateSingletons(sys->singletonLocator);
-  if (!success)
+  auto singletons = LocateSingletons(sys->singletonLocator);
+  if (!sys->singletonLocator.SingletonTypes().empty() && singletons.empty())
     return;
 
   auto work = [=, singletons = std::move(singletons)]() {

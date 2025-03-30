@@ -8,6 +8,11 @@
 
 using namespace My::MyECS;
 
+CmptLocator::CmptLocator(CmptAccessTypeSet cmptTypes)
+    : cmptTypes{std::move(cmptTypes)} {
+  UpdateHashCode();
+}
+
 CmptLocator::CmptLocator(Span<const CmptAccessType> types) {
   for (const auto& type : types)
     cmptTypes.insert(type);

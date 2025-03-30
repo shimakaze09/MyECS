@@ -41,6 +41,8 @@ class EntityMngr {
   // use RTDCmptTraits
   Entity Create(Span<const CmptType> types);
 
+  Entity Create(CmptType type) { return Create({&type, 1}); }
+
   Entity Instantiate(Entity);
 
   // TODO: CreateEntities
@@ -51,24 +53,29 @@ class EntityMngr {
   // use RTDCmptTraits
   void Attach(Entity, Span<const CmptType> types);
 
+  void Attach(Entity e, CmptType type) { Attach(e, {&type, 1}); }
+
   template <typename Cmpt, typename... Args>
   Cmpt* Emplace(Entity, Args&&...);
+
+  void Detach(Entity, Span<const CmptType> types);
+
+  void Detach(Entity e, CmptType type) { Detach(e, {&type, 1}); }
 
   // use Detach(Entity, const CmptType*, size_t)
   template <typename... Cmpts>
   void Detach(Entity);
-  void Detach(Entity, Span<const CmptType> types);
 
+  bool Have(Entity, CmptType) const;
   // use Have(Entity, CmptType)
   template <typename Cmpt>
   bool Have(Entity) const;
-  bool Have(Entity, CmptType) const;
 
-  // nullptr if not containts <Cmpt>
-  template <typename Cmpt>
-  Cmpt* Get(Entity) const;
   // nullptr if not containts CmptType
   CmptPtr Get(Entity, CmptType) const;
+  // use Get(Entity, CmptType)
+  template <typename Cmpt>
+  Cmpt* Get(Entity) const;
 
   std::vector<CmptPtr> Components(Entity) const;
 
@@ -90,9 +97,6 @@ class EntityMngr {
   size_t GetEntityVersion(size_t idx) const noexcept {
     return entityTable.at(idx).version;
   }
-
-  std::tuple<bool, std::vector<CmptAccessPtr>> LocateSingletons(
-      const SingletonLocator&) const;
 
   bool IsSingleton(CmptType) const;
   Entity GetSingletonEntity(CmptType) const;
@@ -127,6 +131,8 @@ class EntityMngr {
   template <typename... Cmpts>
   Archetype* AttachWithoutInit(Entity);
   Archetype* AttachWithoutInit(Entity, Span<const CmptType> types);
+
+  std::vector<CmptAccessPtr> LocateSingletons(const SingletonLocator&) const;
 
   const std::set<Archetype*>& QueryArchetypes(const EntityQuery&) const;
   mutable std::unordered_map<EntityQuery, std::set<Archetype*>> queryCache;
