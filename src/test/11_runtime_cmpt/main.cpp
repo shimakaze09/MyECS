@@ -43,7 +43,7 @@ int main() {
   // }
 
   World w;
-  auto [rtdSystem] = w.systemMngr.systemTraits.Register<RTDSystem>();
+  w.systemMngr.RegisterAndActivate<RTDSystem>();
   w.entityMngr.cmptTraits.RegisterSize(type, 8)
       .RegisterDefaultConstructor(type,
                                   [](void*) { cout << "construct" << endl; })
@@ -51,7 +51,6 @@ int main() {
 
   auto [e] = w.entityMngr.Create();
   w.entityMngr.Attach(e, {&type, 1});
-  w.systemMngr.Activate(rtdSystem);
   w.Update();
 
   cout << w.DumpUpdateJobGraph() << endl;

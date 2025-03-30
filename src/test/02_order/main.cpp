@@ -33,13 +33,12 @@ struct DataSystem {
 
 int main() {
   World w;
-  auto [dataSystem] = w.systemMngr.systemTraits.Register<DataSystem>();
+  w.systemMngr.RegisterAndActivate<DataSystem>();
 
   w.entityMngr.cmptTraits.Register<Data1, Data2>();
 
   w.entityMngr.Create<Data1, Data2>();
 
-  w.systemMngr.Activate(dataSystem);
   w.Update();
 
   cout << w.DumpUpdateJobGraph() << endl;

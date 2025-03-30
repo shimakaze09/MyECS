@@ -37,7 +37,7 @@ struct MySystem {
 
 int main() {
   World w;
-auto [mySystem] = w.systemMngr.systemTraits.Register<MySystem>();
+  w.systemMngr.RegisterAndActivate<MySystem>();
 
   w.entityMngr.cmptTraits.RegisterName(CmptType::Of<A>, "A")
       .RegisterName(CmptType::Of<B>, "B")
@@ -48,7 +48,6 @@ auto [mySystem] = w.systemMngr.systemTraits.Register<MySystem>();
       .RegisterName(CmptType::Of<G>, "G");
 
   w.entityMngr.Create<A, B, C, D, E>();
-  w.systemMngr.Activate(mySystem);
   w.Update();
 
   cout << w.DumpUpdateJobGraph() << endl;

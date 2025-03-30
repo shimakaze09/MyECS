@@ -21,6 +21,10 @@ class SystemMngr {
   SystemMngr(SystemMngr&& mngr, World* w) noexcept;
   ~SystemMngr();
 
+  const auto& GetAliveSystemIDs() const noexcept { return aliveSystemIDs; }
+
+  const auto& GetActiveSystemsIDs() const noexcept { return activeSystemIDs; }
+
   // not alive -> create
   void Create(size_t systemID);
 
@@ -38,9 +42,44 @@ class SystemMngr {
   bool IsAlive(size_t systemID) const;
   bool IsActive(size_t systemID) const;
 
-  const auto& GetAliveSystemIDs() const noexcept { return aliveSystemIDs; }
+  // [ Template ] Functions
+  ///////////////////////////
 
-  const auto& GetActiveSystemsIDs() const noexcept { return activeSystemIDs; }
+  template <typename... Systems>
+  void Create() {
+    (Create(systemTraits.GetID<Systems>()), ...);
+  }
+
+  template <typename... Systems>
+  void Activate() {
+    (Activate(systemTraits.GetID<Systems>()), ...);
+  }
+
+  template <typename... Systems>
+  void Deactivate() {
+    (Deactivate(systemTraits.GetID<Systems>()), ...);
+  }
+
+  template <typename... Systems>
+  void Destroy() {
+    (Destroy(systemTraits.GetID<Systems>()), ...);
+  }
+
+  template <typename System>
+  bool IsAlive() const {
+    return IsAlive(systemTraits.GetID<System>());
+  }
+
+  template <typename System>
+  bool IsActive() const {
+    return IsActive(systemTraits.GetID<System>());
+  }
+
+  template <typename... Systems>
+  std::array<size_t, sizeof...(Systems)> RegisterAndCreate();
+
+  template <typename... Systems>
+  std::array<size_t, sizeof...(Systems)> RegisterAndActivate();
 
   SystemMngr(const SystemMngr&) = delete;
   SystemMngr(SystemMngr&&) noexcept = delete;
@@ -57,3 +96,5 @@ class SystemMngr {
   std::unordered_set<size_t> activeSystemIDs;
 };
 }  // namespace My::MyECS
+
+#include "detail/SystemMngr.inl"

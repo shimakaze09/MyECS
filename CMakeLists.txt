@@ -8,7 +8,7 @@ INIT_MYCMAKE()
 
 INIT_PROJECT()
 
-ADD_DEP(MyContainer 0.0.8)
+ADD_DEP(MyContainer 0.0.9)
 ADD_DEP(MyTemplate 0.4.9)
 ADD_DEP(MyGraphviz 0.1.6)
 

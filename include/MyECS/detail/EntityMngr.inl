@@ -151,7 +151,7 @@ inline CmptPtr EntityMngr::Get(Entity e, CmptType type) const {
   return {type, info.archetype->At(type, info.idxInArchetype)};
 }
 
-inline bool EntityMngr::Exist(Entity e) const {
+inline bool EntityMngr::Exist(Entity e) const noexcept {
   return e.Idx() < entityTable.size() &&
          e.Version() == entityTable[e.Idx()].version;
 }

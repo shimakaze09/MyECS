@@ -79,7 +79,7 @@ class EntityMngr {
 
   std::vector<CmptPtr> Components(Entity) const;
 
-  bool Exist(Entity) const;
+  bool Exist(Entity) const noexcept;
 
   void Destroy(Entity);
 
@@ -115,6 +115,9 @@ class EntityMngr {
   std::vector<Entity> GetEntityArray(const ArchetypeFilter&) const;
 
   void Accept(IListener* listener) const;
+
+  EntityMngr& operator=(EntityMngr&&) noexcept = delete;
+  EntityMngr& operator=(const EntityMngr&) = delete;
 
  private:
   friend class World;

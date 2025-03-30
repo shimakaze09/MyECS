@@ -21,7 +21,7 @@ class World {
  public:
   World() : systemMngr{this} {}
 
-  // not copy schedule, so you can't use DumpUpdateJobGraph() and GenUpdateFrameGraph() before Update()
+  // not copy/move schedule, so you can't use DumpUpdateJobGraph() and GenUpdateFrameGraph() before Update()
   World(const World&);
   World(World&&) noexcept;
   ~World();
@@ -113,12 +113,6 @@ class World {
   void RunCommands();
 
   void Run(SystemFunc*);
-
-  // ==================================================
-  // World(const World& world) = delete;
-  // World(World&& world) = delete;
-  // World& operator==(World&& world) = delete;
-  // World& operator=(const World& world) = delete;
 };
 }  // namespace My::MyECS
 
