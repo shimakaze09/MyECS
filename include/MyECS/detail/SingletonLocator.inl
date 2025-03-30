@@ -14,7 +14,7 @@ SingletonLocator GenerateSingletonLocator(TypeList<Singletons...>) {
     constexpr std::array types{CmptAccessType::Of<Singletons>...};
     return SingletonLocator{types};
   } else
-    return SingletonLocator{{}};
+    return {};
 }
 }  // namespace My::MyECS::detail
 

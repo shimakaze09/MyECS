@@ -4,17 +4,17 @@
 
 #pragma once
 
-#include <set>
-
 #include "CmptTag.h"
 #include "CmptType.h"
+
+#include <MyContainer/Span.h>
 
 namespace My::MyECS {
 // locate components in function's argument list for Archetype
 // immutable
 class CmptLocator {
  public:
-  CmptLocator(const CmptAccessType* types, size_t num);
+  CmptLocator(Span<const CmptAccessType> types);
 
   CmptLocator();
 

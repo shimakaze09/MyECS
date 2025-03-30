@@ -10,15 +10,18 @@
 
 namespace My::MyECS::detail {
 template <typename System>
-Concept(HaveOnCreate, static_cast<void (*)(World*)>(&System::OnCreate));
+Concept(HaveOnCreate, static_cast<SystemTraits::OnCreate*>(&System::OnCreate));
 template <typename System>
-Concept(HaveOnActivate, static_cast<void (*)(World*)>(&System::OnActivate));
+Concept(HaveOnActivate,
+        static_cast<SystemTraits::OnActivate*>(&System::OnActivate));
 template <typename System>
-Concept(HaveOnUpdate, static_cast<void (*)(Schedule&)>(&System::OnUpdate));
+Concept(HaveOnUpdate, static_cast<SystemTraits::OnUpdate*>(&System::OnUpdate));
 template <typename System>
-Concept(HaveOnDeactivate, static_cast<void (*)(World*)>(&System::OnDeactivate));
+Concept(HaveOnDeactivate,
+        static_cast<SystemTraits::OnDeactivate*>(&System::OnDeactivate));
 template <typename System>
-Concept(HaveOnDestroy, static_cast<void (*)(World*)>(&System::OnDestroy));
+Concept(HaveOnDestroy,
+        static_cast<SystemTraits::OnDestroy*>(&System::OnDestroy));
 
 template <typename System>
 size_t Register(SystemTraits& traits) {
@@ -26,20 +29,19 @@ size_t Register(SystemTraits& traits) {
       traits.Register(std::string{SystemTraits::StaticNameof<System>()});
   if constexpr (Require<HaveOnCreate, System>)
     traits.RegisterOnCreate(
-        ID, std::function{static_cast<void (*)(World*)>(&System::OnCreate)});
+        ID, static_cast<SystemTraits::OnCreate*>(&System::OnCreate));
   if constexpr (Require<HaveOnActivate, System>)
     traits.RegisterOnActivate(
-        ID, std::function{static_cast<void (*)(World*)>(&System::OnActivate)});
+        ID, static_cast<SystemTraits::OnActivate*>(&System::OnActivate));
   if constexpr (Require<HaveOnUpdate, System>)
     traits.RegisterOnUpdate(
-        ID, static_cast<void (*)(Schedule&)>(&System::OnUpdate));
+        ID, static_cast<SystemTraits::OnUpdate*>(&System::OnUpdate));
   if constexpr (Require<HaveOnDeactivate, System>)
     traits.RegisterOnDeactivate(
-        ID,
-        std::function{static_cast<void (*)(World*)>(&System::OnDeactivate)});
+        ID, static_cast<SystemTraits::OnDeactivate*>(&System::OnDeactivate));
   if constexpr (Require<HaveOnDeactivate, System>)
     traits.RegisterOnDestroy(
-        ID, std::function{static_cast<void (*)(World*)>(&System::OnDestroy)});
+        ID, static_cast<SystemTraits::OnDestroy*>(&System::OnDestroy));
   return ID;
 }
 }  // namespace My::MyECS::detail
