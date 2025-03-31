@@ -80,7 +80,7 @@ class RTDCmptTraits {
   // register all for Cmpt
   // static_assert
   // - is_default_constructible_v
-  // - is_copy_constructible_v
+  // - is_copy_constructible_v || std::is_constructible_v<Cmpt, Cmpt&>
   // - is_move_constructible_v
   // - is_move_assignable_v
   // - is_destructible_v
