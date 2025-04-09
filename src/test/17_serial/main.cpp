@@ -36,12 +36,12 @@ int main() {
   w.entityMngr.Create<A, B, C>();
   w.entityMngr.cmptTraits.Register<A, B, C>();
 
-  for (size_t i = 0; i < 5; i++) {
+  for (std::size_t i = 0; i < 5; i++) {
     w.Update();
     std::cout << "^^^^^^^^^^" << std::endl;
   }
 
-  for (size_t i = 0; i < 100; i++)
+  for (std::size_t i = 0; i < 100; i++)
     w.entityMngr.Create();
 
   w.RunEntityJob([](Entity e) { std::cout << e.Idx() << std::endl; }, false);

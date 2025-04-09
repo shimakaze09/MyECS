@@ -8,7 +8,7 @@
 - 0.14.3
     - Updated `CmptsView` and `SingletonsView` to use `Span`
     - Replaced APIs using `const CmptType* types, size_t num` with `Span<CmptType> types`
-    - Moved `include/UECS/detail/_deps/taskflow` to `include/_deps/taskflow`
+    - Moved `include/MyECS/detail/_deps/taskflow` to `include/_deps/taskflow`
 - 0.14.2
     - Added `RandomAccessor` for random access to other entities' components
         - Added member to `SystemFunc`

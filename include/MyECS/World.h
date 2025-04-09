@@ -19,7 +19,9 @@ class IListener;
 // SystemMngr + EntityMngr
 class World {
  public:
-  World() : systemMngr{this} {}
+  World()
+      : jobRsrc{std::make_unique<std::pmr::unsynchronized_pool_resource>()},
+        systemMngr{this} {}
 
   // not copy/move schedule, so you can't use DumpUpdateJobGraph() and GenUpdateFrameGraph() before Update()
   World(const World&);
@@ -54,7 +56,7 @@ class World {
   // {LastFrame|Latest}<Singleton<Cmpt>>
   // SingletonsView
   // Entity
-  // size_t indexInQuery
+  // std::size_t indexInQuery
   // <tagged-components>: [const] <Cmpt>*...
   // CmptsView
   template <typename Func>
@@ -66,7 +68,7 @@ class World {
   // {LastFrame|Latest}<Singleton<Cmpt>>
   // SingletonsView
   // Entity
-  // size_t indexInQuery
+  // std::size_t indexInQuery
   // <tagged-components>: const <Cmpt>*...
   // CmptsView
   // --
@@ -79,7 +81,7 @@ class World {
   // [const] World*
   // {LastFrame|Latest}<Singleton<Cmpt>>
   // SingletonsView
-  // size_t entityBeginIndexInQuery
+  // std::size_t entityBeginIndexInQuery
   // ChunkView (necessary)
   template <typename Func>
   void RunChunkJob(Func&&, ArchetypeFilter = {}, bool isParallel = true,
@@ -89,7 +91,7 @@ class World {
   // const World*
   // {LastFrame|Latest}<Singleton<Cmpt>>
   // SingletonsView
-  // size_t entityBeginIndexInQuery
+  // std::size_t entityBeginIndexInQuery
   // ChunkView (necessary)
   // --
   // ArchetypeFilter's Cmpt AccessMode can't be WRITE
@@ -105,7 +107,7 @@ class World {
 
   Job jobGraph;
   std::vector<Job*> jobs;
-  Pool<Job> jobPool;
+  std::unique_ptr<std::pmr::unsynchronized_pool_resource> jobRsrc;
 
   // command
   std::map<int, std::vector<std::function<void()>>> commandBuffer;

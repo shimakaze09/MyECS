@@ -6,6 +6,7 @@
 
 #include <iostream>
 
+using namespace My;
 using namespace My::MyECS;
 using namespace std;
 
@@ -20,7 +21,7 @@ struct MySystem {
     schedule.RegisterEntityJob(
         [](World* w, Entity e, const A* a, const B* b) {
           w->AddCommand([e, w]() {
-            if (!w->entityMngr.Have(e, CmptType::Of<C>)) {
+            if (!w->entityMngr.Have(e, TypeID_of<C>)) {
               cout << "Attach C" << endl;
               w->entityMngr.Attach<C>(e);
             }
@@ -30,7 +31,7 @@ struct MySystem {
     schedule.RegisterEntityJob(
         [](World* w, Entity e, const A* a, const B* b, const C* c) {
           w->AddCommand([e, w]() {
-            if (w->entityMngr.Have(e, CmptType::Of<C>)) {
+            if (w->entityMngr.Have(e, TypeID_of<C>)) {
               cout << "Detach C" << endl;
               w->entityMngr.Detach<C>(e);
             }

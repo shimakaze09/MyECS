@@ -4,6 +4,7 @@
 
 #include <MyECS/World.h>
 
+using namespace My;
 using namespace My::MyECS;
 
 struct Translation {
@@ -46,7 +47,7 @@ struct TranslationSystem {
   static void OnUpdate(Schedule& schedule) {
     {
       ArchetypeFilter filter;
-      filter.all.insert(CmptType::Of<Parent>);
+      filter.all.insert(TypeID_of<Parent>);
       schedule.RegisterEntityJob(
           [](LocalToParent* l2p, const Translation* t) {
             l2p->value = t->value;
@@ -55,7 +56,7 @@ struct TranslationSystem {
     }
     {
       ArchetypeFilter filter;
-      filter.none.insert(CmptType::Of<Parent>);
+      filter.none.insert(TypeID_of<Parent>);
       schedule.RegisterEntityJob(
           [](LocalToWorld* l2w, const Translation* t) {
             l2w->value = t->value;
@@ -65,10 +66,10 @@ struct TranslationSystem {
     {
       ArchetypeFilter filter;
       RandomAccessor randomAccessor;
-      randomAccessor.types = {CmptAccessType::Of<Write<LocalToWorld>>,
-                              CmptAccessType::Of<Latest<LocalToParent>>,
-                              CmptAccessType::Of<Latest<Children>>};
-      filter.none.insert(CmptType::Of<Parent>);
+      randomAccessor.types = {AccessTypeID_of<Write<LocalToWorld>>,
+                              AccessTypeID_of<Latest<LocalToParent>>,
+                              AccessTypeID_of<Latest<Children>>};
+      filter.none.insert(TypeID_of<Parent>);
       schedule.RegisterEntityJob(
           [](World* w, Children* children, const LocalToWorld* l2w) {
             for (const auto& child : children->value)

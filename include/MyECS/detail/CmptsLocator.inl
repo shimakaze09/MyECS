@@ -4,14 +4,13 @@
 
 #pragma once
 
-#include <MyContainer/Algorithm.h>
 #include <MyTemplate/Func.h>
 
 namespace My::MyECS::detail {
 template <typename... Cmpts>
 CmptLocator GenerateCmptLocator(TypeList<Cmpts...>) {
   if constexpr (sizeof...(Cmpts) > 0) {
-    constexpr std::array types{CmptAccessType::Of<Cmpts>...};
+    constexpr std::array types{AccessTypeID_of<Cmpts>...};
     return CmptLocator{types};
   } else
     return {};
@@ -29,8 +28,9 @@ CmptLocator CmptLocator::Generate() {
 template <typename Func>
 CmptLocator& CmptLocator::Combine() {
   CmptLocator funcLocator = Generate<Func>();
-  cmptTypes = SetUnion(cmptTypes, funcLocator.cmptTypes);
-  UpdateHashCode();
+  for (const auto& type : funcLocator.cmptTypes)
+    cmptTypes.insert(type);
+  UpdateGetValue();
   return *this;
 }
 }  // namespace My::MyECS

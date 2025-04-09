@@ -4,43 +4,40 @@
 
 #pragma once
 
+#include "AccessTypeID.h"
 #include "CmptTag.h"
-#include "CmptType.h"
 
-#include <MyContainer/Span.h>
+#include <span>
 
 namespace My::MyECS {
 // locate components in function's argument list for Archetype
 // immutable
 class CmptLocator {
- public:
-  CmptLocator(Span<const CmptAccessType> types);
-  CmptLocator(CmptAccessTypeSet types);
+public:
+  CmptLocator(std::span<const AccessTypeID> types);
+  CmptLocator(AccessTypeIDSet types);
 
   CmptLocator();
 
-  template <typename Func>
+  template<typename Func>
   static CmptLocator Generate();
 
-  template <typename Func>
+  template<typename Func>
   CmptLocator& Combine();
 
-  size_t HashCode() const noexcept { return hashCode; }
+  std::size_t GetValue() const noexcept { return hashCode; }
 
-  const CmptAccessTypeSet& CmptAccessTypes() const noexcept {
-    return cmptTypes;
-  }
+  const AccessTypeIDSet& AccessTypeIDs() const noexcept { return cmptTypes; }
 
   bool operator==(const CmptLocator& rhs) const noexcept;
 
-  bool HasWriteCmptType() const noexcept;
+  bool HasWriteTypeID() const noexcept;
+private:
+  void UpdateGetValue() noexcept;
 
- private:
-  void UpdateHashCode() noexcept;
+  AccessTypeIDSet cmptTypes;
 
-  CmptAccessTypeSet cmptTypes;
-
-  size_t hashCode;
+  std::size_t hashCode;
 };
 }  // namespace My::MyECS
 

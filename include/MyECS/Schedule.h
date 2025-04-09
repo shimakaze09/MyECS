@@ -7,9 +7,9 @@
 #include "detail/Job.h"
 #include "detail/SystemFunc.h"
 
-#include <MyContainer/Pool.h>
-
 #include <map>
+#include <memory>
+#include <memory_resource>
 
 namespace My::MyECS::detail {
 struct Compiler;
@@ -29,12 +29,16 @@ class SysFuncGraph;
 // schedule will be clear at the beginning of the next World::Update()
 class Schedule {
  public:
+  Schedule()
+      : rsrc{std::make_unique<std::pmr::unsynchronized_pool_resource>()},
+        sysFuncAllocator{rsrc.get()} {}
+
   // Func's argument list:
   // [const] World*
   // {LastFrame|Latest}<Singleton<Cmpt>>
   // SingletonsView
   // Entity
-  // size_t indexInQuery
+  // std::size_t indexInQuery
   // <tagged-components>: {LastFrame|Write|Latest}<Cmpt>...
   // CmptsView
   template <typename Func>
@@ -72,8 +76,8 @@ class Schedule {
 
   Schedule& LockFilter(std::string_view sys);
 
-  Schedule& InsertNone(std::string_view sys, CmptType);
-  Schedule& EraseNone(std::string_view sys, CmptType);
+  Schedule& InsertNone(std::string_view sys, TypeID);
+  Schedule& EraseNone(std::string_view sys, TypeID);
 
  private:
   template <typename... Args>
@@ -87,28 +91,29 @@ class Schedule {
     std::vector<SystemFunc*> latestSysFuncs;
   };
   friend struct detail::Compiler;
-  std::unordered_map<CmptType, CmptSysFuncs> GenCmptSysFuncsMap() const;
+  std::unordered_map<TypeID, CmptSysFuncs> GenCmptSysFuncsMap() const;
 
   SysFuncGraph GenSysFuncGraph() const;
 
   // SystemFunc's hashcode to pointer of SystemFunc
-  std::unordered_map<size_t, SystemFunc*> sysFuncs;
+  std::unordered_map<std::size_t, SystemFunc*> sysFuncs;
 
   // SystemFunc's hashcode to SystemFunc's hashcode
   // parent to children
-  std::unordered_map<size_t, size_t> sysFuncOrder;
+  std::unordered_map<std::size_t, std::size_t> sysFuncOrder;
 
   struct FilterChange {
-    std::set<CmptType> insertNones;
-    std::set<CmptType> eraseNones;
+    std::set<TypeID> insertNones;
+    std::set<TypeID> eraseNones;
   };
 
-  std::unordered_map<size_t, FilterChange> sysFilterChange;
-  std::unordered_set<size_t> sysLockFilter;
+  std::unordered_map<std::size_t, FilterChange> sysFilterChange;
+  std::unordered_set<std::size_t> sysLockFilter;
 
   std::map<int, std::vector<std::function<void(World*)>>> commandBuffer;
 
-  Pool<SystemFunc> sysFuncPool;
+  std::unique_ptr<std::pmr::unsynchronized_pool_resource> rsrc;
+  std::pmr::polymorphic_allocator<SystemFunc> sysFuncAllocator;
   friend class World;
 };
 }  // namespace My::MyECS

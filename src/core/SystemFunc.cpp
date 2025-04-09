@@ -7,14 +7,14 @@
 using namespace My::MyECS;
 
 void SystemFunc::operator()(World* w, SingletonsView singletonsView, Entity e,
-                            size_t entityIndexInQuery,
+                            std::size_t entityIndexInQuery,
                             CmptsView cmptsView) const {
   assert(mode == Mode::Entity);
   return func(w, singletonsView, e, entityIndexInQuery, cmptsView, {});
 }
 
 void SystemFunc::operator()(World* w, SingletonsView singletonsView,
-                            size_t entityBeginIndexInQuery,
+                            std::size_t entityBeginIndexInQuery,
                             ChunkView chunkView) const {
   assert(mode == Mode::Chunk);
   return func(w, singletonsView, Entity::Invalid(), entityBeginIndexInQuery, {},
@@ -23,6 +23,6 @@ void SystemFunc::operator()(World* w, SingletonsView singletonsView,
 
 void SystemFunc::operator()(World* w, SingletonsView singletonsView) const {
   assert(mode == Mode::Job);
-  return func(w, singletonsView, Entity::Invalid(), static_cast<size_t>(-1), {},
-              {});
+  return func(w, singletonsView, Entity::Invalid(),
+              static_cast<std::size_t>(-1), {}, {});
 }

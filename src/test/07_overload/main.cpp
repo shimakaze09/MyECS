@@ -6,6 +6,7 @@
 
 #include <iostream>
 
+using namespace My;
 using namespace My::MyECS;
 using namespace std;
 
@@ -26,7 +27,7 @@ struct AVP_System {
   static void OnUpdate(Schedule& schedule) {
     schedule.RegisterEntityJob([](const A*, V*, P*) { cout << "AVP" << endl; },
                                "AVP");
-    schedule.InsertNone("VP", CmptType::Of<A>);
+    schedule.InsertNone("VP", TypeID_of<A>);
   }
 };
 

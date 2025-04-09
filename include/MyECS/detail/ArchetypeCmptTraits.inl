@@ -7,19 +7,19 @@
 #include <stdexcept>
 
 namespace My::MyECS {
-inline size_t ArchetypeCmptTraits::Sizeof(CmptType type) const {
+inline std::size_t ArchetypeCmptTraits::Sizeof(TypeID type) const {
   auto target = sizeofs.find(type);
   assert(target != sizeofs.end());
   return target->second;
 }
 
-inline size_t ArchetypeCmptTraits::Alignof(CmptType type) const {
+inline std::size_t ArchetypeCmptTraits::Alignof(TypeID type) const {
   auto target = alignments.find(type);
   return target != alignments.end() ? target->second
                                     : RTDCmptTraits::DefaultAlignment();
 }
 
-inline void ArchetypeCmptTraits::CopyConstruct(CmptType type, void* dst,
+inline void ArchetypeCmptTraits::CopyConstruct(TypeID type, void* dst,
                                                void* src) const {
   auto target = copy_constructors.find(type);
 
@@ -29,7 +29,7 @@ inline void ArchetypeCmptTraits::CopyConstruct(CmptType type, void* dst,
     memcpy(dst, src, Sizeof(type));
 }
 
-inline void ArchetypeCmptTraits::MoveConstruct(CmptType type, void* dst,
+inline void ArchetypeCmptTraits::MoveConstruct(TypeID type, void* dst,
                                                void* src) const {
   auto target = move_constructors.find(type);
 
@@ -39,7 +39,7 @@ inline void ArchetypeCmptTraits::MoveConstruct(CmptType type, void* dst,
     memcpy(dst, src, Sizeof(type));
 }
 
-inline void ArchetypeCmptTraits::MoveAssign(CmptType type, void* dst,
+inline void ArchetypeCmptTraits::MoveAssign(TypeID type, void* dst,
                                             void* src) const {
   auto target = move_assignments.find(type);
 
@@ -49,7 +49,7 @@ inline void ArchetypeCmptTraits::MoveAssign(CmptType type, void* dst,
     memcpy(dst, src, Sizeof(type));
 }
 
-inline void ArchetypeCmptTraits::Destruct(CmptType type, void* cmpt) const {
+inline void ArchetypeCmptTraits::Destruct(TypeID type, void* cmpt) const {
   auto target = destructors.find(type);
   if (target != destructors.end())
     target->second(cmpt);
@@ -68,7 +68,7 @@ void ArchetypeCmptTraits::Register() {
                 "<Cmpt> must be move-assignable");
   static_assert(std::is_destructible_v<Cmpt>, "<Cmpt> must be destructible");
 
-  constexpr CmptType type = CmptType::Of<Cmpt>;
+  constexpr TypeID type = TypeID_of<Cmpt>;
 
   sizeofs.emplace(type, sizeof(Cmpt));
   alignments.emplace(type, alignof(Cmpt));
@@ -95,12 +95,12 @@ void ArchetypeCmptTraits::Register() {
 }
 
 inline void ArchetypeCmptTraits::Register(const RTDCmptTraits& rtdct,
-                                          CmptType type) {
+                                          TypeID type) {
   auto size_target = rtdct.GetSizeofs().find(type);
   if (size_target == rtdct.GetSizeofs().end())
     throw std::logic_error(
         "ArchetypeCmptTraits::Register: RTDCmptTraits hasn't registered "
-        "<CmptType>");
+        "<TypeID>");
   sizeofs[type] = size_target->second;
 
   auto alignment_target = rtdct.GetAlignments().find(type);
@@ -124,7 +124,7 @@ inline void ArchetypeCmptTraits::Register(const RTDCmptTraits& rtdct,
 
 template <typename Cmpt>
 void ArchetypeCmptTraits::Deregister() noexcept {
-  constexpr CmptType type = CmptType::Of<Cmpt>;
+  constexpr TypeID type = TypeID_of<Cmpt>;
 
   sizeofs.erase(type);
   alignments.erase(type);
@@ -139,7 +139,7 @@ void ArchetypeCmptTraits::Deregister() noexcept {
     move_assignments.erase(type);
 }
 
-inline void ArchetypeCmptTraits::Deregister(CmptType type) noexcept {
+inline void ArchetypeCmptTraits::Deregister(TypeID type) noexcept {
   sizeofs.erase(type);
   alignments.erase(type);
   copy_constructors.erase(type);

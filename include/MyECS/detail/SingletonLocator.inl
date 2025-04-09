@@ -4,14 +4,13 @@
 
 #pragma once
 
-#include <MyContainer/Algorithm.h>
 #include <MyTemplate/Func.h>
 
 namespace My::MyECS::detail {
 template <typename... Singletons>
 SingletonLocator GenerateSingletonLocator(TypeList<Singletons...>) {
   if constexpr (sizeof...(Singletons) > 0) {
-    constexpr std::array types{CmptAccessType::Of<Singletons>...};
+    constexpr std::array types{AccessTypeID_of<Singletons>...};
     return SingletonLocator{types};
   } else
     return {};
@@ -29,7 +28,8 @@ SingletonLocator SingletonLocator::Generate() {
 template <typename Func>
 SingletonLocator& SingletonLocator::Combine() {
   SingletonLocator funcLocator = Generate<Func>();
-  singletonTypes = SetUnion(singletonTypes, funcLocator.singletonTypes);
+  for (const auto& type : funcLocator.singletonTypes)
+    singletonTypes.insert(type);
   return *this;
 }
 }  // namespace My::MyECS

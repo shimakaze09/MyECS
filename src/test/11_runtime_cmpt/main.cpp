@@ -6,13 +6,14 @@
 
 #include <iostream>
 
+using namespace My;
 using namespace My::MyECS;
 using namespace std;
 
 struct RTDSystem {
   static void OnUpdate(Schedule& schedule) {
-    std::array cmpts_write = {CmptAccessType{"LuaCmpt", AccessMode::WRITE}};
-    std::array cmpts_read = {CmptAccessType{"LuaCmpt", AccessMode::LATEST}};
+    std::array cmpts_write = {AccessTypeID{"LuaCmpt", AccessMode::WRITE}};
+    std::array cmpts_read = {AccessTypeID{"LuaCmpt", AccessMode::LATEST}};
 
     CmptLocator locator_write(cmpts_write);
     CmptLocator locator_read(cmpts_read);
@@ -20,7 +21,7 @@ struct RTDSystem {
     schedule.RegisterEntityJob(
         [](CmptsView cmpts) {
           auto luaCmpt =
-              cmpts.GetCmpt(CmptAccessType{"LuaCmpt", AccessMode::WRITE});
+              cmpts.GetCmpt(AccessTypeID{"LuaCmpt", AccessMode::WRITE});
           double& val = *reinterpret_cast<double*>(luaCmpt.Ptr());
           val = 520.;
         },
@@ -28,7 +29,7 @@ struct RTDSystem {
     schedule.RegisterEntityJob(
         [](CmptsView cmpts) {
           auto luaCmpt =
-              cmpts.GetCmpt(CmptAccessType{"LuaCmpt", AccessMode::LATEST});
+              cmpts.GetCmpt(AccessTypeID{"LuaCmpt", AccessMode::LATEST});
           const double& val = *reinterpret_cast<const double*>(luaCmpt.Ptr());
           cout << "value : " << val << endl;
         },
@@ -37,7 +38,7 @@ struct RTDSystem {
 };
 
 int main() {
-  CmptType type("LuaCmpt");
+  TypeID type("LuaCmpt");
   // LuaCmpt {
   //   number value;
   // }

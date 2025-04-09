@@ -3,14 +3,14 @@
 //
 
 #pragma once
- 
- #include "CmptType.h"
- 
- #include <set>
- 
- namespace My::MyECS {
- class RandomAccessor {
+
+#include "AccessTypeID.h"
+
+#include <set>
+
+namespace My::MyECS {
+class RandomAccessor {
  public:
-   CmptAccessTypeSet types;
- };
- }
+  AccessTypeIDSet types;
+};
+}  // namespace My::MyECS

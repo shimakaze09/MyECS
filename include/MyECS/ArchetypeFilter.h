@@ -4,20 +4,20 @@
 
 #pragma once
 
-#include "CmptType.h"
+#include "AccessTypeID.h"
 
 #include <set>
 
 namespace My::MyECS {
 // filter Archetype with all, any and none
 struct ArchetypeFilter {
-  CmptAccessTypeSet all;
-  CmptAccessTypeSet any;
-  std::set<CmptType> none;
+  AccessTypeIDSet all;
+  AccessTypeIDSet any;
+  std::set<TypeID> none;
 
-  size_t HashCode() const noexcept;
+  std::size_t GetValue() const noexcept;
 
-  bool HaveWriteCmptType() const noexcept;
+  bool HaveWriteTypeID() const noexcept;
 
   bool operator==(const ArchetypeFilter& rhs) const noexcept;
 };

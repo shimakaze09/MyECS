@@ -10,8 +10,8 @@ struct hash;
 
 template <>
 struct hash<My::MyECS::EntityQuery> {
-  size_t operator()(const My::MyECS::EntityQuery& query) const noexcept {
-    return query.HashCode();
+  std::size_t operator()(const My::MyECS::EntityQuery& query) const noexcept {
+    return query.GetValue();
   }
 };
 }  // namespace std

@@ -4,9 +4,10 @@
 
 #pragma once
 
-#include "CmptType.h"
+#include "AccessTypeID.h"
 
 #include <functional>
+#include <string>
 #include <unordered_map>
 
 namespace My::MyECS {
@@ -22,24 +23,23 @@ namespace My::MyECS {
 // - name
 class RTDCmptTraits {
  public:
-  static constexpr size_t DefaultAlignment() noexcept {
+  static constexpr std::size_t DefaultAlignment() noexcept {
     return alignof(std::max_align_t);
   }
 
   RTDCmptTraits& Clear();
 
-  RTDCmptTraits& RegisterSize(CmptType, size_t size);
-  RTDCmptTraits& RegisterAlignment(CmptType, size_t alignment);
-  RTDCmptTraits& RegisterDefaultConstructor(CmptType,
-                                            std::function<void(void*)>);
-  RTDCmptTraits& RegisterCopyConstructor(CmptType,
+  RTDCmptTraits& RegisterSize(TypeID, std::size_t size);
+  RTDCmptTraits& RegisterAlignment(TypeID, std::size_t alignment);
+  RTDCmptTraits& RegisterDefaultConstructor(TypeID, std::function<void(void*)>);
+  RTDCmptTraits& RegisterCopyConstructor(TypeID,
                                          std::function<void(void*, void*)>);
-  RTDCmptTraits& RegisterMoveConstructor(CmptType,
+  RTDCmptTraits& RegisterMoveConstructor(TypeID,
                                          std::function<void(void*, void*)>);
-  RTDCmptTraits& RegisterMoveAssignment(CmptType,
+  RTDCmptTraits& RegisterMoveAssignment(TypeID,
                                         std::function<void(void*, void*)>);
-  RTDCmptTraits& RegisterDestructor(CmptType, std::function<void(void*)>);
-  RTDCmptTraits& RegisterName(CmptType, std::string name);
+  RTDCmptTraits& RegisterDestructor(TypeID, std::function<void(void*)>);
+  RTDCmptTraits& RegisterName(TypeID, std::string name);
 
   const auto& GetSizeofs() const noexcept { return sizeofs; }
 
@@ -59,16 +59,16 @@ class RTDCmptTraits {
 
   const auto& GetNames() const noexcept { return names; }
 
-  size_t Sizeof(CmptType) const;
-  size_t Alignof(CmptType) const;
-  void DefaultConstruct(CmptType, void* cmpt) const;
-  void CopyConstruct(CmptType, void* dst, void* src) const;
-  void MoveConstruct(CmptType, void* dst, void* src) const;
-  void MoveAssign(CmptType, void* dst, void* src) const;
-  void Destruct(CmptType, void* cmpt) const;
-  std::string_view Nameof(CmptType) const;
+  std::size_t Sizeof(TypeID) const;
+  std::size_t Alignof(TypeID) const;
+  void DefaultConstruct(TypeID, void* cmpt) const;
+  void CopyConstruct(TypeID, void* dst, void* src) const;
+  void MoveConstruct(TypeID, void* dst, void* src) const;
+  void MoveAssign(TypeID, void* dst, void* src) const;
+  void Destruct(TypeID, void* cmpt) const;
+  std::string_view Nameof(TypeID) const;
 
-  RTDCmptTraits& Deregister(CmptType) noexcept;
+  RTDCmptTraits& Deregister(TypeID) noexcept;
 
   template <typename... Cmpts>
   void Register();
@@ -87,18 +87,18 @@ class RTDCmptTraits {
   template <typename Cmpt>
   void RegisterOne();
 
-  std::unordered_map<CmptType, size_t> sizeofs;
-  std::unordered_map<CmptType, size_t> alignments;
-  std::unordered_map<CmptType, std::function<void(void*)>>
+  std::unordered_map<TypeID, std::size_t> sizeofs;
+  std::unordered_map<TypeID, std::size_t> alignments;
+  std::unordered_map<TypeID, std::function<void(void*)>>
       default_constructors;  // dst <- src
-  std::unordered_map<CmptType, std::function<void(void*, void*)>>
+  std::unordered_map<TypeID, std::function<void(void*, void*)>>
       copy_constructors;  // dst <- src
-  std::unordered_map<CmptType, std::function<void(void*, void*)>>
+  std::unordered_map<TypeID, std::function<void(void*, void*)>>
       move_constructors;  // dst <- src
-  std::unordered_map<CmptType, std::function<void(void*, void*)>>
+  std::unordered_map<TypeID, std::function<void(void*, void*)>>
       move_assignments;  // dst <- src
-  std::unordered_map<CmptType, std::function<void(void*)>> destructors;
-  std::unordered_map<CmptType, std::string> names;
+  std::unordered_map<TypeID, std::function<void(void*)>> destructors;
+  std::unordered_map<TypeID, std::string> names;
 };
 }  // namespace My::MyECS
 

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <MyTemplate/Basic.h>
+#include <MyTemplate/Util.h>
 
 namespace My::MyECS {
 class Entity;
@@ -105,7 +105,7 @@ template <typename T>
 static constexpr bool IsTaggedCmpt_v = IsTaggedCmpt<T>::value;
 
 template <typename T, AccessMode defaultMode>
-static constexpr AccessMode AccessModeOf_default =
+static constexpr AccessMode AccessMode_of_default =
     IsLastFrame_v<T> || IsLastFrameSingleton_v<T>
         ? AccessMode::LAST_FRAME
         : (IsWrite_v<T> || IsWriteSingleton_v<T>
@@ -114,117 +114,121 @@ static constexpr AccessMode AccessModeOf_default =
                                                           : defaultMode));
 
 template <typename T>
-static constexpr AccessMode AccessModeOf =
-    AccessModeOf_default<T, AccessMode::WRITE>;
+static constexpr AccessMode AccessMode_of =
+    AccessMode_of_default<T, AccessMode::WRITE>;
 
 template <typename Cmpt>
-struct RemoveTag : IType<Cmpt> {};  // default
+struct RemoveTag : std::type_identity<Cmpt> {};  // default
 
 template <typename Cmpt>
-struct RemoveTag<LastFrame<Cmpt>> : IType<Cmpt> {};
+struct RemoveTag<LastFrame<Cmpt>> : std::type_identity<Cmpt> {};
 
 template <typename Cmpt>
-struct RemoveTag<Write<Cmpt>> : IType<Cmpt> {};
+struct RemoveTag<Write<Cmpt>> : std::type_identity<Cmpt> {};
 
 template <typename Cmpt>
-struct RemoveTag<Latest<Cmpt>> : IType<Cmpt> {};
+struct RemoveTag<Latest<Cmpt>> : std::type_identity<Cmpt> {};
 
 template <typename Cmpt>
-struct RemoveTag<LastFrame<Singleton<Cmpt>>> : IType<Cmpt> {};
+struct RemoveTag<LastFrame<Singleton<Cmpt>>> : std::type_identity<Cmpt> {};
 
 template <typename Cmpt>
-struct RemoveTag<Write<Singleton<Cmpt>>> : IType<Cmpt> {};
+struct RemoveTag<Write<Singleton<Cmpt>>> : std::type_identity<Cmpt> {};
 
 template <typename Cmpt>
-struct RemoveTag<Latest<Singleton<Cmpt>>> : IType<Cmpt> {};
+struct RemoveTag<Latest<Singleton<Cmpt>>> : std::type_identity<Cmpt> {};
 
 template <typename Cmpt>
-struct RemoveTag<Cmpt*> : IType<Cmpt> {};
+struct RemoveTag<Cmpt*> : std::type_identity<Cmpt> {};
 
 template <typename Cmpt>
-struct RemoveTag<const Cmpt*> : IType<Cmpt> {};
+struct RemoveTag<const Cmpt*> : std::type_identity<Cmpt> {};
 
 template <typename Cmpt>
-struct RemoveTag<Singleton<Cmpt>> : IType<Cmpt> {};
+struct RemoveTag<Singleton<Cmpt>> : std::type_identity<Cmpt> {};
 
 template <typename Cmpt>
-struct RemoveTag<const Singleton<Cmpt>> : IType<Cmpt> {};
+struct RemoveTag<const Singleton<Cmpt>> : std::type_identity<Cmpt> {};
 
 // ====
 
 template <typename T>
-struct RemoveRWTag : IType<T> {};  // default
+struct RemoveRWTag : std::type_identity<T> {};  // default
 
 template <typename T>
-struct RemoveRWTag<LastFrame<T>> : IType<T> {};
+struct RemoveRWTag<LastFrame<T>> : std::type_identity<T> {};
 
 template <typename T>
-struct RemoveRWTag<Write<T>> : IType<T> {};
+struct RemoveRWTag<Write<T>> : std::type_identity<T> {};
 
 template <typename T>
-struct RemoveRWTag<Latest<T>> : IType<T> {};
+struct RemoveRWTag<Latest<T>> : std::type_identity<T> {};
 
 template <typename Cmpt>
-struct RemoveRWTag<Cmpt*> : IType<Cmpt> {};
+struct RemoveRWTag<Cmpt*> : std::type_identity<Cmpt> {};
 
 template <typename Cmpt>
-struct RemoveRWTag<const Cmpt*> : IType<Cmpt> {};
+struct RemoveRWTag<const Cmpt*> : std::type_identity<Cmpt> {};
 
 template <typename Cmpt>
-struct RemoveRWTag<const Singleton<Cmpt>> : IType<Singleton<Cmpt>> {};
+struct RemoveRWTag<const Singleton<Cmpt>>
+    : std::type_identity<Singleton<Cmpt>> {};
 
 // ====
 
 template <typename T>
-struct RemoveSingletonTag : IType<T> {};  // default
+struct RemoveSingletonTag : std::type_identity<T> {};  // default
 
 template <typename Cmpt>
-struct RemoveSingletonTag<LastFrame<Singleton<Cmpt>>> : IType<LastFrame<Cmpt>> {
-};
+struct RemoveSingletonTag<LastFrame<Singleton<Cmpt>>>
+    : std::type_identity<LastFrame<Cmpt>> {};
 
 template <typename Cmpt>
-struct RemoveSingletonTag<Write<Singleton<Cmpt>>> : IType<Write<Cmpt>> {};
+struct RemoveSingletonTag<Write<Singleton<Cmpt>>>
+    : std::type_identity<Write<Cmpt>> {};
 
 template <typename Cmpt>
-struct RemoveSingletonTag<Latest<Singleton<Cmpt>>> : IType<Latest<Cmpt>> {};
+struct RemoveSingletonTag<Latest<Singleton<Cmpt>>>
+    : std::type_identity<Latest<Cmpt>> {};
 
 template <typename Cmpt>
-struct RemoveSingletonTag<Singleton<Cmpt>> : IType<Cmpt*> {};
+struct RemoveSingletonTag<Singleton<Cmpt>> : std::type_identity<Cmpt*> {};
 
 template <typename Cmpt>
-struct RemoveSingletonTag<const Singleton<Cmpt>> : IType<const Cmpt*> {};
+struct RemoveSingletonTag<const Singleton<Cmpt>>
+    : std::type_identity<const Cmpt*> {};
 
 // ====
 
 template <typename T>
-struct DecayTag : IType<T> {};
+struct DecayTag : std::type_identity<T> {};
 
 template <typename Cmpt>
-struct DecayTag<LastFrame<Cmpt>> : IType<Cmpt*> {};
+struct DecayTag<LastFrame<Cmpt>> : std::type_identity<Cmpt*> {};
 
 template <typename Cmpt>
-struct DecayTag<Write<Cmpt>> : IType<Cmpt*> {};
+struct DecayTag<Write<Cmpt>> : std::type_identity<Cmpt*> {};
 
 template <typename Cmpt>
-struct DecayTag<Latest<Cmpt>> : IType<Cmpt*> {};
+struct DecayTag<Latest<Cmpt>> : std::type_identity<Cmpt*> {};
 
 template <typename Cmpt>
-struct DecayTag<LastFrame<Singleton<Cmpt>>> : IType<Cmpt*> {};
+struct DecayTag<LastFrame<Singleton<Cmpt>>> : std::type_identity<Cmpt*> {};
 
 template <typename Cmpt>
-struct DecayTag<Write<Singleton<Cmpt>>> : IType<Cmpt*> {};
+struct DecayTag<Write<Singleton<Cmpt>>> : std::type_identity<Cmpt*> {};
 
 template <typename Cmpt>
-struct DecayTag<Latest<Singleton<Cmpt>>> : IType<Cmpt*> {};
+struct DecayTag<Latest<Singleton<Cmpt>>> : std::type_identity<Cmpt*> {};
 
 template <typename Cmpt>
-struct DecayTag<const Cmpt*> : IType<Cmpt*> {};
+struct DecayTag<const Cmpt*> : std::type_identity<Cmpt*> {};
 
 template <typename Cmpt>
-struct DecayTag<Singleton<Cmpt>> : IType<Cmpt*> {};
+struct DecayTag<Singleton<Cmpt>> : std::type_identity<Cmpt*> {};
 
 template <typename Cmpt>
-struct DecayTag<const Singleton<Cmpt>> : IType<Cmpt*> {};
+struct DecayTag<const Singleton<Cmpt>> : std::type_identity<Cmpt*> {};
 
 // ====
 
@@ -232,7 +236,7 @@ template <typename Arg>
 struct DecayArg : DecayTag<Arg> {};
 
 template <>
-struct DecayArg<const World*> : IType<World*> {};
+struct DecayArg<const World*> : std::type_identity<World*> {};
 
 // ====
 

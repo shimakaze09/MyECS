@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <cstddef>
+
 namespace My::MyECS {
 // read/write tag : LastFrame -> Write -> Latest
 // singleton tag  : Singleton
@@ -15,7 +17,7 @@ namespace My::MyECS {
 // 5. Write<Singleton<Cmpt>> == Singleton<Cmpt>
 // 6. Latest<Singleton<Cmpt>>
 
-enum class AccessMode : size_t {
+enum class AccessMode : std::size_t {
   LAST_FRAME = 0b000,  // LastFrame<Cmpt>
   WRITE = 0b001,       // Write<Cmpt> / Cmpt*
   LATEST = 0b010,      // Latest<Cmpt> / const Cmpt*

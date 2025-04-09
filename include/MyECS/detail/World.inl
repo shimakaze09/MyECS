@@ -29,7 +29,7 @@ void World::RunEntityJob(Func&& func, bool isParallel, ArchetypeFilter filter,
   static_assert(Length_v<Filter_t<ArgList, IsWrite>> == 0,
                 "const RunEntityJob can't write cmpt");
   assert("const RunEntityJob can't write cmpt" &&
-         !cmptLocator.HasWriteCmptType());
+         !cmptLocator.HasWriteTypeID());
 
   const_cast<World*>(this)->RunEntityJob(
       std::forward<Func>(func), isParallel, std::move(filter),
@@ -50,7 +50,7 @@ void World::RunChunkJob(Func&& func, ArchetypeFilter filter, bool isParallel,
   using ArgList = FuncTraits_ArgList<Func>;
   static_assert(Contain_v<ArgList, World*> == 0,
                 "const RunChunkJob should use const World*");
-  assert("const RunChunkJob can't write cmpt" && !filter.HaveWriteCmptType());
+  assert("const RunChunkJob can't write cmpt" && !filter.HaveWriteTypeID());
 
   const_cast<World*>(this)->RunChunkJob(std::forward<Func>(func),
                                         std::move(filter), isParallel,

@@ -19,14 +19,14 @@ struct Velocity {
 };
 
 class Dumper : public IListener {
-  size_t indent{0};
+  std::size_t indent{0};
   bool firstSystem{true};
   bool firstEntity{true};
   bool firstCmpt{true};
   const World* w;
 
   void PrintIndent() {
-    for (size_t i = 0; i < indent; i++)
+    for (std::size_t i = 0; i < indent; i++)
       cout << "  ";
   }
 

@@ -38,13 +38,14 @@ const SystemFunc* Schedule::RegisterJob(Func&& func, std::string name,
 
 template <typename... Args>
 const SystemFunc* Schedule::Request(Args&&... args) {
-  SystemFunc* sysFunc = sysFuncPool.Request(std::forward<Args>(args)...);
-  sysFuncs.emplace(sysFunc->HashCode(), sysFunc);
+  SystemFunc* sysFunc = sysFuncAllocator.allocate(1);
+  new(sysFunc)SystemFunc(std::forward<Args>(args)...);
+  sysFuncs.emplace(sysFunc->GetValue(), sysFunc);
   return sysFunc;
 }
 
 inline Schedule& Schedule::LockFilter(std::string_view sys) {
-  sysLockFilter.insert(SystemFunc::HashCode(sys));
+  sysLockFilter.insert(SystemFunc::GetValue(sys));
   return *this;
 }
 }  // namespace My::MyECS

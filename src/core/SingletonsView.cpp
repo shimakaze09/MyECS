@@ -6,7 +6,7 @@
 
 using namespace My::MyECS;
 
-CmptAccessPtr SingletonsView::GetSingleton(CmptAccessType t) const noexcept {
+CmptAccessPtr SingletonsView::GetSingleton(AccessTypeID t) const noexcept {
   for (const auto& singleton : singletons) {
     if (singleton.AccessType() == t)
       return singleton;

@@ -9,7 +9,7 @@
 namespace My::MyECS::detail {
 template <typename Func>
 auto Pack(Func&& func) noexcept;
-}  // namespace My::MyECS::detail
+}
 
 namespace My::MyECS {
 // Mode::Entity
@@ -24,7 +24,7 @@ SystemFunc::SystemFunc(Func&& func, std::string name,
       randomAccessor{std::move(randomAccessor)},
       mode{Mode::Entity},
       name{std::move(name)},
-      hashCode{HashCode(this->name)},
+      hashCode{GetValue(this->name)},
       isParallel{isParallel},
       func{detail::Pack(std::forward<Func>(func))} {
   using ArgList = FuncTraits_ArgList<std::decay_t<Func>>;
@@ -52,7 +52,7 @@ SystemFunc::SystemFunc(Func&& func, std::string name,
       randomAccessor{std::move(randomAccessor)},
       mode{Mode::Chunk},
       name{std::move(name)},
-      hashCode{HashCode(this->name)},
+      hashCode{GetValue(this->name)},
       isParallel{isParallel},
       func{detail::Pack(std::forward<Func>(func))} {
   using ArgList = FuncTraits_ArgList<std::decay_t<Func>>;
@@ -90,7 +90,7 @@ SystemFunc::SystemFunc(Func&& func, std::string name,
       randomAccessor{std::move(randomAccessor)},
       mode{Mode::Job},
       name{std::move(name)},
-      hashCode{HashCode(this->name)},
+      hashCode{GetValue(this->name)},
       isParallel{false},
       func{detail::Pack(std::forward<Func>(func))} {
   using ArgList = FuncTraits_ArgList<std::decay_t<Func>>;
@@ -98,11 +98,11 @@ SystemFunc::SystemFunc(Func&& func, std::string name,
   static_assert(Length_v<Filter_t<ArgList, IsNonSingleton>> == 0,
                 "(Mode::Job) SystemFunc can't access entities' components");
 
-  static_assert(!Contain_v<ArgList, Entity> && !Contain_v<ArgList, size_t> &&
-                    !Contain_v<ArgList, CmptsView> &&
-                    !Contain_v<ArgList, ChunkView>,
-                "(Mode::Job) SystemFunc's argument list cann't have Entity, "
-                "indexInQuery CmptsView or ChunkView");
+  static_assert(
+      !Contain_v<ArgList, Entity> && !Contain_v<ArgList, std::size_t> &&
+          !Contain_v<ArgList, CmptsView> && !Contain_v<ArgList, ChunkView>,
+      "(Mode::Job) SystemFunc's argument list cann't have Entity, indexInQuery "
+      "CmptsView or ChunkView");
 }
 }  // namespace My::MyECS
 
@@ -120,26 +120,26 @@ struct Packer<TypeList<DecayedArgs...>, TypeList<Singletons...>,
 
   template <typename Func>
   static auto run(Func&& func) noexcept {
-    return
-        [func = std::forward<Func>(func)](
-            World* w, SingletonsView singletons, Entity e,
-            size_t entityIndexInQuery, CmptsView cmpts, ChunkView chunkView) {
-          auto args = std::tuple{
-              w,
-              singletons,
-              reinterpret_cast<Singletons*>(
-                  singletons.Singletons()[Find_v<SingletonList, Singletons>]
-                      .Ptr())...,
-              e,
-              entityIndexInQuery,
-              cmpts,
-              reinterpret_cast<NonSingletons*>(
-                  cmpts.Components()[Find_v<NonSingletonList, NonSingletons>]
-                      .Ptr())...,
-              chunkView,
-          };
-          func(std::get<DecayedArgs>(args)...);
-        };
+    return [func = std::forward<Func>(func)](
+               World* w, SingletonsView singletons, Entity e,
+               std::size_t entityIndexInQuery, CmptsView cmpts,
+               ChunkView chunkView) {
+      auto args = std::tuple{
+          w,
+          singletons,
+          reinterpret_cast<Singletons*>(
+              singletons.Singletons()[Find_v<SingletonList, Singletons>]
+                  .Ptr())...,
+          e,
+          entityIndexInQuery,
+          cmpts,
+          reinterpret_cast<NonSingletons*>(
+              cmpts.Components()[Find_v<NonSingletonList, NonSingletons>]
+                  .Ptr())...,
+          chunkView,
+      };
+      func(std::get<DecayedArgs>(args)...);
+    };
   }
 };
 

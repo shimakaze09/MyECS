@@ -7,7 +7,7 @@
 using namespace My::MyECS;
 using namespace std;
 
-CmptAccessPtr CmptsView::GetCmpt(CmptAccessType t) const noexcept {
+CmptAccessPtr CmptsView::GetCmpt(AccessTypeID t) const noexcept {
   for (const auto& cmpt : cmpts) {
     if (cmpt.AccessType() == t)
       return cmpt;

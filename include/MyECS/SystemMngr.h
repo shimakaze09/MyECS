@@ -26,21 +26,21 @@ class SystemMngr {
   const auto& GetActiveSystemsIDs() const noexcept { return activeSystemIDs; }
 
   // not alive -> create
-  void Create(size_t systemID);
+  void Create(std::size_t systemID);
 
   // 1. not alive create -> create and activate
   // 2. not active -> then activate
-  void Activate(size_t systemID);
+  void Activate(std::size_t systemID);
 
   // active -> deactavate
-  void Deactivate(size_t systemID);
+  void Deactivate(std::size_t systemID);
 
   // 1. active -> deactavite
   // 2. alive -> destroy
-  void Destroy(size_t systemID);
+  void Destroy(std::size_t systemID);
 
-  bool IsAlive(size_t systemID) const;
-  bool IsActive(size_t systemID) const;
+  bool IsAlive(std::size_t systemID) const;
+  bool IsActive(std::size_t systemID) const;
 
   // [ Template ] Functions
   ///////////////////////////
@@ -76,10 +76,10 @@ class SystemMngr {
   }
 
   template <typename... Systems>
-  std::array<size_t, sizeof...(Systems)> RegisterAndCreate();
+  std::array<std::size_t, sizeof...(Systems)> RegisterAndCreate();
 
   template <typename... Systems>
-  std::array<size_t, sizeof...(Systems)> RegisterAndActivate();
+  std::array<std::size_t, sizeof...(Systems)> RegisterAndActivate();
 
   SystemMngr(const SystemMngr&) = delete;
   SystemMngr(SystemMngr&&) noexcept = delete;
@@ -89,11 +89,11 @@ class SystemMngr {
  private:
   friend class World;
   World* w;
-  void Update(size_t systemID, Schedule&) const;
+  void Update(std::size_t systemID, Schedule&) const;
   void Clear();
 
-  std::unordered_set<size_t> aliveSystemIDs;
-  std::unordered_set<size_t> activeSystemIDs;
+  std::unordered_set<std::size_t> aliveSystemIDs;
+  std::unordered_set<std::size_t> activeSystemIDs;
 };
 }  // namespace My::MyECS
 
