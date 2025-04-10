@@ -6,8 +6,8 @@
 
 #include "EntityQuery.h"
 #include "SingletonLocator.h"
-#include "detail/Archetype.h"
-#include "detail/Job.h"
+#include "details/Archetype.h"
+#include "details/Job.h"
 
 #include <memory_resource>
 
@@ -168,4 +168,4 @@ class EntityMngr {
 };
 }  // namespace My::MyECS
 
-#include "detail/EntityMngr.inl"
+#include "details/EntityMngr.inl"

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "detail/Util.h"
+#include "details/Util.h"
 
 namespace My::MyECS {
 // index + version

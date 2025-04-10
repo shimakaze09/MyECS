@@ -104,4 +104,4 @@ class SystemTraits {
 };
 }  // namespace My::MyECS
 
-#include "detail/SystemTraits.inl"
+#include "details/SystemTraits.inl"

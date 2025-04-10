@@ -6,7 +6,7 @@
 
 #include <MyTemplate/Func.h>
 
-namespace My::MyECS::detail {
+namespace My::MyECS::details {
 template <typename Func>
 auto Pack(Func&& func) noexcept;
 }
@@ -26,7 +26,7 @@ SystemFunc::SystemFunc(Func&& func, std::string name,
       name{std::move(name)},
       hashCode{GetValue(this->name)},
       isParallel{isParallel},
-      func{detail::Pack(std::forward<Func>(func))} {
+      func{details::Pack(std::forward<Func>(func))} {
   using ArgList = FuncTraits_ArgList<std::decay_t<Func>>;
 
   static_assert(Length_v<Filter_t<ArgList, IsWriteSingleton>> == 0,
@@ -54,7 +54,7 @@ SystemFunc::SystemFunc(Func&& func, std::string name,
       name{std::move(name)},
       hashCode{GetValue(this->name)},
       isParallel{isParallel},
-      func{detail::Pack(std::forward<Func>(func))} {
+      func{details::Pack(std::forward<Func>(func))} {
   using ArgList = FuncTraits_ArgList<std::decay_t<Func>>;
 
   static_assert(Length_v<Filter_t<ArgList, IsWriteSingleton>> == 0,
@@ -92,7 +92,7 @@ SystemFunc::SystemFunc(Func&& func, std::string name,
       name{std::move(name)},
       hashCode{GetValue(this->name)},
       isParallel{false},
-      func{detail::Pack(std::forward<Func>(func))} {
+      func{details::Pack(std::forward<Func>(func))} {
   using ArgList = FuncTraits_ArgList<std::decay_t<Func>>;
 
   static_assert(Length_v<Filter_t<ArgList, IsNonSingleton>> == 0,
@@ -106,7 +106,7 @@ SystemFunc::SystemFunc(Func&& func, std::string name,
 }
 }  // namespace My::MyECS
 
-namespace My::MyECS::detail {
+namespace My::MyECS::details {
 template <typename DecayedArgList, typename SortedSingletonList,
           typename SortedNonSingletonList>
 struct Packer;

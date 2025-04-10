@@ -35,4 +35,4 @@ class SingletonLocator {
 };
 }  // namespace My::MyECS
 
-#include "detail/SingletonLocator.inl"
+#include "details/SingletonLocator.inl"

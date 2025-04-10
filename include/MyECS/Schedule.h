@@ -4,14 +4,14 @@
 
 #pragma once
 
-#include "detail/Job.h"
-#include "detail/SystemFunc.h"
+#include "details/Job.h"
+#include "details/SystemFunc.h"
 
 #include <map>
 #include <memory>
 #include <memory_resource>
 
-namespace My::MyECS::detail {
+namespace My::MyECS::details {
 struct Compiler;
 }  // namespace My::MyECS::detail
 
@@ -90,7 +90,7 @@ class Schedule {
     std::vector<SystemFunc*> writeSysFuncs;
     std::vector<SystemFunc*> latestSysFuncs;
   };
-  friend struct detail::Compiler;
+  friend struct details::Compiler;
   std::unordered_map<TypeID, CmptSysFuncs> GenCmptSysFuncsMap() const;
 
   SysFuncGraph GenSysFuncGraph() const;
@@ -118,4 +118,4 @@ class Schedule {
 };
 }  // namespace My::MyECS
 
-#include "detail/Schedule.inl"
+#include "details/Schedule.inl"

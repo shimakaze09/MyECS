@@ -41,4 +41,4 @@ private:
 };
 }  // namespace My::MyECS
 
-#include "detail/CmptsLocator.inl"
+#include "details/CmptsLocator.inl"

@@ -4,7 +4,7 @@
 
 #include <MyECS/ChunkView.h>
 
-#include <MyECS/detail/Archetype.h>
+#include <MyECS/details/Archetype.h>
 
 using namespace My::MyECS;
 

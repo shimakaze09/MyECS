@@ -129,4 +129,4 @@ class Latest<Singleton<Cmpt>> {
 };
 }  // namespace My::MyECS
 
-#include "detail/CmptTag.inl"
+#include "details/CmptTag.inl"

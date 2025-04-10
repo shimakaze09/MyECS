@@ -6,7 +6,7 @@
 
 #include "ArchetypeFilter.h"
 #include "CmptLocator.h"
-#include "detail/Util.h"
+#include "details/Util.h"
 
 namespace My::MyECS {
 // ArchetypeFilter + CmptLocator
@@ -24,4 +24,4 @@ struct EntityQuery {
 };
 }  // namespace My::MyECS
 
-#include "detail/EntityQuery.inl"
+#include "details/EntityQuery.inl"

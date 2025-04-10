@@ -4,7 +4,7 @@
 
 #include <MyECS/CmptLocator.h>
 
-#include <MyECS/detail/Util.h>
+#include <MyECS/details/Util.h>
 
 using namespace My::MyECS;
 

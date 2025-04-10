@@ -34,4 +34,4 @@ class ChunkView {
 };
 }  // namespace My::MyECS
 
-#include "detail/ChunkView.inl"
+#include "details/ChunkView.inl"

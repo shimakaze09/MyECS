@@ -6,7 +6,7 @@
 
 #include "CmptTag.h"
 
-#include "detail/Util.h"
+#include "details/Util.h"
 
 #include <MyTemplate/TypeID.h>
 
@@ -45,4 +45,4 @@ static constexpr AccessTypeID AccessTypeID_of = {TypeID_of<RemoveTag_t<Cmpt>>,
 using AccessTypeIDSet = std::set<AccessTypeID, std::less<>>;
 }  // namespace My::MyECS
 
-#include "detail/AccessTypeID.inl"
+#include "details/AccessTypeID.inl"

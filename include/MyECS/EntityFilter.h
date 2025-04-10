@@ -130,4 +130,4 @@ class EntityFilter {
 };
 }  // namespace My
 
-#include "detail/EntityFilter.inl"
+#include "details/EntityFilter.inl"

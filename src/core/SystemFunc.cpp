@@ -2,7 +2,7 @@
 // Created by Admin on 13/03/2025.
 //
 
-#include <MyECS/detail/SystemFunc.h>
+#include <MyECS/details/SystemFunc.h>
 
 using namespace My::MyECS;
 

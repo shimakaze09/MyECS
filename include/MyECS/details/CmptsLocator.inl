@@ -6,7 +6,7 @@
 
 #include <MyTemplate/Func.h>
 
-namespace My::MyECS::detail {
+namespace My::MyECS::details {
 template <typename... Cmpts>
 CmptLocator GenerateCmptLocator(TypeList<Cmpts...>) {
   if constexpr (sizeof...(Cmpts) > 0) {
@@ -22,7 +22,7 @@ template <typename Func>
 CmptLocator CmptLocator::Generate() {
   using ArgList = FuncTraits_ArgList<std::decay_t<Func>>;
   using CmptList = Filter_t<ArgList, IsNonSingleton>;
-  return detail::GenerateCmptLocator(CmptList{});
+  return details::GenerateCmptLocator(CmptList{});
 }
 
 template <typename Func>

@@ -6,7 +6,7 @@
 
 #include <MyTemplate/Name.h>
 
-namespace My::MyECS::detail {
+namespace My::MyECS::details {
 template <typename System>
 concept HaveOnCreate = requires(World * w) {
   {System::OnCreate(w)};
@@ -54,7 +54,7 @@ std::size_t Register(SystemTraits& traits) {
 namespace My::MyECS {
 template <typename... Systems>
 std::array<std::size_t, sizeof...(Systems)> SystemTraits::Register() {
-  return {detail::Register<Systems>(*this)...};
+  return {details::Register<Systems>(*this)...};
 }
 
 template <typename System>

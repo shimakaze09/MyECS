@@ -97,4 +97,4 @@ class SystemMngr {
 };
 }  // namespace My::MyECS
 
-#include "detail/SystemMngr.inl"
+#include "details/SystemMngr.inl"

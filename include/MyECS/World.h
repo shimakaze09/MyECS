@@ -118,4 +118,4 @@ class World {
 };
 }  // namespace My::MyECS
 
-#include "detail/World.inl"
+#include "details/World.inl"

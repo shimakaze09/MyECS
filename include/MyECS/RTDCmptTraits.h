@@ -102,4 +102,4 @@ class RTDCmptTraits {
 };
 }  // namespace My::MyECS
 
-#include "detail/RTDCmptTraits.inl"
+#include "details/RTDCmptTraits.inl"
