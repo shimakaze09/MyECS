@@ -107,7 +107,7 @@ class EntityMngr {
 
   template <typename Cmpt>
   Cmpt* GetSingleton() const {
-    return GetSingleton(TypeID_of<Cmpt>).As<Cmpt>();
+    return GetSingleton(TypeID_of<Cmpt>).template As<Cmpt>();
   }
 
   // filter's all contains cmpt

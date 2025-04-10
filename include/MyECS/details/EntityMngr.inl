@@ -7,7 +7,7 @@
 #include "../CmptTag.h"
 
 #include <MyTemplate/Func.h>
-#include <MyTemplate/Typelist.h>
+#include <MyTemplate/TypeList.h>
 
 namespace My::MyECS {
 template <typename... Cmpts>
@@ -165,7 +165,7 @@ std::vector<Cmpt*> EntityMngr::GetCmptArray(
 
   std::vector<Cmpt*> rst;
 
-  const auto& archetypes = QueryArchetypes(filter);
+  const auto& archetypes = QueryArchetypes(EntityQuery{filter});
   std::size_t num = 0;
   for (const auto& archetype : archetypes)
     num += archetype->EntityNum();

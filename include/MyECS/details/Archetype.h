@@ -12,7 +12,8 @@
 #include "Chunk.h"
 #include "TypeIDSet.h"
 
-#include <MyTemplate/Typelist.h>
+#include <MyTemplate/TypeList.h>
+#include <memory_resource>
 
 namespace My::MyECS {
 class EntityMngr;

@@ -85,7 +85,7 @@ class CmptAccessPtr {
     else if constexpr (mode == AccessMode::LATEST)
       return Latest<Cmpt>{p};
     else
-      static_assert(false);
+      static_assert(always_false<Cmpt>);
   }
 
  private:
