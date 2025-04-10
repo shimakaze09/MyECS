@@ -39,14 +39,14 @@ struct Position { float val; };
 struct Velocity { float val; };
 
 struct MoverSystem {
-    static void OnUpdate(Schedule& schedule) {
-        schedule.RegisterEntityJob(
-            [](const Velocity* v, Position* p) {
-                p->val += v->val;
-            },
-            "Mover"
-        );
-    }
+  static void OnUpdate(Schedule& schedule) {
+    schedule.RegisterEntityJob(
+      [](const Velocity* v, Position* p) {
+        p->val += v->val;
+      },
+      "Mover"
+    );
+  }
 };
 
 int main() {
