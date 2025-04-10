@@ -1,6 +1,8 @@
-GET_TARGET_NAME(CORE "${PROJECT_SOURCE_DIR}/src/core")
 ADD_TARGET(
         TEST
+        RET_TARGET_NAME tname
         MODE EXE
-        LIB ${CORE}
+        LIB
+        My::MyECS_core
 )
+TARGET_PRECOMPILE_HEADERS(${tname} REUSE_FROM MyECS_core)
