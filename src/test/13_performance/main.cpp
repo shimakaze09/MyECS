@@ -1,13 +1,9 @@
-//
-// Created by Admin on 12/03/2025.
-//
-
 #include <MyECS/World.h>
+
+using namespace My::MyECS;
 
 #include <chrono>
 #include <iostream>
-
-using namespace My::MyECS;
 
 struct A {
   float val;

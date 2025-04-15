@@ -1,7 +1,3 @@
-//
-// Created by Admin on 12/03/2025.
-//
-
 #include <MyECS/IListener.h>
 #include <MyECS/World.h>
 

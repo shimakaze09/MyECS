@@ -1,7 +1,3 @@
-//
-// Created by Admin on 14/03/2025.
-//
-
 #include <MyECS/SingletonsView.h>
 
 using namespace My::MyECS;

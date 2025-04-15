@@ -1,7 +1,3 @@
-//
-// Created by Admin on 31/03/2025.
-//
-
 #pragma once
 
 namespace My::MyECS {

@@ -1,8 +1,4 @@
-//
-// Created by Admin on 19/03/2025.
-//
-
-#include <MyTemplate/TypeID.h>
+#include <MyTemplate/Type.h>
 
 #include <iostream>
 

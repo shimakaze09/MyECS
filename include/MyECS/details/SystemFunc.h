@@ -1,7 +1,3 @@
-//
-// Created by Admin on 4/03/2025.
-//
-
 #pragma once
 
 #include "../ChunkView.h"
@@ -13,7 +9,6 @@
 #include "../SingletonsView.h"
 
 #include <functional>
-#include <string>
 
 namespace My::MyECS {
 // [- description]

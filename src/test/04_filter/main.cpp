@@ -1,7 +1,3 @@
-//
-// Created by Admin on 4/03/2025.
-//
-
 #include <MyECS/World.h>
 
 #include <iostream>

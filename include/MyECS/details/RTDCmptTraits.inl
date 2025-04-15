@@ -1,7 +1,3 @@
-//
-// Created by Admin on 6/03/2025.
-//
-
 #pragma once
 
 #include "../RTDCmptTraits.h"

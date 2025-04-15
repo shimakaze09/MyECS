@@ -1,7 +1,3 @@
-//
-// Created by Admin on 4/03/2025.
-//
-
 #include "SysFuncGraph.h"
 
 #include <queue>
@@ -39,8 +35,8 @@ bool SysFuncGraph::HaveEdge(SystemFunc* x, SystemFunc* y) const {
 
 bool SysFuncGraph::HavePath(SystemFunc* x, SystemFunc* y) const {
   assert(HaveVertex(x) && HaveVertex(y));
-  // if (x == y)
-  //	 return false; // acyclic
+  //if (x == y)
+  //	return false; // acyclic
 
   unordered_set<SystemFunc*> visited;
   queue<SystemFunc*> q;

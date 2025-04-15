@@ -1,7 +1,3 @@
-//
-// Created by Admin on 28/03/2025.
-//
-
 #pragma once
 
 #include <MyTemplate/Name.h>
@@ -49,7 +45,7 @@ std::size_t Register(SystemTraits& traits) {
         ID, static_cast<SystemTraits::OnDestroy*>(&System::OnDestroy));
   return ID;
 }
-}  // namespace My::MyECS::detail
+}  // namespace My::MyECS::details
 
 namespace My::MyECS {
 template <typename... Systems>

@@ -1,7 +1,3 @@
-//
-// Created by Admin on 2/03/2025.
-//
-
 #include <MyECS/Schedule.h>
 
 #include "SysFuncGraph.h"
@@ -309,7 +305,7 @@ struct Compiler {
     return rst;
   }
 };
-}  // namespace My::MyECS::detail
+}  // namespace My::MyECS::details
 
 Schedule& Schedule::Order(string_view x, string_view y) {
   sysFuncOrder.emplace(SystemFunc::GetValue(x), SystemFunc::GetValue(y));

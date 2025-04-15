@@ -1,7 +1,3 @@
-//
-// Created by Admin on 26/12/2024.
-//
-
 #pragma once
 
 #include <cassert>
@@ -11,7 +7,7 @@ template <typename... Cmpts>
 Archetype::Archetype(std::pmr::polymorphic_allocator<Chunk> chunkAllocator,
                      TypeList<Cmpts...>)
     : types(GenTypeIDSet<Cmpts...>()), chunkAllocator{chunkAllocator} {
-  static_assert(IsSet_v<TypeList<Entity, Cmpts...>>,
+  static_assert(IsUnique_v<TypeList<Entity, Cmpts...>>,
                 "<Cmpts>... must be different");
   cmptTraits.Register<Entity>();
   (cmptTraits.Register<Cmpts>(), ...);
@@ -21,7 +17,7 @@ Archetype::Archetype(std::pmr::polymorphic_allocator<Chunk> chunkAllocator,
 template <typename... Cmpts>
 Archetype* Archetype::Add(const Archetype* from) {
   static_assert(sizeof...(Cmpts) > 0);
-  static_assert(IsSet_v<TypeList<Entity, Cmpts...>>,
+  static_assert(IsUnique_v<TypeList<Entity, Cmpts...>>,
                 "<Cmpts>... must be different");
   assert(!(from->types.Contains(TypeID_of<Cmpts>) && ...));
 
@@ -41,7 +37,7 @@ template <typename... Cmpts>
 std::tuple<std::size_t, std::tuple<Cmpts*...>> Archetype::Create(Entity e) {
   static_assert((std::is_constructible_v<Cmpts> && ...),
                 "<Cmpts> isn't constructible");
-  static_assert(IsSet_v<TypeList<Entity, Cmpts...>>,
+  static_assert(IsUnique_v<TypeList<Entity, Cmpts...>>,
                 "<Cmpts>... must be different");
 
   assert((types.Contains(TypeID_of<Cmpts>) && ...) &&
@@ -63,7 +59,7 @@ std::tuple<std::size_t, std::tuple<Cmpts*...>> Archetype::Create(Entity e) {
 template <typename... Cmpts>
 TypeIDSet Archetype::GenTypeIDSet() {
   if constexpr (sizeof...(Cmpts) > 0) {
-    static_assert(IsSet_v<TypeList<Entity, Cmpts...>>,
+    static_assert(IsUnique_v<TypeList<Entity, Cmpts...>>,
                   "<Cmpts>... must be different");
 
     constexpr std::array types = {TypeID_of<Cmpts>...};

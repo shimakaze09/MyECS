@@ -1,10 +1,6 @@
-//
-// Created by Admin on 4/03/2025.
-//
-
 #pragma once
 
-#include <MyTemplate/TypeID.h>
+#include <MyTemplate/Type.h>
 
 namespace My::MyECS {
 constexpr std::size_t hash_combine(std::size_t x, std::size_t y) noexcept {

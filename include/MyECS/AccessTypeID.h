@@ -1,14 +1,10 @@
-//
-// Created by Admin on 10/04/2025.
-//
-
 #pragma once
 
 #include "CmptTag.h"
 
 #include "details/Util.h"
 
-#include <MyTemplate/TypeID.h>
+#include <MyTemplate/Type.h>
 
 #include <set>
 

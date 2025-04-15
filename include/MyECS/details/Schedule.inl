@@ -1,7 +1,3 @@
-//
-// Created by Admin on 8/03/2025.
-//
-
 #pragma once
 
 namespace My::MyECS {
@@ -39,7 +35,7 @@ const SystemFunc* Schedule::RegisterJob(Func&& func, std::string name,
 template <typename... Args>
 const SystemFunc* Schedule::Request(Args&&... args) {
   SystemFunc* sysFunc = sysFuncAllocator.allocate(1);
-  new(sysFunc)SystemFunc(std::forward<Args>(args)...);
+  new (sysFunc) SystemFunc(std::forward<Args>(args)...);
   sysFuncs.emplace(sysFunc->GetValue(), sysFunc);
   return sysFunc;
 }

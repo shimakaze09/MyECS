@@ -1,7 +1,3 @@
-//
-// Created by Admin on 4/03/2025.
-//
-
 #pragma once
 
 #include "AccessTypeID.h"
@@ -13,16 +9,16 @@ namespace My::MyECS {
 // locate components in function's argument list for Archetype
 // immutable
 class CmptLocator {
-public:
+ public:
   CmptLocator(std::span<const AccessTypeID> types);
   CmptLocator(AccessTypeIDSet types);
 
   CmptLocator();
 
-  template<typename Func>
+  template <typename Func>
   static CmptLocator Generate();
 
-  template<typename Func>
+  template <typename Func>
   CmptLocator& Combine();
 
   std::size_t GetValue() const noexcept { return hashCode; }
@@ -32,7 +28,8 @@ public:
   bool operator==(const CmptLocator& rhs) const noexcept;
 
   bool HasWriteTypeID() const noexcept;
-private:
+
+ private:
   void UpdateGetValue() noexcept;
 
   AccessTypeIDSet cmptTypes;

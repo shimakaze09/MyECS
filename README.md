@@ -15,13 +15,11 @@
 
 **My** **E**ntity-**C**omponent-**S**ystem in Unity3D-style
 
-## Environment
+## Compiler compatibility
 
-- Compiler
-    - MSVC: >=1926
-    - GCC: >= 10
-    - Clang: >= 10
-- C++ 20
+- Clang/LLVM >= 10.0
+- GCC >= 10.0
+- MSVC >= 1926
 
 ## Documentation
 

@@ -1,7 +1,3 @@
-//
-// Created by Admin on 4/03/2025.
-//
-
 #pragma once
 
 #include "details/Job.h"
@@ -13,7 +9,7 @@
 
 namespace My::MyECS::details {
 struct Compiler;
-}  // namespace My::MyECS::detail
+}
 
 namespace My::MyECS {
 class EntityMngr;

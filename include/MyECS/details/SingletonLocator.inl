@@ -1,7 +1,3 @@
-//
-// Created by Admin on 14/03/2025.
-//
-
 #pragma once
 
 #include <MyTemplate/Func.h>
@@ -15,7 +11,7 @@ SingletonLocator GenerateSingletonLocator(TypeList<Singletons...>) {
   } else
     return {};
 }
-}  // namespace My::MyECS::detail
+}  // namespace My::MyECS::details
 
 namespace My::MyECS {
 template <typename Func>

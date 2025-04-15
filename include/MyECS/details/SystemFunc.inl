@@ -1,7 +1,3 @@
-//
-// Created by Admin on 4/03/2025.
-//
-
 #pragma once
 
 #include <MyTemplate/Func.h>
@@ -148,8 +144,9 @@ auto Pack(Func&& func) noexcept {
   using ArgList = FuncTraits_ArgList<Func>;
 
   using DecayedArgList = Transform_t<ArgList, DecayArg>;
-  static_assert(IsSet_v<DecayedArgList>,
-                "detail::System_::Pack: <Func>'s argument types must be a set");
+  static_assert(
+      IsUnique_v<DecayedArgList>,
+      "details::System_::Pack: <Func>'s argument types must be a set");
 
   using TaggedCmptList = Filter_t<ArgList, IsTaggedCmpt>;
 
@@ -165,4 +162,4 @@ auto Pack(Func&& func) noexcept {
   return Packer<DecayedArgList, SortedSingletonList,
                 SortedNonSingletonList>::run(std::forward<Func>(func));
 }
-}  // namespace My::MyECS::detail
+}  // namespace My::MyECS::details
