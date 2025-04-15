@@ -87,11 +87,9 @@ inline std::size_t TypeIDSet::GetValue() const noexcept {
 }
 }  // namespace My::MyECS
 
-namespace std {
 template <>
-struct hash<My::MyECS::TypeIDSet> {
+struct std::hash<My::MyECS::TypeIDSet> {
   std::size_t operator()(const My::MyECS::TypeIDSet& types) const noexcept {
     return types.GetValue();
   }
 };
-}  // namespace std

@@ -20,4 +20,9 @@ struct EntityQuery {
 };
 }  // namespace My::MyECS
 
-#include "details/EntityQuery.inl"
+template <>
+struct std::hash<My::MyECS::EntityQuery> {
+  std::size_t operator()(const My::MyECS::EntityQuery& query) const noexcept {
+    return query.GetValue();
+  }
+};

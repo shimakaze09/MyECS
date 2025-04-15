@@ -41,4 +41,10 @@ static constexpr AccessTypeID AccessTypeID_of = {TypeID_of<RemoveTag_t<Cmpt>>,
 using AccessTypeIDSet = std::set<AccessTypeID, std::less<>>;
 }  // namespace My::MyECS
 
-#include "details/AccessTypeID.inl"
+template <>
+struct std::hash<My::MyECS::AccessTypeID> {
+  constexpr std::size_t operator()(
+      const My::MyECS::AccessTypeID& id) const noexcept {
+    return id.GetValue();
+  }
+};
