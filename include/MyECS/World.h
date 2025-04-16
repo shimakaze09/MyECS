@@ -1,13 +1,13 @@
 #pragma once
 
+#include <MyGraphviz/MyGraphviz.h>
+
+#include <mutex>
+
 #include "Entity.h"
 #include "EntityMngr.h"
 #include "Schedule.h"
 #include "SystemMngr.h"
-
-#include <MyGraphviz/MyGraphviz.h>
-
-#include <mutex>
 
 namespace My::MyECS {
 class IListener;
@@ -19,7 +19,8 @@ class World {
       : jobRsrc{std::make_unique<std::pmr::unsynchronized_pool_resource>()},
         systemMngr{this} {}
 
-  // not copy/move schedule, so you can't use DumpUpdateJobGraph() and GenUpdateFrameGraph() before Update()
+  // not copy/move schedule, so you can't use DumpUpdateJobGraph() and
+  // GenUpdateFrameGraph() before Update()
   World(const World&);
   World(World&&) noexcept;
   ~World();
@@ -45,7 +46,8 @@ class World {
 
   void Accept(IListener*) const;
 
-  // you can't run several parallel jobs in parallel because there is only an executor
+  // you can't run several parallel jobs in parallel because there is only an
+  // executor
 
   // Func's argument list:
   // [const] World*
@@ -95,6 +97,10 @@ class World {
   void RunChunkJob(Func&&, ArchetypeFilter = {}, bool isParallel = true,
                    SingletonLocator = {}) const;
 
+  std::pmr::synchronized_pool_resource* GetFrameSyncResource() {
+    return &frame_sync_rsrc;
+  }
+
  private:
   bool inRunningJobGraph{false};
 
@@ -111,6 +117,8 @@ class World {
   void RunCommands();
 
   void Run(SystemFunc*);
+
+  std::pmr::synchronized_pool_resource frame_sync_rsrc;
 };
 }  // namespace My::MyECS
 

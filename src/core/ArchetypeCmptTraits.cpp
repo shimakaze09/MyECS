@@ -8,8 +8,8 @@
 
 using namespace My::MyECS;
 
-const ArchetypeCmptTraits::CmptTraits* ArchetypeCmptTraits::GetTraits(
-    TypeID ID) const noexcept {
+ArchetypeCmptTraits::CmptTrait* ArchetypeCmptTraits::GetTrait(
+    TypeID ID) noexcept {
   for (auto& trait : cmpt_traits) {
     if (trait.ID == ID) return &trait;
   }
@@ -17,63 +17,36 @@ const ArchetypeCmptTraits::CmptTraits* ArchetypeCmptTraits::GetTraits(
   return nullptr;
 }
 
-bool ArchetypeCmptTraits::IsTrivial(TypeID type) const {
-  return GetTraits(type)->trivial;
-}
-
-std::size_t ArchetypeCmptTraits::Sizeof(TypeID type) const {
-  return GetTraits(type)->size;
-}
-
-std::size_t ArchetypeCmptTraits::Alignof(TypeID type) const {
-  return GetTraits(type)->alignment;
-}
-
-void ArchetypeCmptTraits::CopyConstruct(TypeID type, void* dst,
-                                        void* src) const {
-  auto* trait = GetTraits(type);
-  if (trait->copy_ctor)
-    trait->copy_ctor(dst, src);
-  else {
-    assert(trait->trivial);
-    std::memcpy(dst, src, trait->size);
-  }
-}
-
-void ArchetypeCmptTraits::MoveConstruct(TypeID type, void* dst,
-                                        void* src) const {
-  auto* trait = GetTraits(type);
-  if (trait->move_ctor)
-    trait->move_ctor(dst, src);
-  else {
-    assert(trait->trivial);
-    std::memcpy(dst, src, trait->size);
-  }
-}
-
-void ArchetypeCmptTraits::MoveAssign(TypeID type, void* dst, void* src) const {
-  auto* trait = GetTraits(type);
-  if (trait->move_assign)
-    trait->move_assign(dst, src);
-  else {
-    assert(trait->trivial);
-    std::memcpy(dst, src, trait->size);
-  }
-}
-
-void ArchetypeCmptTraits::Destruct(TypeID type, void* cmpt) const {
-  auto* trait = GetTraits(type);
-  if (trait->dtor)
-    trait->dtor(cmpt);
+void ArchetypeCmptTraits::CmptTrait::CopyConstruct(void* dst, void* src) const {
+  if (copy_ctor)
+    copy_ctor(dst, src);
   else
-    assert(trait->trivial);
+    std::memcpy(dst, src, size);
+}
+
+void ArchetypeCmptTraits::CmptTrait::MoveConstruct(void* dst, void* src) const {
+  if (move_ctor)
+    move_ctor(dst, src);
+  else
+    std::memcpy(dst, src, size);
+}
+
+void ArchetypeCmptTraits::CmptTrait::MoveAssign(void* dst, void* src) const {
+  if (move_assign)
+    move_assign(dst, src);
+  else
+    std::memcpy(dst, src, size);
+}
+
+void ArchetypeCmptTraits::CmptTrait::Destruct(void* cmpt) const {
+  if (dtor) dtor(cmpt);
 }
 
 void ArchetypeCmptTraits::Register(const RTDCmptTraits& rtdct, TypeID type) {
   auto size_target = rtdct.GetSizeofs().find(type);
   if (size_target == rtdct.GetSizeofs().end())
     throw std::logic_error(
-        "ArchetypeCmptTraits::Register: RTDCmptTraits hasn't registered "
+        "ArchetypeCmptTraits::Register: RTDCmptTrait hasn't registered "
         "<TypeID>");
 
   auto copy_constructor_target = rtdct.GetCopyConstructors().find(type);
@@ -81,10 +54,10 @@ void ArchetypeCmptTraits::Register(const RTDCmptTraits& rtdct, TypeID type) {
   auto move_assignments_target = rtdct.GetMoveAssignments().find(type);
   auto destructor_target = rtdct.GetDestructors().find(type);
 
-  CmptTraits trait{.ID = type,
-                   .trivial = rtdct.IsTrivial(type),
-                   .size = size_target->second,
-                   .alignment = rtdct.Alignof(type)};
+  CmptTrait trait{.ID = type,
+                  .trivial = rtdct.IsTrivial(type),
+                  .size = size_target->second,
+                  .alignment = rtdct.Alignof(type)};
   if (copy_constructor_target != rtdct.GetCopyConstructors().end())
     trait.copy_ctor = copy_constructor_target->second;
   if (move_constructor_target != rtdct.GetMoveConstructors().end())

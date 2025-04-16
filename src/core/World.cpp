@@ -1,6 +1,5 @@
-#include <MyECS/World.h>
-
 #include <MyECS/IListener.h>
+#include <MyECS/World.h>
 
 #include "SysFuncGraph.h"
 
@@ -18,11 +17,15 @@ World::World(World&& w) noexcept
       systemMngr{std::move(w.systemMngr), this},
       entityMngr{std::move(w.entityMngr)} {}
 
-World::~World() { systemMngr.Clear(); }
+World::~World() {
+  systemMngr.Clear();
+  entityMngr.Clear();
+}
 
 void World::Update() {
   inRunningJobGraph = true;
 
+  frame_sync_rsrc.release();
   schedule.Clear();
   for (auto* job : jobs) {
     job->~Taskflow();
@@ -79,8 +82,8 @@ void World::Run(SystemFunc* sys) {
 }
 
 // after running Update
-MyGraphviz::Graph World::GenUpdateFrameGraph() const {
-  MyGraphviz::Graph graph("Update Frame Graph", true);
+UGraphviz::Graph World::GenUpdateFrameGraph() const {
+  UGraphviz::Graph graph("Update Frame Graph", true);
 
   graph.RegisterGraphNodeAttr("style", "filled")
       .RegisterGraphNodeAttr("fontcolor", "white")
