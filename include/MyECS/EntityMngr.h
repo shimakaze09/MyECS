@@ -1,11 +1,11 @@
 #pragma once
 
+#include <memory_resource>
+
 #include "EntityQuery.h"
 #include "SingletonLocator.h"
 #include "details/Archetype.h"
 #include "details/Job.h"
-
-#include <memory_resource>
 
 namespace My::MyECS {
 class World;
@@ -13,14 +13,15 @@ class SystemFunc;
 class IListener;
 
 // Entity Manager of World
-// auto maintain Component's lifecycle ({default|copy|move} constructor, destructor)
-// [API]
+// auto maintain Component's lifecycle ({default|copy|move} constructor,
+// destructor) [API]
 // - Entity: Create, Instantiate, Destroy, Exist
 // - Component: Attach, Emplace, Detach, Have, Get, Components
 // - Singleton: IsSingleton, GetSingletonEntity, GetSingleton
 // - other: EntityNum, AddCommand
 // [important]
-// - some API with TypeID need RTDCmptTraits to get {size|alignment|lifecycle function} (throw std::logic_error)
+// - some API with TypeID need RTDCmptTraits to get {size|alignment|lifecycle
+// function} (throw std::logic_error)
 // - API with Entity require Entity exist  (throw std::invalid_argument)
 // [details]
 // - when free entries is empty, use new entity entry (version is 0)
@@ -38,7 +39,6 @@ class EntityMngr {
 
   // use RTDCmptTraits
   Entity Create(std::span<const TypeID> types);
-
   Entity Create(TypeID type) { return Create({&type, 1}); }
 
   Entity Instantiate(Entity);
@@ -50,16 +50,13 @@ class EntityMngr {
 
   // use RTDCmptTraits
   void Attach(Entity, std::span<const TypeID> types);
-
   void Attach(Entity e, TypeID type) { Attach(e, {&type, 1}); }
 
   template <typename Cmpt, typename... Args>
   Cmpt* Emplace(Entity, Args&&...);
 
   void Detach(Entity, std::span<const TypeID> types);
-
   void Detach(Entity e, TypeID type) { Detach(e, {&type, 1}); }
-
   // use Detach(Entity, const TypeID*, std::size_t)
   template <typename... Cmpts>
   void Detach(Entity);
@@ -84,23 +81,19 @@ class EntityMngr {
   std::size_t TotalEntityNum() const noexcept {
     return entityTable.size() - entityTableFreeEntry.size();
   }
-
   std::size_t EntityNum(const EntityQuery&) const;
-
   // use entry in reverse
-  const std::vector<std::size_t>& GetEntityFreeEntries() const noexcept {
-    return entityTableFreeEntry;
+  std::span<const std::size_t> GetEntityFreeEntries() const noexcept {
+    return {entityTableFreeEntry.data(), entityTableFreeEntry.size()};
   }
-
   std::size_t GetEntityVersion(std::size_t idx) const noexcept {
-    return entityTable.at(idx).version;
+    return entityTable[idx].version;
   }
 
   bool IsSingleton(TypeID) const;
   Entity GetSingletonEntity(TypeID) const;
   // nullptr if not singleton
   CmptPtr GetSingleton(TypeID) const;
-
   template <typename Cmpt>
   Cmpt* GetSingleton() const {
     return GetSingleton(TypeID_of<Cmpt>).template As<Cmpt>();
@@ -133,7 +126,8 @@ class EntityMngr {
   Archetype* AttachWithoutInit(Entity);
   Archetype* AttachWithoutInit(Entity, std::span<const TypeID> types);
 
-  std::vector<CmptAccessPtr> LocateSingletons(const SingletonLocator&) const;
+  small_vector<CmptAccessPtr, 16> LocateSingletons(
+      const SingletonLocator&) const;
 
   const std::set<Archetype*>& QueryArchetypes(const EntityQuery&) const;
   mutable std::unordered_map<EntityQuery, std::set<Archetype*>> queryCache;
@@ -152,7 +146,6 @@ class EntityMngr {
     std::size_t idxInArchetype{static_cast<std::size_t>(-1)};
     std::size_t version{0};  // version
   };
-
   std::vector<EntityInfo> entityTable;
   std::vector<std::size_t> entityTableFreeEntry;
   std::size_t RequestEntityFreeEntry();

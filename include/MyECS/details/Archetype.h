@@ -1,15 +1,15 @@
 #pragma once
 
+#include <MyTemplate/TypeList.h>
+
+#include <memory_resource>
+
 #include "../CmptLocator.h"
 #include "../CmptPtr.h"
 #include "../Entity.h"
-
 #include "ArchetypeCmptTraits.h"
 #include "Chunk.h"
 #include "TypeIDSet.h"
-
-#include <MyTemplate/TypeList.h>
-#include <memory_resource>
 
 namespace My::MyECS {
 class EntityMngr;
@@ -50,8 +50,9 @@ class Archetype {
                            std::span<const TypeID> types);
 
   // Entity + Components
-  std::tuple<std::vector<Entity*>, std::vector<std::vector<CmptAccessPtr>>,
-             std::vector<std::size_t>>
+  std::tuple<small_vector<Entity*, 16>,
+             small_vector<small_vector<CmptAccessPtr, 16>, 16>,
+             small_vector<std::size_t, 16>>
   Locate(const CmptLocator& locator) const;
 
   // nullptr if not contains
@@ -92,17 +93,13 @@ class Archetype {
 
   // Components + Entity
   const TypeIDSet& GetTypeIDSet() const noexcept { return types; }
-
   const ArchetypeCmptTraits& GetArchetypeCmptTraits() const noexcept {
     return cmptTraits;
   }
 
   std::size_t EntityNum() const noexcept { return entityNum; }
-
   std::size_t EntityNumOfChunk(std::size_t chunkIdx) const noexcept;
-
   std::size_t ChunkNum() const noexcept { return chunks.size(); }
-
   std::size_t ChunkCapacity() const noexcept { return chunkCapacity; }
 
   // add Entity
@@ -116,7 +113,6 @@ class Archetype {
   void SetLayout();
 
   std::size_t Offsetof(TypeID type) const { return type2offset.at(type); }
-
   static bool NotContainEntity(std::span<const TypeID> types) noexcept;
 
   friend class EntityMngr;

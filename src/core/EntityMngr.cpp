@@ -1,5 +1,4 @@
 #include <MyECS/EntityMngr.h>
-
 #include <MyECS/IListener.h>
 #include <MyECS/details/SystemFunc.h>
 
@@ -26,8 +25,7 @@ EntityMngr::EntityMngr(const EntityMngr& em)
     const auto& src = em.entityTable[i];
     dst.idxInArchetype = src.idxInArchetype;
     dst.version = src.version;
-    if (src.archetype)
-      dst.archetype = ts2a.at(src.archetype->types).get();
+    if (src.archetype) dst.archetype = ts2a.at(src.archetype->types).get();
   }
   queryCache.reserve(em.queryCache.size());
   for (const auto& [query, srcArchetypes] : em.queryCache) {
@@ -37,9 +35,7 @@ EntityMngr::EntityMngr(const EntityMngr& em)
   }
 }
 
-EntityMngr::~EntityMngr() {
-  ts2a.clear();
-}
+EntityMngr::~EntityMngr() { ts2a.clear(); }
 
 std::size_t EntityMngr::RequestEntityFreeEntry() {
   if (entityTableFreeEntry.empty()) {
@@ -67,16 +63,14 @@ void EntityMngr::RecycleEntityEntry(Entity e) {
 Archetype* EntityMngr::GetOrCreateArchetypeOf(std::span<const TypeID> types) {
   auto typeset = Archetype::GenTypeIDSet(types);
   auto target = ts2a.find(typeset);
-  if (target != ts2a.end())
-    return target->second.get();
+  if (target != ts2a.end()) return target->second.get();
 
   auto* archetype = Archetype::New(
       cmptTraits, std::pmr::polymorphic_allocator<Chunk>{rsrc.get()}, types);
 
   ts2a.emplace(std::move(typeset), std::unique_ptr<Archetype>{archetype});
   for (auto& [query, archetypes] : queryCache) {
-    if (archetype->GetTypeIDSet().IsMatch(query))
-      archetypes.insert(archetype);
+    if (archetype->GetTypeIDSet().IsMatch(query)) archetypes.insert(archetype);
   }
 
   return archetype;
@@ -95,8 +89,7 @@ Entity EntityMngr::Create(std::span<const TypeID> types) {
 Archetype* EntityMngr::AttachWithoutInit(Entity e,
                                          std::span<const TypeID> types) {
   assert(IsSet(types));
-  if (!Exist(e))
-    throw std::invalid_argument("Entity is invalid");
+  if (!Exist(e)) throw std::invalid_argument("Entity is invalid");
 
   auto& info = entityTable[e.Idx()];
   Archetype* srcArchetype = info.archetype;
@@ -113,15 +106,13 @@ Archetype* EntityMngr::AttachWithoutInit(Entity e,
     dstArchetype = Archetype::Add(cmptTraits, srcArchetype, types);
     assert(dstTypeIDSet == dstArchetype->GetTypeIDSet());
     for (auto& [query, archetypes] : queryCache) {
-      if (dstTypeIDSet.IsMatch(query))
-        archetypes.insert(dstArchetype);
+      if (dstTypeIDSet.IsMatch(query)) archetypes.insert(dstArchetype);
     }
     ts2a.emplace(std::move(dstTypeIDSet),
                  std::unique_ptr<Archetype>{dstArchetype});
   } else {
     dstArchetype = target->second.get();
-    if (dstArchetype == srcArchetype)
-      return srcArchetype;
+    if (dstArchetype == srcArchetype) return srcArchetype;
   }
 
   // move src to dst
@@ -149,12 +140,10 @@ void EntityMngr::Attach(Entity e, std::span<const TypeID> types) {
   auto* origArchetype = AttachWithoutInit(e, types);
   const auto& info = entityTable[e.Idx()];
   for (const auto& type : types) {
-    if (origArchetype->GetTypeIDSet().Contains(type))
-      continue;
+    if (origArchetype->GetTypeIDSet().Contains(type)) continue;
 
     auto target = cmptTraits.GetDefaultConstructors().find(type);
-    if (target == cmptTraits.GetDefaultConstructors().end())
-      continue;
+    if (target == cmptTraits.GetDefaultConstructors().end()) continue;
 
     target->second(info.archetype->At(type, info.idxInArchetype));
   }
@@ -181,14 +170,12 @@ void EntityMngr::Detach(Entity e, std::span<const TypeID> types) {
     dstArchetype = Archetype::Remove(srcArchetype, types);
     assert(dstTypeIDSet == dstArchetype->GetTypeIDSet());
     for (auto& [query, archetypes] : queryCache) {
-      if (dstTypeIDSet.IsMatch(query))
-        archetypes.insert(dstArchetype);
+      if (dstTypeIDSet.IsMatch(query)) archetypes.insert(dstArchetype);
     }
   } else {
     isNewArchetype = false;
     dstArchetype = target->second.get();
-    if (dstArchetype == srcArchetype)
-      return;
+    if (dstArchetype == srcArchetype) return;
   }
 
   // move src to dst
@@ -217,16 +204,14 @@ void EntityMngr::Detach(Entity e, std::span<const TypeID> types) {
 }
 
 vector<CmptPtr> EntityMngr::Components(Entity e) const {
-  if (!Exist(e))
-    throw std::invalid_argument("Entity is invalid");
+  if (!Exist(e)) throw std::invalid_argument("Entity is invalid");
 
   const auto& info = entityTable[e.Idx()];
   return info.archetype->Components(info.idxInArchetype);
 }
 
 Entity EntityMngr::Instantiate(Entity srcEntity) {
-  if (!Exist(srcEntity))
-    throw std::invalid_argument("Entity is invalid");
+  if (!Exist(srcEntity)) throw std::invalid_argument("Entity is invalid");
 
   std::size_t dstEntityIndex = RequestEntityFreeEntry();
   const auto& srcInfo = entityTable[srcEntity.Idx()];
@@ -242,8 +227,7 @@ Entity EntityMngr::Instantiate(Entity srcEntity) {
 bool EntityMngr::IsSet(std::span<const TypeID> types) noexcept {
   for (std::size_t i = 0; i < types.size(); i++) {
     for (std::size_t j = 0; j < i; j++)
-      if (types[i] == types[j])
-        return false;
+      if (types[i] == types[j]) return false;
   }
 
   return true;
@@ -252,14 +236,12 @@ bool EntityMngr::IsSet(std::span<const TypeID> types) noexcept {
 const set<Archetype*>& EntityMngr::QueryArchetypes(
     const EntityQuery& query) const {
   auto target = queryCache.find(query);
-  if (target != queryCache.end())
-    return target->second;
+  if (target != queryCache.end()) return target->second;
 
   // queryCache is **mutable**
   set<Archetype*>& archetypes = queryCache[query];
   for (const auto& [ts, a] : ts2a) {
-    if (a->GetTypeIDSet().IsMatch(query))
-      archetypes.insert(a.get());
+    if (a->GetTypeIDSet().IsMatch(query)) archetypes.insert(a.get());
   }
 
   return archetypes;
@@ -273,8 +255,7 @@ std::size_t EntityMngr::EntityNum(const EntityQuery& query) const {
 }
 
 void EntityMngr::Destroy(Entity e) {
-  if (!Exist(e))
-    throw std::invalid_argument("Entity is invalid");
+  if (!Exist(e)) throw std::invalid_argument("Entity is invalid");
 
   auto info = entityTable[e.Idx()];
   auto* archetype = info.archetype;
@@ -288,15 +269,14 @@ void EntityMngr::Destroy(Entity e) {
   RecycleEntityEntry(e);
 }
 
-vector<CmptAccessPtr> EntityMngr::LocateSingletons(
+My::small_vector<CmptAccessPtr, 16> EntityMngr::LocateSingletons(
     const SingletonLocator& locator) const {
   std::size_t numSingletons = 0;
-  vector<CmptAccessPtr> rst;
+  small_vector<CmptAccessPtr, 16> rst;
   rst.reserve(locator.SingletonTypes().size());
   for (const auto& t : locator.SingletonTypes()) {
     auto ptr = GetSingleton(t);
-    if (ptr.Ptr() == nullptr)
-      return {};
+    if (ptr.Ptr() == nullptr) return {};
     rst.emplace_back(ptr, t.GetAccessMode());
   }
   return rst;
@@ -495,11 +475,9 @@ bool EntityMngr::IsSingleton(TypeID t) const {
   ArchetypeFilter filter{{AccessTypeID{t}}, {}, {}};
   EntityQuery query{move(filter)};
   const auto& archetypes = QueryArchetypes(query);
-  if (archetypes.size() != 1)
-    return false;
+  if (archetypes.size() != 1) return false;
   auto* archetype = *archetypes.begin();
-  if (archetype->EntityNum() != 1)
-    return false;
+  if (archetype->EntityNum() != 1) return false;
 
   return true;
 }
@@ -519,15 +497,12 @@ CmptPtr EntityMngr::GetSingleton(TypeID t) const {
   const auto& archetypes = QueryArchetypes(query);
 
   std::size_t num = 0;
-  for (auto* archetype : archetypes)
-    num += archetype->EntityNum();
+  for (auto* archetype : archetypes) num += archetype->EntityNum();
 
-  if (num != 1)
-    return {TypeID{}, nullptr};
+  if (num != 1) return {TypeID{}, nullptr};
 
   for (auto* archetype : archetypes) {
-    if (archetype->EntityNum() != 0)
-      return {t, archetype->At(t, 0)};
+    if (archetype->EntityNum() != 0) return {t, archetype->At(t, 0)};
   }
 
   return {TypeID{}, nullptr};
@@ -542,13 +517,12 @@ std::vector<CmptPtr> EntityMngr::GetCmptArray(const ArchetypeFilter& filter,
   const auto& archetypes = QueryArchetypes(EntityQuery{filter});
 
   std::size_t num = 0;
-  for (const auto& archetype : archetypes)
-    num += archetype->EntityNum();
+  for (const auto& archetype : archetypes) num += archetype->EntityNum();
 
   rst.reserve(num);
   for (auto* archetype : archetypes) {
     /*for (std::size_t i = 0; i < archetype->EntityNum(); i++)
-			rst[idx++] = *archetype->At(type, i);*/
+            rst[idx++] = *archetype->At(type, i);*/
 
     // speed up
 
@@ -573,13 +547,12 @@ std::vector<Entity> EntityMngr::GetEntityArray(
   const auto& archetypes = QueryArchetypes(EntityQuery{filter});
 
   std::size_t num = 0;
-  for (const auto& archetype : archetypes)
-    num += archetype->EntityNum();
+  for (const auto& archetype : archetypes) num += archetype->EntityNum();
 
   rst.reserve(num);
   for (auto* archetype : archetypes) {
     /*for (std::size_t i = 0; i < archetype->EntityNum(); i++)
-			rst[idx++] = *archetype->At<Entity>(i);*/
+            rst[idx++] = *archetype->At<Entity>(i);*/
 
     // speed up
 

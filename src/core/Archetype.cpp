@@ -199,7 +199,9 @@ std::size_t Archetype::Instantiate(Entity e, std::size_t srcIdx) {
   return dstIdx;
 }
 
-tuple<vector<Entity*>, vector<vector<CmptAccessPtr>>, vector<std::size_t>>
+std::tuple<My::small_vector<Entity*, 16>,
+           My::small_vector<My::small_vector<CmptAccessPtr, 16>, 16>,
+           My::small_vector<std::size_t, 16> >
 Archetype::Locate(const CmptLocator& locator) const {
   assert(types.IsMatch(locator));
 
@@ -207,8 +209,9 @@ Archetype::Locate(const CmptLocator& locator) const {
   const std::size_t numType = locator.AccessTypeIDs().size();
   const std::size_t offsetEntity = Offsetof(TypeID_of<Entity>);
 
-  vector<vector<CmptAccessPtr>> chunkCmpts(numChunk);
-  vector<Entity*> chunkEntity(numChunk);
+  My::small_vector<My::small_vector<CmptAccessPtr, 16>, 16> chunkCmpts(
+      numChunk);
+  My::small_vector<Entity*, 16> chunkEntity(numChunk);
 
   for (std::size_t i = 0; i < numChunk; i++) {
     byte* data = chunks[i]->Data();
@@ -218,7 +221,7 @@ Archetype::Locate(const CmptLocator& locator) const {
     chunkEntity[i] = reinterpret_cast<Entity*>(data + offsetEntity);
   }
 
-  vector<std::size_t> sizes;
+  My::small_vector<std::size_t, 16> sizes;
   sizes.reserve(numType);
   for (const auto& type : locator.AccessTypeIDs())
     sizes.push_back(cmptTraits.Sizeof(type));
