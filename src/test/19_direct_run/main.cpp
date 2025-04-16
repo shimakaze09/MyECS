@@ -47,8 +47,9 @@ void print1(const World& w) {
 
 int main() {
   World w;
+  w.entityMngr.cmptTraits.Register<Position, Velocity>();
   w.systemMngr.RegisterAndActivate<MoverSystem>();
-  w.entityMngr.Create<Position, Velocity>();
+  w.entityMngr.Create(My::TypeIDs_of<Position, Velocity>);
   w.Update();
   print0(w);
   print1(w);

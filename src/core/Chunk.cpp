@@ -1,4 +1,4 @@
-#include <MyECS/details/Chunk.h>
+#include "Chunk.h"
 
 #include <algorithm>
 
@@ -26,8 +26,7 @@ Chunk::Layout Chunk::GenLayout(const vector<std::size_t>& alignments,
 
   constexpr std::size_t chunkSize = 16 * 1024;
   std::size_t sumSize = 0;
-  for (std::size_t s : sizes)
-    sumSize += s;
+  for (std::size_t s : sizes) sumSize += s;
   layout.capacity = chunkSize / sumSize;
 
   layout.offsets.resize(sizes.size());

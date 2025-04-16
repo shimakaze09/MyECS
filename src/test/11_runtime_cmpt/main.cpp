@@ -46,8 +46,7 @@ int main() {
                                   [](void*) { cout << "construct" << endl; })
       .RegisterDestructor(type, [](void*) { cout << "destruct" << endl; });
 
-  auto [e] = w.entityMngr.Create();
-  w.entityMngr.Attach(e, {&type, 1});
+  auto e = w.entityMngr.Create(My::TempTypeIDs{type});
   w.Update();
 
   cout << w.DumpUpdateJobGraph() << endl;

@@ -30,8 +30,9 @@ struct MoverSystem {
 
 int main() {
   World w;
+  w.entityMngr.cmptTraits.Register<Position, Velocity>();
   auto [move] = w.systemMngr.systemTraits.Register<MoverSystem>();
-  w.entityMngr.Create<Position, Velocity>();
+  w.entityMngr.Create(My::TypeIDs_of<Position, Velocity>);
   w.systemMngr.Activate(move);
   w.Update();
 }

@@ -29,10 +29,11 @@ struct AVP_System {
 
 int main() {
   World w;
+  w.entityMngr.cmptTraits.Register<A, V, P>();
   w.systemMngr.RegisterAndActivate<VP_System, AVP_System>();
 
-  w.entityMngr.Create<V, P>();
-  w.entityMngr.Create<A, V, P>();
+  w.entityMngr.Create(My::TypeIDs_of<V, P>);
+  w.entityMngr.Create(My::TypeIDs_of<A, V, P>);
 
   w.Update();
 

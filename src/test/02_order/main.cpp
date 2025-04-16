@@ -33,7 +33,7 @@ int main() {
 
   w.entityMngr.cmptTraits.Register<Data1, Data2>();
 
-  w.entityMngr.Create<Data1, Data2>();
+  w.entityMngr.Create(My::TypeIDs_of<Data1, Data2>);
 
   w.Update();
 

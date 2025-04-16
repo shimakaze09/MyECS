@@ -6,19 +6,15 @@ using namespace My::MyECS;
 struct Translation {
   float value{0.f};
 };
-
 struct LocalToParent {
   float value{0.f};
 };
-
 struct LocalToWorld {
   float value{0.f};
 };
-
 struct Children {
   std::vector<Entity> value;
 };
-
 struct Parent {
   Entity value;
 };
@@ -26,17 +22,16 @@ struct Parent {
 struct TranslationSystem {
   static void SetTreeL2W(World* w, const Entity& entity,
                          const LocalToWorld* l2w) {
-    if (!w->entityMngr.Have<LocalToParent>(entity) ||
-        !w->entityMngr.Have<LocalToWorld>(entity))
+    if (!w->entityMngr.Have(entity, TypeID_of<LocalToParent>) ||
+        !w->entityMngr.Have(entity, TypeID_of<LocalToWorld>))
       return;
     auto* el2p = w->entityMngr.Get<LocalToParent>(entity);
     auto* el2w = w->entityMngr.Get<LocalToWorld>(entity);
     el2w->value = l2w->value + el2p->value;
 
-    if (w->entityMngr.Have<Children>(entity)) {
+    if (w->entityMngr.Have(entity, TypeID_of<Children>)) {
       auto* children = w->entityMngr.Get<Children>(entity);
-      for (const auto& child : children->value)
-        SetTreeL2W(w, child, el2w);
+      for (const auto& child : children->value) SetTreeL2W(w, child, el2w);
     }
   }
 
@@ -68,8 +63,7 @@ struct TranslationSystem {
       filter.none.insert(TypeID_of<Parent>);
       schedule.RegisterEntityJob(
           [](World* w, Children* children, const LocalToWorld* l2w) {
-            for (const auto& child : children->value)
-              SetTreeL2W(w, child, l2w);
+            for (const auto& child : children->value) SetTreeL2W(w, child, l2w);
           },
           "LocalToWorld", true, filter, {}, {}, randomAccessor);
     }
@@ -87,24 +81,26 @@ int main() {
   w.entityMngr.cmptTraits
       .Register<Translation, LocalToWorld, LocalToParent, Children, Parent>();
   w.systemMngr.RegisterAndActivate<TranslationSystem>();
-  auto [e1, c, t1, l2w1] =
-      w.entityMngr.Create<Children, Translation, LocalToWorld>();
-  auto [e2, p2, t2, l2p2, l2w2] =
-      w.entityMngr.Create<Parent, Translation, LocalToParent, LocalToWorld>();
-  auto [e3, p3, t3, l2p3, l2w3] =
-      w.entityMngr.Create<Parent, Translation, LocalToParent, LocalToWorld>();
 
-  c->value = {e2, e3};
-  p2->value = e1;
-  p3->value = e1;
+  auto e1 =
+      w.entityMngr.Create(My::TypeIDs_of<Children, Translation, LocalToWorld>);
+  auto e2 = w.entityMngr.Create(
+      My::TypeIDs_of<Parent, Translation, LocalToParent, LocalToWorld>);
+  auto e3 = w.entityMngr.Create(
+      My::TypeIDs_of<Parent, Translation, LocalToParent, LocalToWorld>);
 
-  t1->value = 1.f;
-  t2->value = 2.f;
-  t3->value = 3.f;
+  w.entityMngr.Get<Children>(e1)->value = {e2, e3};
+  w.entityMngr.Get<Parent>(e2)->value = e1;
+  w.entityMngr.Get<Parent>(e3)->value = e1;
+
+  w.entityMngr.Get<Translation>(e1)->value = 1;
+  w.entityMngr.Get<Translation>(e2)->value = 2;
+  w.entityMngr.Get<Translation>(e3)->value = 3;
 
   w.Update();
 
   std::cout << w.GenUpdateFrameGraph().Dump() << std::endl;
   std::cout << w.DumpUpdateJobGraph() << std::endl;
+
   return 0;
 }

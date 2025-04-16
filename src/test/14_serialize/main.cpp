@@ -22,8 +22,7 @@ class Dumper : public IListener {
   const World* w;
 
   void PrintIndent() {
-    for (std::size_t i = 0; i < indent; i++)
-      cout << "  ";
+    for (std::size_t i = 0; i < indent; i++) cout << "  ";
   }
 
   // new line
@@ -133,10 +132,9 @@ int main() {
   World w;
   w.entityMngr.cmptTraits.Register<Position, Velocity>();
   w.systemMngr.RegisterAndActivate<MoverSystem>();
-  w.entityMngr.Create<Position, Velocity>();
-  w.entityMngr.Create<Position>();
-  w.entityMngr.Create<Velocity>();
-  w.entityMngr.Create<>();
+  w.entityMngr.Create(My::TypeIDs_of<Position, Velocity>);
+  w.entityMngr.Create(My::TypeIDs_of<Position>);
+  w.entityMngr.Create(My::TypeIDs_of<Velocity>);
   w.Update();
   Dumper dumper;
   w.Accept(&dumper);

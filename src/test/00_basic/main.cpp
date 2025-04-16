@@ -1,11 +1,11 @@
 #include <MyECS/World.h>
 
+using namespace My;
 using namespace My::MyECS;
 
 struct Position {
   float val;
 };
-
 struct Velocity {
   float val;
 };
@@ -19,7 +19,8 @@ struct MoverSystem {
 
 int main() {
   World w;
+  w.entityMngr.cmptTraits.Register<Position, Velocity>();
   w.systemMngr.RegisterAndActivate<MoverSystem>();
-  w.entityMngr.Create<Position, Velocity>();
+  w.entityMngr.Create(TypeIDs_of<Position, Velocity>);
   w.Update();
 }

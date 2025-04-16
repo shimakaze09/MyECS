@@ -1,15 +1,15 @@
 #pragma once
 
+#include <MyECS/CmptLocator.h>
+#include <MyECS/CmptPtr.h>
+#include <MyECS/Entity.h>
+#include <MyECS/details/TypeIDSet.h>
 #include <MyTemplate/TypeList.h>
 
 #include <memory_resource>
 
-#include "../CmptLocator.h"
-#include "../CmptPtr.h"
-#include "../Entity.h"
 #include "ArchetypeCmptTraits.h"
 #include "Chunk.h"
-#include "TypeIDSet.h"
 
 namespace My::MyECS {
 class EntityMngr;
@@ -20,12 +20,6 @@ class Archetype {
  public:
   Archetype(std::pmr::polymorphic_allocator<Chunk> chunkAllocator) noexcept
       : chunkAllocator{chunkAllocator} {}
-
-  // argument TypeList<Cmpts...> is for type deduction
-  // auto add Entity
-  template <typename... Cmpts>
-  Archetype(std::pmr::polymorphic_allocator<Chunk> chunkAllocator,
-            TypeList<Cmpts...>);
 
   // copy
   Archetype(std::pmr::polymorphic_allocator<Chunk> chunkAllocator,
@@ -39,9 +33,6 @@ class Archetype {
                         std::pmr::polymorphic_allocator<Chunk> chunkAllocator,
                         std::span<const TypeID> types);
 
-  // auto add Entity
-  template <typename... Cmpts>
-  static Archetype* Add(const Archetype* from);
   static Archetype* Add(RTDCmptTraits&, const Archetype* from,
                         std::span<const TypeID> types);
 
@@ -52,7 +43,7 @@ class Archetype {
   // Entity + Components
   std::tuple<small_vector<Entity*, 16>,
              small_vector<small_vector<CmptAccessPtr, 16>, 16>,
-             small_vector<std::size_t, 16>>
+             small_vector<std::size_t, 16> >
   Locate(const CmptLocator& locator) const;
 
   // nullptr if not contains
@@ -74,11 +65,6 @@ class Archetype {
 
   // no init
   std::size_t RequestBuffer();
-
-  // init cmpts, set Entity
-  // std::size_t: index in archetype
-  template <typename... Cmpts>
-  std::tuple<std::size_t, std::tuple<Cmpts*...>> Create(Entity);
 
   std::size_t Create(RTDCmptTraits&, Entity);
 
@@ -104,8 +90,6 @@ class Archetype {
 
   // add Entity
   static TypeIDSet GenTypeIDSet(std::span<const TypeID> types);
-  template <typename... Cmpts>
-  static TypeIDSet GenTypeIDSet();
 
  private:
   // set type2alignment
@@ -129,5 +113,3 @@ class Archetype {
   std::size_t entityNum{0};  // number of entities
 };
 }  // namespace My::MyECS
-
-#include "Archetype.inl"

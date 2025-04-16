@@ -25,20 +25,19 @@ struct PrintASystem {
 
 int main() {
   World w;
-  w.systemMngr.RegisterAndActivate<PrintASystem>();
-  w.entityMngr.Create<A>();
-  w.entityMngr.Create<A, B>();
-  w.entityMngr.Create<A, C>();
-  w.entityMngr.Create<A, B, C>();
   w.entityMngr.cmptTraits.Register<A, B, C>();
+  w.systemMngr.RegisterAndActivate<PrintASystem>();
+  w.entityMngr.Create(My::TypeIDs_of<A>);
+  w.entityMngr.Create(My::TypeIDs_of<A, B>);
+  w.entityMngr.Create(My::TypeIDs_of<A, C>);
+  w.entityMngr.Create(My::TypeIDs_of<A, B, C>);
 
   for (std::size_t i = 0; i < 5; i++) {
     w.Update();
     std::cout << "^^^^^^^^^^" << std::endl;
   }
 
-  for (std::size_t i = 0; i < 100; i++)
-    w.entityMngr.Create();
+  for (std::size_t i = 0; i < 100; i++) w.entityMngr.Create();
 
   w.RunEntityJob([](Entity e) { std::cout << e.Idx() << std::endl; }, false);
 

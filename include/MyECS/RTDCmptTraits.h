@@ -22,7 +22,7 @@ class RTDCmptTraits {
  public:
   static constexpr std::size_t default_alignment = alignof(std::max_align_t);
 
-  RTDCmptTraits() = default;
+  RTDCmptTraits();
   RTDCmptTraits(const RTDCmptTraits& other);
   RTDCmptTraits(RTDCmptTraits&& other) noexcept = default;
   RTDCmptTraits& operator=(const RTDCmptTraits& other);
@@ -30,6 +30,8 @@ class RTDCmptTraits {
 
   RTDCmptTraits& Clear();
 
+  RTDCmptTraits& RegisterName(Type);
+  RTDCmptTraits& RegisterTrivial(TypeID);
   RTDCmptTraits& RegisterSize(TypeID, std::size_t size);
   RTDCmptTraits& RegisterAlignment(TypeID, std::size_t alignment);
   RTDCmptTraits& RegisterDefaultConstructor(TypeID, std::function<void(void*)>);
@@ -40,7 +42,6 @@ class RTDCmptTraits {
   RTDCmptTraits& RegisterMoveAssignment(TypeID,
                                         std::function<void(void*, void*)>);
   RTDCmptTraits& RegisterDestructor(TypeID, std::function<void(void*)>);
-  RTDCmptTraits& RegisterName(Type);
 
   const auto& GetSizeofs() const noexcept { return sizeofs; }
   const auto& GetAlignments() const noexcept { return alignments; };
@@ -53,6 +54,7 @@ class RTDCmptTraits {
   const auto& GetDestructors() const noexcept { return destructors; }
   const auto& GetNames() const noexcept { return names; }
 
+  bool IsTrivial(TypeID) const;
   std::size_t Sizeof(TypeID) const;
   std::size_t Alignof(TypeID) const;
   void DefaultConstruct(TypeID, void* cmpt) const;
@@ -82,6 +84,7 @@ class RTDCmptTraits {
   void RegisterOne();
 
   std::pmr::synchronized_pool_resource rsrc;
+  std::unordered_set<TypeID> trivials;
   std::unordered_map<TypeID, std::string_view> names;
   std::unordered_map<TypeID, std::size_t> sizeofs;
   std::unordered_map<TypeID, std::size_t> alignments;

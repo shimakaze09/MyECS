@@ -1,10 +1,10 @@
 #pragma once
 
+#include <MyECS/config.h>
+
 #include <array>
 #include <cstdint>
 #include <vector>
-
-#include "../config.h"
 
 namespace My::MyECS {
 using byte = uint8_t;
