@@ -1,10 +1,12 @@
 #pragma once
 
-#include "../AccessTypeID.h"
-#include "../RTDCmptTraits.h"
+#include <small_vector.h>
 
 #include <functional>
 #include <unordered_map>
+
+#include "../AccessTypeID.h"
+#include "../RTDCmptTraits.h"
 
 namespace My::MyECS {
 // run-time static component traits
@@ -17,6 +19,11 @@ class ArchetypeCmptTraits {
   void MoveAssign(TypeID, void* dst, void* src) const;
   void Destruct(TypeID, void* cmpt) const;
 
+  const std::function<void(void*, void*)>* GetCopyConstruct(TypeID) const;
+  const std::function<void(void*, void*)>* GetMoveConstruct(TypeID) const;
+  const std::function<void(void*, void*)>* GetMoveAssign(TypeID) const;
+  const std::function<void(void*)>* GetDestruct(TypeID) const;
+
   template <typename Cmpt>
   void Register();
 
@@ -27,17 +34,15 @@ class ArchetypeCmptTraits {
   void Deregister(TypeID) noexcept;
 
  private:
-  friend class Archetype;
-
-  std::unordered_map<TypeID, std::size_t> sizeofs;
-  std::unordered_map<TypeID, std::size_t> alignments;
-  std::unordered_map<TypeID, std::function<void(void*, void*)>>
+  small_vector<std::tuple<TypeID, size_t>, 16> sizeofs;
+  small_vector<std::tuple<TypeID, size_t>, 16> alignments;
+  small_vector<std::tuple<TypeID, std::function<void(void*, void*)>>, 16>
       copy_constructors;  // dst <- src
-  std::unordered_map<TypeID, std::function<void(void*, void*)>>
+  small_vector<std::tuple<TypeID, std::function<void(void*, void*)>>, 16>
       move_constructors;  // dst <- src
-  std::unordered_map<TypeID, std::function<void(void*, void*)>>
+  small_vector<std::tuple<TypeID, std::function<void(void*, void*)>>, 16>
       move_assignments;  // dst <- src
-  std::unordered_map<TypeID, std::function<void(void*)>> destructors;
+  small_vector<std::tuple<TypeID, std::function<void(void*)>>, 16> destructors;
 };
 }  // namespace My::MyECS
 

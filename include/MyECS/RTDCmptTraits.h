@@ -1,10 +1,10 @@
 #pragma once
 
-#include "AccessTypeID.h"
-
 #include <functional>
 #include <string>
 #include <unordered_map>
+
+#include "AccessTypeID.h"
 
 namespace My::MyECS {
 // run-time dynamic component traits
@@ -19,9 +19,7 @@ namespace My::MyECS {
 // - name
 class RTDCmptTraits {
  public:
-  static constexpr std::size_t DefaultAlignment() noexcept {
-    return alignof(std::max_align_t);
-  }
+  static constexpr std::size_t default_alignment = alignof(std::max_align_t);
 
   RTDCmptTraits& Clear();
 

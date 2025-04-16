@@ -5,10 +5,8 @@ using namespace std;
 
 Archetype::~Archetype() {
   for (const auto& type : types.data) {
-    auto target = cmptTraits.destructors.find(type);
-    if (target == cmptTraits.destructors.end())
-      continue;
-    const auto& destructor = target->second;
+    auto destructor = cmptTraits.GetDestruct(type);
+    if (!destructor) continue;
     std::size_t size = cmptTraits.Sizeof(type);
     std::size_t offset = Offsetof(type);
     for (std::size_t k = 0; k < chunks.size(); k++) {
@@ -17,12 +15,12 @@ Archetype::~Archetype() {
       byte* beg = buffer + offset;
       for (std::size_t i = 0; i < num; i++) {
         byte* address = beg + i * size;
-        destructor(address);
+        (*destructor)(address);
       }
     }
   }
   // FastClear by EntityMngr
-  //for (Chunk* chunk : chunks)
+  // for (Chunk* chunk : chunks)
   //	entityMngr->sharedChunkPool.Recycle(chunk);
 }
 
@@ -45,12 +43,11 @@ Archetype::Archetype(std::pmr::polymorphic_allocator<Chunk> chunkAllocator,
       auto* srcBegin = srcChunk->Data() + offset;
       auto* dstBegin = dstChunk->Data() + offset;
       auto size = cmptTraits.Sizeof(type);
-      auto target = cmptTraits.copy_constructors.find(type);
-      if (target != cmptTraits.copy_constructors.end()) {
-        const auto& copy_ctor = target->second;
+      auto copy_ctor = cmptTraits.GetCopyConstruct(type);
+      if (copy_ctor) {
         for (std::size_t j = 0; j < num; j++) {
           auto offset_j = j * size;
-          copy_ctor(dstBegin + offset_j, srcBegin + offset_j);
+          (*copy_ctor)(dstBegin + offset_j, srcBegin + offset_j);
         }
       } else
         memcpy(dstBegin, srcBegin, num * size);
@@ -90,8 +87,7 @@ Archetype* Archetype::New(RTDCmptTraits& rtdCmptTraits,
   rst->types.Insert(types);
   rst->types.data.insert(TypeID_of<Entity>);
   rst->cmptTraits.Register<Entity>();
-  for (const auto& type : types)
-    rst->cmptTraits.Register(rtdCmptTraits, type);
+  for (const auto& type : types) rst->cmptTraits.Register(rtdCmptTraits, type);
   rst->SetLayout();
   return rst;
 }
@@ -106,8 +102,7 @@ Archetype* Archetype::Add(RTDCmptTraits& rtdCmptTraits, const Archetype* from,
   rst->types = from->types;
   rst->cmptTraits = from->cmptTraits;
   rst->types.Insert(types);
-  for (const auto& type : types)
-    rst->cmptTraits.Register(rtdCmptTraits, type);
+  for (const auto& type : types) rst->cmptTraits.Register(rtdCmptTraits, type);
 
   rst->SetLayout();
 
@@ -124,8 +119,7 @@ Archetype* Archetype::Remove(const Archetype* from,
   rst->types = from->types;
   rst->cmptTraits = from->cmptTraits;
   rst->types.Erase(types);
-  for (const auto& type : types)
-    rst->cmptTraits.Deregister(type);
+  for (const auto& type : types) rst->cmptTraits.Deregister(type);
 
   rst->SetLayout();
 
@@ -144,8 +138,7 @@ std::size_t Archetype::Create(RTDCmptTraits& rtdCmptTraits, Entity e) {
       memcpy(buffer + offset + idxInChunk * size, &e, size);
     } else {
       auto target = rtdCmptTraits.GetDefaultConstructors().find(type);
-      if (target == rtdCmptTraits.GetDefaultConstructors().end())
-        continue;
+      if (target == rtdCmptTraits.GetDefaultConstructors().end()) continue;
       const auto& ctor = target->second;
       std::size_t size = cmptTraits.Sizeof(type);
       std::size_t offset = Offsetof(type);
@@ -168,8 +161,7 @@ std::size_t Archetype::RequestBuffer() {
 void* Archetype::At(TypeID type, std::size_t idx) const {
   assert(idx < entityNum);
 
-  if (!types.Contains(type))
-    return nullptr;
+  if (!types.Contains(type)) return nullptr;
 
   std::size_t size = cmptTraits.Sizeof(type);
   std::size_t offset = Offsetof(type);
@@ -236,8 +228,7 @@ Archetype::Locate(const CmptLocator& locator) const {
 
 void* Archetype::Locate(std::size_t chunkIdx, TypeID t) const {
   assert(chunkIdx < chunks.size());
-  if (!types.Contains(t))
-    return nullptr;
+  if (!types.Contains(t)) return nullptr;
 
   auto* buffer = chunks[chunkIdx]->Data();
   return buffer + Offsetof(t);
@@ -263,8 +254,7 @@ std::size_t Archetype::Erase(std::size_t idx) {
       byte* dst = dstBuffer + offset + dstIdxInChunk * size;
       byte* src = srcBuffer + offset + srcIdxInChunk * size;
 
-      if (type.Is<Entity>())
-        movedIdx = reinterpret_cast<Entity*>(src)->Idx();
+      if (type.Is<Entity>()) movedIdx = reinterpret_cast<Entity*>(src)->Idx();
 
       cmptTraits.MoveAssign(type, dst, src);
       cmptTraits.Destruct(type, src);
@@ -293,8 +283,7 @@ vector<CmptPtr> Archetype::Components(std::size_t idx) const {
   vector<CmptPtr> rst;
 
   for (const auto& type : types.data) {
-    if (type.Is<Entity>())
-      continue;
+    if (type.Is<Entity>()) continue;
     rst.emplace_back(type, At(type, idx));
   }
 
@@ -320,8 +309,7 @@ TypeIDSet Archetype::GenTypeIDSet(std::span<const TypeID> types) {
 
 bool Archetype::NotContainEntity(std::span<const TypeID> types) noexcept {
   for (const auto& type : types) {
-    if (type.Is<Entity>())
-      return false;
+    if (type.Is<Entity>()) return false;
   }
   return true;
 }

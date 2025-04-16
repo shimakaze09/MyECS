@@ -60,14 +60,13 @@ inline std::size_t RTDCmptTraits::Sizeof(TypeID type) const {
 inline std::size_t RTDCmptTraits::Alignof(TypeID type) const {
   auto target = alignments.find(type);
 
-  return target != alignments.end() ? target->second : DefaultAlignment();
+  return target != alignments.end() ? target->second : default_alignment;
 }
 
 inline void RTDCmptTraits::DefaultConstruct(TypeID type, void* cmpt) const {
   auto target = default_constructors.find(type);
 
-  if (target != default_constructors.end())
-    target->second(cmpt);
+  if (target != default_constructors.end()) target->second(cmpt);
 }
 
 inline void RTDCmptTraits::CopyConstruct(TypeID type, void* dst,
@@ -101,8 +100,7 @@ inline void RTDCmptTraits::MoveAssign(TypeID type, void* dst, void* src) const {
 
 inline void RTDCmptTraits::Destruct(TypeID type, void* cmpt) const {
   auto target = destructors.find(type);
-  if (target != destructors.end())
-    target->second(cmpt);
+  if (target != destructors.end()) target->second(cmpt);
 }
 
 inline std::string_view RTDCmptTraits::Nameof(TypeID type) const {

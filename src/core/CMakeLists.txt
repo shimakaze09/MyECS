@@ -23,6 +23,7 @@ ADD_TARGET(
         LIB
         My::MyTemplate_core
         My::MyGraphviz_core
+        My::MySmallFlat_core
         INC
         "${PROJECT_SOURCE_DIR}/include"
         C_OPTION
