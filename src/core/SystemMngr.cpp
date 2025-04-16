@@ -22,53 +22,47 @@ SystemMngr::~SystemMngr() {
 }
 
 void SystemMngr::Clear() {
-  for (auto ID : activeSystemIDs)
-    systemTraits.Deactivate(ID, w);
-  for (auto ID : aliveSystemIDs)
-    systemTraits.Destroy(ID, w);
+  for (auto name : activeSystemIDs) systemTraits.Deactivate(name, w);
+  for (auto name : aliveSystemIDs) systemTraits.Destroy(name, w);
   activeSystemIDs.clear();
   aliveSystemIDs.clear();
 }
 
-void SystemMngr::Create(std::size_t ID) {
-  if (IsAlive(ID))
-    return;
+void SystemMngr::Create(NameID ID) {
+  if (IsAlive(ID)) return;
   systemTraits.Create(ID, w);
   aliveSystemIDs.insert(ID);
 }
 
-void SystemMngr::Activate(std::size_t ID) {
+void SystemMngr::Activate(NameID ID) {
   Create(ID);
-  if (IsActive(ID))
-    return;
+  if (IsActive(ID)) return;
   systemTraits.Activate(ID, w);
   activeSystemIDs.insert(ID);
 }
 
-void SystemMngr::Update(std::size_t ID, Schedule& schedule) const {
+void SystemMngr::Update(NameID ID, Schedule& schedule) const {
   assert(IsActive(ID));
   systemTraits.Update(ID, schedule);
 }
 
-void SystemMngr::Deactivate(std::size_t ID) {
-  if (!IsAlive(ID) || !IsActive(ID))
-    return;
+void SystemMngr::Deactivate(NameID ID) {
+  if (!IsAlive(ID) || !IsActive(ID)) return;
   systemTraits.Deactivate(ID, w);
   activeSystemIDs.erase(ID);
 }
 
-void SystemMngr::Destroy(std::size_t ID) {
-  if (!IsAlive(ID))
-    return;
+void SystemMngr::Destroy(NameID ID) {
+  if (!IsAlive(ID)) return;
   Deactivate(ID);
   systemTraits.Destroy(ID, w);
   aliveSystemIDs.erase(ID);
 }
 
-bool SystemMngr::IsAlive(std::size_t ID) const {
+bool SystemMngr::IsAlive(NameID ID) const {
   return aliveSystemIDs.find(ID) != aliveSystemIDs.end();
 }
 
-bool SystemMngr::IsActive(std::size_t ID) const {
+bool SystemMngr::IsActive(NameID ID) const {
   return activeSystemIDs.find(ID) != activeSystemIDs.end();
 }

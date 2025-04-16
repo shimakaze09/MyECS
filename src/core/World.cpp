@@ -18,9 +18,7 @@ World::World(World&& w) noexcept
       systemMngr{std::move(w.systemMngr), this},
       entityMngr{std::move(w.entityMngr)} {}
 
-World::~World() {
-  systemMngr.Clear();
-}
+World::~World() { systemMngr.Clear(); }
 
 void World::Update() {
   inRunningJobGraph = true;
@@ -33,8 +31,8 @@ void World::Update() {
   jobs.clear();
   jobGraph.clear();
 
-  for (auto id : systemMngr.GetActiveSystemsIDs())
-    systemMngr.Update(id, schedule);
+  for (const auto& ID : systemMngr.GetActiveSystemIDs())
+    systemMngr.Update(ID, schedule);
 
   for (auto& [layer, scheduleCommands] : schedule.commandBuffer) {
     auto& worldCommands = commandBuffer[layer];
@@ -59,8 +57,7 @@ void World::Update() {
 
   for (const auto& [v, adjVs] : graph.GetAdjList()) {
     auto vJob = table.at(v);
-    for (auto* adjV : adjVs)
-      vJob.precede(table.at(adjV));
+    for (auto* adjV : adjVs) vJob.precede(table.at(adjV));
   }
 
   executor.run(jobGraph).wait();
@@ -69,9 +66,7 @@ void World::Update() {
   RunCommands();
 }
 
-string World::DumpUpdateJobGraph() const {
-  return jobGraph.dump();
-}
+string World::DumpUpdateJobGraph() const { return jobGraph.dump(); }
 
 void World::Run(SystemFunc* sys) {
   if (sys->IsParallel()) {
@@ -319,8 +314,7 @@ void World::AddCommand(std::function<void()> command, int layer) {
 
 void World::RunCommands() {
   for (const auto& [layer, commands] : commandBuffer) {
-    for (const auto& command : commands)
-      command();
+    for (const auto& command : commands) command();
   }
   commandBuffer.clear();
 }

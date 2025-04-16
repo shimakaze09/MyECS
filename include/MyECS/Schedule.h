@@ -1,11 +1,11 @@
 #pragma once
 
-#include "details/Job.h"
-#include "details/SystemFunc.h"
-
 #include <map>
 #include <memory>
 #include <memory_resource>
+
+#include "details/Job.h"
+#include "details/SystemFunc.h"
 
 namespace My::MyECS::details {
 struct Compiler;
@@ -70,8 +70,6 @@ class Schedule {
 
   Schedule& Order(std::string_view x, std::string_view y);
 
-  Schedule& LockFilter(std::string_view sys);
-
   Schedule& InsertNone(std::string_view sys, TypeID);
   Schedule& EraseNone(std::string_view sys, TypeID);
 
@@ -104,7 +102,6 @@ class Schedule {
   };
 
   std::unordered_map<std::size_t, FilterChange> sysFilterChange;
-  std::unordered_set<std::size_t> sysLockFilter;
 
   std::map<int, std::vector<std::function<void(World*)>>> commandBuffer;
 

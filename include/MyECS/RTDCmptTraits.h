@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <memory_resource>
 #include <string>
 #include <unordered_map>
 
@@ -21,6 +22,12 @@ class RTDCmptTraits {
  public:
   static constexpr std::size_t default_alignment = alignof(std::max_align_t);
 
+  RTDCmptTraits() = default;
+  RTDCmptTraits(const RTDCmptTraits& other);
+  RTDCmptTraits(RTDCmptTraits&& other) noexcept = default;
+  RTDCmptTraits& operator=(const RTDCmptTraits& other);
+  RTDCmptTraits& operator=(RTDCmptTraits&& other) noexcept = default;
+
   RTDCmptTraits& Clear();
 
   RTDCmptTraits& RegisterSize(TypeID, std::size_t size);
@@ -33,24 +40,17 @@ class RTDCmptTraits {
   RTDCmptTraits& RegisterMoveAssignment(TypeID,
                                         std::function<void(void*, void*)>);
   RTDCmptTraits& RegisterDestructor(TypeID, std::function<void(void*)>);
-  RTDCmptTraits& RegisterName(TypeID, std::string name);
+  RTDCmptTraits& RegisterName(Type);
 
   const auto& GetSizeofs() const noexcept { return sizeofs; }
-
   const auto& GetAlignments() const noexcept { return alignments; };
-
   const auto& GetDefaultConstructors() const noexcept {
     return default_constructors;
   }
-
   const auto& GetCopyConstructors() const noexcept { return copy_constructors; }
-
   const auto& GetMoveConstructors() const noexcept { return move_constructors; }
-
   const auto& GetMoveAssignments() const noexcept { return move_assignments; }
-
   const auto& GetDestructors() const noexcept { return destructors; }
-
   const auto& GetNames() const noexcept { return names; }
 
   std::size_t Sizeof(TypeID) const;
@@ -81,6 +81,8 @@ class RTDCmptTraits {
   template <typename Cmpt>
   void RegisterOne();
 
+  std::pmr::synchronized_pool_resource rsrc;
+  std::unordered_map<TypeID, std::string_view> names;
   std::unordered_map<TypeID, std::size_t> sizeofs;
   std::unordered_map<TypeID, std::size_t> alignments;
   std::unordered_map<TypeID, std::function<void(void*)>>
@@ -92,7 +94,6 @@ class RTDCmptTraits {
   std::unordered_map<TypeID, std::function<void(void*, void*)>>
       move_assignments;  // dst <- src
   std::unordered_map<TypeID, std::function<void(void*)>> destructors;
-  std::unordered_map<TypeID, std::string> names;
 };
 }  // namespace My::MyECS
 
