@@ -52,4 +52,10 @@ void World::RunChunkJob(Func&& func, ArchetypeFilter filter, bool isParallel,
                                         std::move(filter), isParallel,
                                         std::move(singletonLocator));
 }
+
+template <typename T, typename... Args>
+T* World::SyncCreateFrameObject(Args&&... args) {
+  void* buffer = frame_sync_rsrc.allocate(sizeof(T), alignof(T));
+  return new (buffer) T(std::forward<Args>(args)...);
+}
 }  // namespace My::MyECS

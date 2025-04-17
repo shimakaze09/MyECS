@@ -18,7 +18,6 @@ class World {
   World()
       : jobRsrc{std::make_unique<std::pmr::unsynchronized_pool_resource>()},
         systemMngr{this} {}
-
   // not copy/move schedule, so you can't use DumpUpdateJobGraph() and
   // GenUpdateFrameGraph() before Update()
   World(const World&);
@@ -97,9 +96,12 @@ class World {
   void RunChunkJob(Func&&, ArchetypeFilter = {}, bool isParallel = true,
                    SingletonLocator = {}) const;
 
+  // you just can use it in a job within a frame
   std::pmr::synchronized_pool_resource* GetFrameSyncResource() {
     return &frame_sync_rsrc;
   }
+  template <typename T, typename... Args>
+  T* SyncCreateFrameObject(Args&&... args);
 
  private:
   bool inRunningJobGraph{false};

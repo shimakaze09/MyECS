@@ -61,14 +61,16 @@ class Schedule {
   const SystemFunc* RegisterJob(Func&&, std::string_view name,
                                 SingletonLocator = {}, RandomAccessor = {});
 
-  void RegisterCommand(std::function<void(World*)> command, int layer = 0) {
+  Schedule& RegisterCommand(std::function<void(World*)> command,
+                            int layer = 0) {
     commandBuffer[layer].push_back(std::move(command));
+    return *this;
   }
 
   Schedule& Order(std::string_view x, std::string_view y);
 
-  Schedule& InsertNone(std::string_view sys, TypeID);
-  Schedule& EraseNone(std::string_view sys, TypeID);
+  Schedule& AddNone(std::string_view sys, TypeID);
+  Schedule& Disable(std::string_view sys);
 
   // clear every frame
   std::pmr::monotonic_buffer_resource* GetFrameMonotonicResource() {
@@ -111,15 +113,13 @@ class Schedule {
   // SystemFunc's hashcode to pointer of SystemFunc
   std::unordered_map<std::size_t, SystemFunc*> sysFuncs;
 
+  std::unordered_set<std::size_t> disabledSysFuncs;
+
   // SystemFunc's hashcode to SystemFunc's hashcode
   // parent to children
   std::unordered_map<std::size_t, std::size_t> sysFuncOrder;
 
-  struct FilterChange {
-    small_flat_set<TypeID> insertNones;
-    small_flat_set<TypeID> eraseNones;
-  };
-  std::unordered_map<std::size_t, FilterChange> sysFilterChange;
+  std::unordered_map<std::size_t, small_vector<TypeID>> sysNones;
 
   std::map<int, std::vector<std::function<void(World*)>>> commandBuffer;
 

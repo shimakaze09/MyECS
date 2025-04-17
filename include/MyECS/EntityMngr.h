@@ -1,7 +1,6 @@
 #pragma once
 
 #include <MySmallFlat/small_vector.hpp>
-
 #include <memory_resource>
 
 #include "CmptPtr.h"
@@ -110,13 +109,13 @@ class EntityMngr {
   mutable std::unordered_map<EntityQuery, std::set<Archetype*>> queryCache;
 
   // if job is nullptr, direct run
-  void GenEntityJob(World*, Job*, SystemFunc*) const;
+  bool GenEntityJob(World*, Job*, SystemFunc*) const;
   // if job is nullptr, direct run
-  void GenChunkJob(World*, Job*, SystemFunc*) const;
+  bool GenChunkJob(World*, Job*, SystemFunc*) const;
   // if job is nullptr, direct run
-  void GenJob(World*, Job*, SystemFunc*) const;
+  bool GenJob(World*, Job*, SystemFunc*) const;
   // if job is nullptr, direct run
-  void AutoGen(World*, Job*, SystemFunc*) const;
+  bool AutoGen(World*, Job*, SystemFunc*) const;
 
   struct EntityInfo {
     Archetype* archetype{nullptr};
