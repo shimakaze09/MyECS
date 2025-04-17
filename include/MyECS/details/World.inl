@@ -2,9 +2,10 @@
 
 namespace My::MyECS {
 template <typename Func>
-void World::RunEntityJob(Func&& func, bool isParallel, ArchetypeFilter filter,
-                         CmptLocator cmptLocator,
-                         SingletonLocator singletonLocator) {
+CommandBuffer World::RunEntityJob(Func&& func, bool isParallel,
+                                  ArchetypeFilter filter,
+                                  CmptLocator cmptLocator,
+                                  SingletonLocator singletonLocator) {
   SystemFunc sys{std::forward<Func>(func),
                  "",
                  std::move(filter),
@@ -13,7 +14,7 @@ void World::RunEntityJob(Func&& func, bool isParallel, ArchetypeFilter filter,
                  {},
                  {},
                  isParallel};
-  Run(&sys);
+  return Run(&sys);
 }
 
 template <typename Func>
@@ -25,6 +26,8 @@ void World::RunEntityJob(Func&& func, bool isParallel, ArchetypeFilter filter,
                 "const RunEntityJob should use const World*");
   static_assert(Length_v<Filter_t<ArgList, IsWrite>> == 0,
                 "const RunEntityJob can't write cmpt");
+  static_assert(!Contain_v<ArgList, CommandBufferView>,
+                "const RunEntityJob shouldn't use CommandBufferView");
   assert("const RunEntityJob can't write cmpt" &&
          !cmptLocator.HasWriteTypeID());
 
@@ -34,8 +37,9 @@ void World::RunEntityJob(Func&& func, bool isParallel, ArchetypeFilter filter,
 }
 
 template <typename Func>
-void World::RunChunkJob(Func&& func, ArchetypeFilter filter, bool isParallel,
-                        SingletonLocator singletonLocator) {
+CommandBuffer World::RunChunkJob(Func&& func, ArchetypeFilter filter,
+                                 bool isParallel,
+                                 SingletonLocator singletonLocator) {
   SystemFunc sys{std::forward<Func>(func),
                  "",
                  std::move(filter),
@@ -43,15 +47,17 @@ void World::RunChunkJob(Func&& func, ArchetypeFilter filter, bool isParallel,
                  {},
                  {},
                  isParallel};
-  Run(&sys);
+  return Run(&sys);
 }
 
 template <typename Func>
 void World::RunChunkJob(Func&& func, ArchetypeFilter filter, bool isParallel,
                         SingletonLocator singletonLocator) const {
   using ArgList = FuncTraits_ArgList<Func>;
-  static_assert(Contain_v<ArgList, World*> == 0,
+  static_assert(!Contain_v<ArgList, World*>,
                 "const RunChunkJob should use const World*");
+  static_assert(!Contain_v<ArgList, CommandBufferView>,
+                "const RunChunkJob shouldn't use CommandBufferView");
   assert("const RunChunkJob can't write cmpt" && !filter.HaveWriteTypeID());
 
   const_cast<World*>(this)->RunChunkJob(std::forward<Func>(func),

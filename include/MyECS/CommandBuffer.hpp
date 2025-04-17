@@ -19,6 +19,11 @@ class CommandBuffer {
   auto& GetCommands() noexcept { return commands; }
   const auto& GetCommands() const noexcept { return commands; }
 
+  void Run() {
+    for (const auto& cmd : commands) cmd();
+    commands.clear();
+  }
+
  private:
   std::vector<std::function<void()>> commands;
 };

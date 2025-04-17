@@ -15,11 +15,7 @@ class IListener;
 // SystemMngr + EntityMngr
 class World {
  public:
-  World()
-      : jobRsrc{std::make_unique<std::pmr::unsynchronized_pool_resource>()},
-        systemMngr{this} {}
-  // not copy/move schedule, so you can't use DumpUpdateJobGraph() and
-  // GenUpdateFrameGraph() before Update()
+  World();
   World(const World&);
   World(World&&) noexcept;
   ~World();
@@ -58,8 +54,9 @@ class World {
   // <tagged-components>: [const] <Cmpt>*...
   // CmptsView
   template <typename Func>
-  void RunEntityJob(Func&&, bool isParallel = true, ArchetypeFilter = {},
-                    CmptLocator = {}, SingletonLocator = {});
+  CommandBuffer RunEntityJob(Func&&, bool isParallel = true,
+                             ArchetypeFilter = {}, CmptLocator = {},
+                             SingletonLocator = {});
 
   // Func's argument list:
   // const World*
@@ -82,8 +79,8 @@ class World {
   // std::size_t entityBeginIndexInQuery
   // ChunkView (necessary)
   template <typename Func>
-  void RunChunkJob(Func&&, ArchetypeFilter = {}, bool isParallel = true,
-                   SingletonLocator = {});
+  CommandBuffer RunChunkJob(Func&&, ArchetypeFilter = {},
+                            bool isParallel = true, SingletonLocator = {});
 
   // Func's argument list:
   // const World*
@@ -122,7 +119,7 @@ class World {
   std::mutex commandBufferMutex;
   void RunCommands(int layer);
 
-  void Run(SystemFunc*);
+  CommandBuffer Run(SystemFunc*);
 
   std::pmr::synchronized_pool_resource frame_sync_rsrc;
 };

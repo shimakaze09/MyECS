@@ -13,6 +13,8 @@
 #include "SingletonsView.hpp"
 
 namespace My::MyECS {
+class Schedule;
+
 // [- description]
 // system function registered by Schedule in <System>::OnUpdate(Schedule&)
 // name + query(archetype filter + component locator) + singleton locator +
@@ -83,6 +85,8 @@ class SystemFunc {
   }
 
  private:
+  friend class Schedule;
+  SystemFunc(const SystemFunc&) = default;
   Mode mode;
   std::string_view name;
   std::size_t hashCode;  // after name

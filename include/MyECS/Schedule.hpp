@@ -17,6 +17,8 @@ class EntityMngr;
 class SystemMngr;
 class SysFuncGraph;
 
+static constexpr int SpecialLayer = -std::numeric_limits<int>::max();
+
 // [description]
 // system infomation record
 // - SystemFunc
@@ -97,14 +99,18 @@ class Schedule {
 
   // clear every frame
   std::pmr::monotonic_buffer_resource* GetFrameMonotonicResource() {
-    return &frame_rsrc;
+    return frame_rsrc.get();
   }
   template <typename T, typename... Args>
   T* CreateFrameObject(Args&&... args) const;
-
-  ~Schedule();
+  std::string_view RegisterFrameString(std::string_view str);
 
  private:
+  Schedule();
+  Schedule(const Schedule&);
+  Schedule(Schedule&&) noexcept = default;
+  ~Schedule();
+
   template <typename... Args>
   const SystemFunc* Request(int layer, Args&&...);
 
@@ -148,9 +154,8 @@ class Schedule {
 
   std::map<int, LayerInfo> layerInfos;
 
-  mutable std::pmr::monotonic_buffer_resource
+  std::unique_ptr<std::pmr::monotonic_buffer_resource>
       frame_rsrc;  // release in every frame
-  std::string_view RegisterFrameString(std::string_view str);
 
   friend class World;
 };
