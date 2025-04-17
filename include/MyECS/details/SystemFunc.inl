@@ -100,9 +100,10 @@ SystemFunc::SystemFunc(Func&& func, std::string_view name,
 
   static_assert(
       !Contain_v<ArgList, Entity> && !Contain_v<ArgList, std::size_t> &&
-          !Contain_v<ArgList, CmptsView> && !Contain_v<ArgList, ChunkView>,
+          !Contain_v<ArgList, CmptsView> && !Contain_v<ArgList, ChunkView> &&
+          !Contain_v<ArgList, CommandBufferView>,
       "(Mode::Job) SystemFunc's argument list cann't have Entity, indexInQuery "
-      "CmptsView or ChunkView");
+      "CmptsView, ChunkView or CommandBufferView");
 }
 }  // namespace My::MyECS
 
@@ -122,7 +123,7 @@ struct Packer<TypeList<DecayedArgs...>, TypeList<Singletons...>,
     return [func = std::forward<Func>(func)](
                World* w, SingletonsView singletons, Entity e,
                std::size_t entityIndexInQuery, CmptsView cmpts,
-               ChunkView chunkView) {
+               ChunkView chunkView, CommandBufferView cbv) {
       auto args = std::tuple{
           w,
           singletons,
@@ -136,7 +137,7 @@ struct Packer<TypeList<DecayedArgs...>, TypeList<Singletons...>,
               cmpts.Components()[Find_v<NonSingletonList, NonSingletons>]
                   .Ptr())...,
           chunkView,
-      };
+          cbv};
       func(std::get<DecayedArgs>(args)...);
     };
   }

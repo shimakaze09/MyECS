@@ -5,6 +5,7 @@
 #include "ChangeFilter.hpp"
 #include "Chunk.hpp"
 #include "CmptsView.hpp"
+#include "CommandBuffer.hpp"
 #include "Entity.hpp"
 #include "EntityQuery.hpp"
 #include "RandomAccessor.hpp"
@@ -25,9 +26,11 @@ namespace My::MyECS {
 // * std::size_t indexInQuery
 // * <tagged-components>: {LastFrame|Write|Latest}<Cmpt>...
 // * CmptsView
+// * CommandBufferView
 // 2. Mode::Chunk
 // * std::size_t entityBeginIndexInQuery
 // * ChunkView (necessary)
+// * CommandBufferView
 // 3. Mode::Job
 // * Write<Singleton<Cmpt>> (only job can write singletons)
 class SystemFunc {
@@ -66,9 +69,10 @@ class SystemFunc {
   std::size_t GetValue() const noexcept { return hashCode; }
 
   void operator()(World*, SingletonsView, Entity,
-                  std::size_t entityIndexInQuery, CmptsView) const;
+                  std::size_t entityIndexInQuery, CmptsView,
+                  CommandBufferView) const;
   void operator()(World*, SingletonsView, std::size_t entityBeginIndexInQuery,
-                  ChunkView) const;
+                  ChunkView, CommandBufferView) const;
   void operator()(World*, SingletonsView) const;
 
   Mode GetMode() const noexcept { return mode; }
@@ -84,7 +88,7 @@ class SystemFunc {
   std::size_t hashCode;  // after name
   bool isParallel;
   std::function<void(World*, SingletonsView, Entity, std::size_t, CmptsView,
-                     ChunkView)>
+                     ChunkView, CommandBufferView)>
       func;
 };
 }  // namespace My::MyECS

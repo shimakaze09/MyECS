@@ -1,3 +1,4 @@
+#include <MyECS/CommandBuffer.hpp>
 #include <MyECS/EntityMngr.hpp>
 #include <MyECS/IListener.hpp>
 #include <MyECS/SystemFunc.hpp>
@@ -173,7 +174,7 @@ void EntityMngr::Attach(Entity e, std::span<const TypeID> types) {
     assert(target != dstArchetype->GetCmptTraits().GetTypes().end());
     auto idx = static_cast<std::size_t>(std::distance(
         dstArchetype->GetCmptTraits().GetTypes().begin(), target));
-    srcArchetype->GetCmptTraits().GetTraits()[idx].DefaultConstruct(
+    dstArchetype->GetCmptTraits().GetTraits()[idx].DefaultConstruct(
         info.archetype->WriteAt(type, info.idxInArchetype).Ptr());
   }
 }
@@ -319,10 +320,11 @@ bool EntityMngr::GenEntityJob(World* w, Job* job, SystemFunc* sys) const {
   if (!sys->singletonLocator.SingletonTypes().empty() && singletons.empty())
     return false;
 
+  const auto& archetypes = QueryArchetypes(sys->entityQuery);
+  if (archetypes.empty()) return false;
+
   if (sys->IsParallel()) {
     assert(job);
-    const auto& archetypes = QueryArchetypes(sys->entityQuery);
-    if (archetypes.empty()) return false;
     std::size_t indexOffsetInQuery = 0;
     for (Archetype* archetype : archetypes) {
       auto [chunkEntity, chunkCmpts, sizes] =
@@ -347,23 +349,26 @@ bool EntityMngr::GenEntityJob(World* w, Job* job, SystemFunc* sys) const {
           CmptsView chunkView{std::span{cmpts.data(), cmpts.size()}};
           SingletonsView singletonsView{
               std::span{singletons.data(), singletons.size()}};
-
+          CommandBuffer cb;
           std::size_t J = min(chunkCapacity, num - idxOffsetInChunk);
           for (std::size_t j = 0; j < J; j++) {
             (*sys)(w, singletonsView, entities[j], indexOffsetInQueryChunk + j,
-                   chunkView);
+                   chunkView, &cb);
             for (std::size_t k = 0; k < cmpts.size(); k++)
               reinterpret_cast<uint8_t*&>(cmpts[k].p) += sizes[k];
           }
+          w->AddCommandBuffer(std::move(cb));
         });
       }
 
       indexOffsetInQuery += num;
     }
   } else {
-    auto work = [this, singletons = std::move(singletons), sys, w]() {
+    auto work = [this, singletons = std::move(singletons), sys, w,
+                 archetypes]() {
+      CommandBuffer cb;
       std::size_t indexOffsetInQuery = 0;
-      for (Archetype* archetype : QueryArchetypes(sys->entityQuery)) {
+      for (Archetype* archetype : archetypes) {
         auto [chunkEntity, chunkCmpts, sizes] =
             archetype->Locate(sys->entityQuery.locator.AccessTypeIDs());
 
@@ -387,7 +392,7 @@ bool EntityMngr::GenEntityJob(World* w, Job* job, SystemFunc* sys) const {
           std::size_t J = min(chunkCapacity, num - idxOffsetInChunk);
           for (std::size_t j = 0; j < J; j++) {
             (*sys)(w, singletonsView, chunkEntity[i][j],
-                   indexOffsetInQueryChunk + j, chunkView);
+                   indexOffsetInQueryChunk + j, chunkView, &cb);
             for (std::size_t k = 0; k < chunkCmpts[i].size(); k++)
               reinterpret_cast<uint8_t*&>(chunkCmpts[i][k].p) += sizes[k];
           }
@@ -395,6 +400,7 @@ bool EntityMngr::GenEntityJob(World* w, Job* job, SystemFunc* sys) const {
 
         indexOffsetInQuery += num;
       }
+      w->AddCommandBuffer(std::move(cb));
     };
 
     if (job)
@@ -433,10 +439,12 @@ bool EntityMngr::GenChunkJob(World* w, Job* job, SystemFunc* sys) const {
         std::size_t indexOffsetInQueryChunk =
             indexOffsetInQuery + idxOffsetInChunk;
         job->emplace([=, singletons = singletons]() {
+          CommandBuffer cb;
           (*sys)(
               w,
               SingletonsView{std::span{singletons.data(), singletons.size()}},
-              indexOffsetInQueryChunk, archetype->chunks[i]);
+              indexOffsetInQueryChunk, archetype->chunks[i], &cb);
+          w->AddCommandBuffer(std::move(cb));
         });
       }
 
@@ -447,6 +455,7 @@ bool EntityMngr::GenChunkJob(World* w, Job* job, SystemFunc* sys) const {
       SingletonsView singletonsView{
           std::span{singletons.data(), singletons.size()}};
 
+      CommandBuffer cb;
       std::size_t indexOffsetInQuery = 0;
       for (Archetype* archetype : QueryArchetypes(sys->entityQuery)) {
         std::size_t num = archetype->EntityNum();
@@ -463,9 +472,10 @@ bool EntityMngr::GenChunkJob(World* w, Job* job, SystemFunc* sys) const {
           std::size_t indexOffsetInQueryChunk =
               indexOffsetInQuery + idxOffsetInChunk;
           (*sys)(w, singletonsView, indexOffsetInQueryChunk,
-                 archetype->chunks[i]);
+                 archetype->chunks[i], &cb);
         }
       }
+      w->AddCommandBuffer(std::move(cb));
     };
 
     if (job)

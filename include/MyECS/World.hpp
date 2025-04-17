@@ -3,6 +3,7 @@
 #include <MyGraphviz/MyGraphviz.hpp>
 #include <mutex>
 
+#include "CommandBuffer.hpp"
 #include "Entity.hpp"
 #include "EntityMngr.hpp"
 #include "Schedule.hpp"
@@ -33,6 +34,7 @@ class World {
   void Update();
 
   void AddCommand(std::function<void()> command, int layer = 0);
+  void AddCommandBuffer(CommandBuffer cb);
 
   // after running Update()
   // you can use graphviz to vistualize the graph
@@ -116,7 +118,7 @@ class World {
   std::unique_ptr<std::pmr::unsynchronized_pool_resource> jobRsrc;
 
   // command
-  std::map<int, std::vector<std::function<void()>>> commandBuffer;
+  CommandBuffer commandBuffer;
   std::mutex commandBufferMutex;
   void RunCommands();
 

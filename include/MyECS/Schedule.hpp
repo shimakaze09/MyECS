@@ -86,12 +86,6 @@ class Schedule {
   const SystemFunc* RegisterChunkJob(Func&&, std::string_view name,
                                      ChunkJobConfig config);
 
-  Schedule& RegisterCommand(std::function<void(World*)> command,
-                            int layer = 0) {
-    commandBuffer[layer].push_back(std::move(command));
-    return *this;
-  }
-
   Schedule& Order(std::string_view x, std::string_view y);
 
   Schedule& AddNone(std::string_view sys, TypeID);
@@ -145,8 +139,6 @@ class Schedule {
   std::unordered_map<std::size_t, std::size_t> sysFuncOrder;
 
   std::unordered_map<std::size_t, small_vector<TypeID>> sysNones;
-
-  std::map<int, std::vector<std::function<void(World*)>>> commandBuffer;
 
   mutable std::pmr::monotonic_buffer_resource
       frame_rsrc;  // release in every frame
