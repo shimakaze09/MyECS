@@ -27,12 +27,6 @@ void World::Update() {
 
   frame_sync_rsrc.release();
   schedule.Clear();
-  for (auto* job : jobs) {
-    job->~Taskflow();
-    jobRsrc->deallocate(job, sizeof(Job), alignof(Job));
-  }
-  jobs.clear();
-  jobGraph.clear();
 
   // 2. run systems schedule
 
@@ -40,6 +34,7 @@ void World::Update() {
     systemMngr.Update(ID, schedule);
 
   // 3. generate job graph
+  inRunningJobGraph = true;
 
   auto* table =
       schedule
@@ -47,30 +42,36 @@ void World::Update() {
               std::pmr::unordered_map<SystemFunc*, JobHandle>::allocator_type{
                   schedule.GetFrameMonotonicResource()});
 
-  for (const auto& [hashcode, func] : schedule.sysFuncs) {
-    auto* job_buffer = jobRsrc->allocate(sizeof(Job), alignof(Job));
-    auto* job = new (job_buffer) Job{std::string{func->Name()}};
-    jobs.push_back(job);
-    if (!entityMngr.AutoGen(this, job, func)) schedule.Disable(func->Name());
-    table->emplace(func, jobGraph.composed_of(*job));
+  for (const auto& [layer, layerinfo] : schedule.layerInfos) {
+    for (const auto& [hashcode, func] : layerinfo.sysFuncs) {
+      auto* job_buffer = jobRsrc->allocate(sizeof(Job), alignof(Job));
+      auto* job = new (job_buffer) Job{std::string{func->Name()}};
+      jobs.push_back(job);
+      if (!entityMngr.AutoGen(this, job, func, layer))
+        schedule.Disable(func->Name());
+      table->emplace(func, jobGraph.composed_of(*job));
+    }
+
+    const auto* graph = schedule.GenSysFuncGraph(layer);  // no need to delete
+
+    for (const auto& [v, adjVs] : graph->GetAdjList()) {
+      auto vJob = table->at(v);
+      for (auto* adjV : adjVs) vJob.precede(table->at(adjV));
+    }
+    table->clear();
+    executor.run(jobGraph).wait();
+    RunCommands(layer);
+
+    for (auto* job : jobs) {
+      job->~Taskflow();
+      jobRsrc->deallocate(job, sizeof(Job), alignof(Job));
+    }
+    jobs.clear();
+    jobGraph.clear();
   }
-
-  const auto* graph = schedule.GenSysFuncGraph();  // no need to delete
-
-  for (const auto& [v, adjVs] : graph->GetAdjList()) {
-    auto vJob = table->at(v);
-    for (auto* adjV : adjVs) vJob.precede(table->at(adjV));
-  }
-
-  // 4. run jobs and commands
-
-  inRunningJobGraph = true;
-  executor.run(jobGraph).wait();
   inRunningJobGraph = false;
 
-  RunCommands();
-
-  // 5. update version
+  // 4. update version
   version++;
   entityMngr.UpdateVersion(version);
 }
@@ -81,15 +82,19 @@ void World::Run(SystemFunc* sys) {
   if (sys->IsParallel()) {
     assert(!inRunningJobGraph);
     Job job;
-    entityMngr.AutoGen(this, &job, sys);
+    entityMngr.AutoGen(this, &job, sys, 0);
     executor.run(job).wait();
   } else
-    entityMngr.AutoGen(this, nullptr, sys);
+    entityMngr.AutoGen(this, nullptr, sys, 0);
 }
 
 // after running Update
-MyGraphviz::Graph World::GenUpdateFrameGraph() const {
-  MyGraphviz::Graph graph("Update Frame Graph", true);
+MyGraphviz::Graph World::GenUpdateFrameGraph(int layer) const {
+  std::string title =
+      "Update Frame Graph [layer: " + std::to_string(layer) + "]";
+  MyGraphviz::Graph graph(std::move(title), true);
+
+  const auto& layerinfo = schedule.layerInfos.at(layer);
 
   graph.RegisterGraphNodeAttr("style", "filled")
       .RegisterGraphNodeAttr("fontcolor", "white")
@@ -174,7 +179,7 @@ MyGraphviz::Graph World::GenUpdateFrameGraph() const {
                             : string{cmptName};
   };
 
-  for (const auto& [hash, sysFunc] : schedule.sysFuncs) {
+  for (const auto& [hash, sysFunc] : layerinfo.sysFuncs) {
     for (auto cmptType : sysFunc->entityQuery.locator.AccessTypeIDs())
       cmptTypes.insert(cmptType);
     for (auto cmptType : sysFunc->entityQuery.filter.all)
@@ -199,7 +204,7 @@ MyGraphviz::Graph World::GenUpdateFrameGraph() const {
     subgraph_singleton.AddNode(cmptIdx);
   }
 
-  for (const auto& [hash, sysFunc] : schedule.sysFuncs) {
+  for (const auto& [hash, sysFunc] : layerinfo.sysFuncs) {
     auto sysIdx = registry.RegisterNode(std::string{sysFunc->Name()});
     sysFuncHashcode2idx.emplace(hash, sysIdx);
 
@@ -299,7 +304,7 @@ MyGraphviz::Graph World::GenUpdateFrameGraph() const {
     }
   }
 
-  for (const auto& [from, to] : schedule.sysFuncOrder) {
+  for (const auto& [from, to] : layerinfo.sysFuncOrder) {
     auto fromIdx = sysFuncHashcode2idx.at(from);
     auto toIdx = sysFuncHashcode2idx.at(to);
     auto edgeIdx = registry.RegisterEdge(fromIdx, toIdx);
@@ -318,18 +323,20 @@ void World::Accept(IListener* listener) const {
 void World::AddCommand(std::function<void()> command, int layer) {
   assert(inRunningJobGraph);
   std::lock_guard<std::mutex> guard(commandBufferMutex);
-  commandBuffer.AddCommand(command, layer);
+  lcommandBuffer[layer].AddCommand(command);
 }
 
-void World::AddCommandBuffer(CommandBuffer cb) {
+void World::AddCommandBuffer(CommandBuffer cb, int layer) {
   assert(inRunningJobGraph);
   std::lock_guard<std::mutex> guard(commandBufferMutex);
-  commandBuffer.AddCommandBuffer(std::move(cb));
+  lcommandBuffer[layer].AddCommandBuffer(std::move(cb));
 }
 
-void World::RunCommands() {
-  for (const auto& [layer, commands] : commandBuffer.GetCommands()) {
-    for (const auto& command : commands) command();
-  }
-  commandBuffer.Clear();
+void World::RunCommands(int layer) {
+  auto target = lcommandBuffer.find(layer);
+  if (target == lcommandBuffer.end()) return;
+  auto& cb = target->second;
+  for (const auto& cmd : cb.GetCommands()) cmd();
+  cb.Clear();
+  lcommandBuffer.erase(target);
 }

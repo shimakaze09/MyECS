@@ -39,7 +39,8 @@ class Schedule {
                                       bool isParallel = true,
                                       ArchetypeFilter = {}, CmptLocator = {},
                                       SingletonLocator = {},
-                                      RandomAccessor = {}, ChangeFilter = {});
+                                      RandomAccessor = {}, ChangeFilter = {},
+                                      int layer = 0);
 
   // Func's argument list:
   // [const] World*
@@ -51,7 +52,7 @@ class Schedule {
                                      ArchetypeFilter = {},
                                      bool isParallel = true,
                                      SingletonLocator = {}, RandomAccessor = {},
-                                     ChangeFilter = {});
+                                     ChangeFilter = {}, int layer = 0);
 
   // Func's argument list:
   // [const] World*
@@ -59,7 +60,8 @@ class Schedule {
   // SingletonsView
   template <typename Func>
   const SystemFunc* RegisterJob(Func&&, std::string_view name,
-                                SingletonLocator = {}, RandomAccessor = {});
+                                SingletonLocator = {}, RandomAccessor = {},
+                                int layer = 0);
 
   struct EntityJobConfig {
     bool isParallel{true};
@@ -68,6 +70,7 @@ class Schedule {
     SingletonLocator singletonLocator;
     RandomAccessor randomAccessor;
     ChangeFilter changeFilter;
+    int layer{0};
   };
 
   struct ChunkJobConfig {
@@ -76,6 +79,7 @@ class Schedule {
     SingletonLocator singletonLocator;
     RandomAccessor randomAccessor;
     ChangeFilter changeFilter;
+    int layer{0};
   };
 
   template <typename Func>
@@ -86,10 +90,10 @@ class Schedule {
   const SystemFunc* RegisterChunkJob(Func&&, std::string_view name,
                                      ChunkJobConfig config);
 
-  Schedule& Order(std::string_view x, std::string_view y);
+  Schedule& Order(std::string_view x, std::string_view y, int layer = 0);
 
-  Schedule& AddNone(std::string_view sys, TypeID);
-  Schedule& Disable(std::string_view sys);
+  Schedule& AddNone(std::string_view sys, TypeID, int layer = 0);
+  Schedule& Disable(std::string_view sys, int layer = 0);
 
   // clear every frame
   std::pmr::monotonic_buffer_resource* GetFrameMonotonicResource() {
@@ -102,7 +106,7 @@ class Schedule {
 
  private:
   template <typename... Args>
-  const SystemFunc* Request(Args&&...);
+  const SystemFunc* Request(int layer, Args&&...);
 
   void Clear();
 
@@ -124,21 +128,25 @@ class Schedule {
   using CmptSysFuncsMap = std::pmr::unordered_map<TypeID, CmptSysFuncs>;
 
   // use frame_rsrc, so no need to delete
-  CmptSysFuncsMap* GenCmptSysFuncsMap() const;
+  CmptSysFuncsMap* GenCmptSysFuncsMap(int layer) const;
 
   // use frame_rsrc, so no need to delete
-  SysFuncGraph* GenSysFuncGraph() const;
+  SysFuncGraph* GenSysFuncGraph(int layer) const;
 
-  // SystemFunc's hashcode to pointer of SystemFunc
-  std::unordered_map<std::size_t, SystemFunc*> sysFuncs;
+  struct LayerInfo {
+    // SystemFunc's hashcode to pointer of SystemFunc
+    std::unordered_map<std::size_t, SystemFunc*> sysFuncs;
 
-  std::unordered_set<std::size_t> disabledSysFuncs;
+    std::unordered_set<std::size_t> disabledSysFuncs;
 
-  // SystemFunc's hashcode to SystemFunc's hashcode
-  // parent to children
-  std::unordered_map<std::size_t, std::size_t> sysFuncOrder;
+    // SystemFunc's hashcode to SystemFunc's hashcode
+    // parent to children
+    std::unordered_map<std::size_t, std::size_t> sysFuncOrder;
 
-  std::unordered_map<std::size_t, small_vector<TypeID>> sysNones;
+    std::unordered_map<std::size_t, small_vector<TypeID>> sysNones;
+  };
+
+  std::map<int, LayerInfo> layerInfos;
 
   mutable std::pmr::monotonic_buffer_resource
       frame_rsrc;  // release in every frame

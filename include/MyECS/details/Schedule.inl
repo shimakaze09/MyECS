@@ -11,21 +11,19 @@ template <typename Func>
 const SystemFunc* Schedule::RegisterEntityJob(
     Func&& func, std::string_view name, bool isParallel, ArchetypeFilter filter,
     CmptLocator cmptLocator, SingletonLocator singletonLocator,
-    RandomAccessor randomAccessor, ChangeFilter changeFilter) {
-  return Request(std::forward<Func>(func), RegisterFrameString(name),
+    RandomAccessor randomAccessor, ChangeFilter changeFilter, int layer) {
+  return Request(layer, std::forward<Func>(func), RegisterFrameString(name),
                  std::move(filter), std::move(cmptLocator),
                  std::move(singletonLocator), std::move(randomAccessor),
                  std::move(changeFilter), isParallel);
 }
 
 template <typename Func>
-const SystemFunc* Schedule::RegisterChunkJob(Func&& func, std::string_view name,
-                                             ArchetypeFilter filter,
-                                             bool isParallel,
-                                             SingletonLocator singletonLocator,
-                                             RandomAccessor randomAccessor,
-                                             ChangeFilter changeFilter) {
-  return Request(std::forward<Func>(func), RegisterFrameString(name),
+const SystemFunc* Schedule::RegisterChunkJob(
+    Func&& func, std::string_view name, ArchetypeFilter filter, bool isParallel,
+    SingletonLocator singletonLocator, RandomAccessor randomAccessor,
+    ChangeFilter changeFilter, int layer) {
+  return Request(layer, std::forward<Func>(func), RegisterFrameString(name),
                  std::move(filter), std::move(singletonLocator),
                  std::move(randomAccessor), std::move(changeFilter),
                  isParallel);
@@ -34,8 +32,9 @@ const SystemFunc* Schedule::RegisterChunkJob(Func&& func, std::string_view name,
 template <typename Func>
 const SystemFunc* Schedule::RegisterJob(Func&& func, std::string_view name,
                                         SingletonLocator singletonLocator,
-                                        RandomAccessor randomAccessor) {
-  return Request(std::forward<Func>(func), RegisterFrameString(name),
+                                        RandomAccessor randomAccessor,
+                                        int layer) {
+  return Request(layer, std::forward<Func>(func), RegisterFrameString(name),
                  std::move(singletonLocator), std::move(randomAccessor));
 }
 
@@ -43,29 +42,29 @@ template <typename Func>
 const SystemFunc* Schedule::RegisterEntityJob(Func&& func,
                                               std::string_view name,
                                               EntityJobConfig config) {
-  return Request(
-      std::forward<Func>(func), RegisterFrameString(name),
+  return RegisterEntityJob(
+      std::forward<Func>(func), RegisterFrameString(name), config.isParallel,
       std::move(config.archetypeFilter), std::move(config.cmptLocator),
       std::move(config.singletonLocator), std::move(config.randomAccessor),
-      std::move(config.changeFilter), config.isParallel);
+      std::move(config.changeFilter), config.layer);
 }
 
 template <typename Func>
 const SystemFunc* Schedule::RegisterChunkJob(Func&& func, std::string_view name,
                                              ChunkJobConfig config) {
-  return Request(std::forward<Func>(func), RegisterFrameString(name),
-                 std::move(config.archetypeFilter),
-                 std::move(config.singletonLocator),
-                 std::move(config.randomAccessor),
-                 std::move(config.changeFilter), config.isParallel);
+  return RegisterChunkJob(std::forward<Func>(func), RegisterFrameString(name),
+                          config.isParallel, std::move(config.archetypeFilter),
+                          std::move(config.singletonLocator),
+                          std::move(config.randomAccessor),
+                          std::move(config.changeFilter), config.layer);
 }
 
 template <typename... Args>
-const SystemFunc* Schedule::Request(Args&&... args) {
+const SystemFunc* Schedule::Request(int layer, Args&&... args) {
   SystemFunc* sysFunc =
       (SystemFunc*)frame_rsrc.allocate(sizeof(SystemFunc), alignof(SystemFunc));
   new (sysFunc) SystemFunc(std::forward<Args>(args)...);
-  sysFuncs.emplace(sysFunc->GetValue(), sysFunc);
+  layerInfos[layer].sysFuncs.emplace(sysFunc->GetValue(), sysFunc);
   return sysFunc;
 }
 }  // namespace My::MyECS

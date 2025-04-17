@@ -12,8 +12,8 @@ struct C {};
 struct MySystem {
   static void OnUpdate(Schedule& schedule) {
     schedule.RegisterEntityJob(
-        [](World* w, Entity e, const A* a, const B* b) {
-          w->AddCommand([e, w]() {
+        [](World* w, Entity e, const A* a, const B* b, CommandBufferView cbv) {
+          cbv->AddCommand([e, w]() {
             if (!w->entityMngr.Have(e, TypeID_of<C>)) {
               cout << "Attach C" << endl;
               w->entityMngr.Attach(e, TypeIDs_of<C>);
@@ -22,8 +22,9 @@ struct MySystem {
         },
         "AB");
     schedule.RegisterEntityJob(
-        [](World* w, Entity e, const A* a, const B* b, const C* c) {
-          w->AddCommand([e, w]() {
+        [](World* w, Entity e, const A* a, const B* b, const C* c,
+           CommandBufferView cbv) {
+          cbv->AddCommand([e, w]() {
             if (w->entityMngr.Have(e, TypeID_of<C>)) {
               cout << "Dettach C" << endl;
               w->entityMngr.Detach(e, TypeIDs_of<C>);
