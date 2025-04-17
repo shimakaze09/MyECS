@@ -40,7 +40,8 @@ EntityMngr::EntityMngr(const EntityMngr& em,
   for (std::size_t i = 0; i < em.entityTable.size(); i++) {
     auto& dst = entityTable[i];
     const auto& src = em.entityTable[i];
-    dst.idxInArchetype = src.idxInArchetype;
+    dst.chunkIdx = src.chunkIdx;
+    dst.idxInChunk = src.idxInChunk;
     dst.version = src.version;
     if (src.archetype)
       dst.archetype = ts2a.at(src.archetype->cmptTraits.GetTypes()).get();
@@ -81,7 +82,7 @@ CmptAccessPtr EntityMngr::GetComponent(Entity e, AccessTypeID type) const {
   assert(!type.Is<Entity>());
   if (!Exist(e)) throw std::invalid_argument("Entity is invalid");
   const auto& info = entityTable[e.index];
-  return info.archetype->At(type, info.idxInArchetype);
+  return info.archetype->At(type, {info.chunkIdx, info.idxInChunk});
 }
 
 bool EntityMngr::Exist(Entity e) const noexcept {
@@ -106,7 +107,8 @@ void EntityMngr::RecycleEntityEntry(Entity e) {
 
   auto& info = entityTable[e.index];
   info.archetype = nullptr;
-  info.idxInArchetype = static_cast<std::size_t>(-1);
+  info.chunkIdx = static_cast<std::size_t>(-1);
+  info.idxInChunk = static_cast<std::size_t>(-1);
   info.version++;
 
   entityTableFreeEntry.push_back(e.index);
@@ -135,7 +137,9 @@ Entity EntityMngr::Create(std::span<const TypeID> types) {
   auto& info = entityTable[entityIndex];
   Entity e{entityIndex, info.version};
   info.archetype = archetype;
-  info.idxInArchetype = archetype->Create(e);
+  auto addr = archetype->Create(e);
+  info.chunkIdx = addr.chunkIdx;
+  info.idxInChunk = addr.idxInChunk;
   return e;
 }
 
@@ -145,7 +149,8 @@ void EntityMngr::Attach(Entity e, std::span<const TypeID> types) {
 
   auto& info = entityTable[e.index];
   Archetype* srcArchetype = info.archetype;
-  std::size_t srcIdxInArchetype = info.idxInArchetype;
+  std::size_t srcChunkIdx = info.chunkIdx;
+  std::size_t srcIdxInChunk = info.idxInChunk;
 
   const auto& srcTypeIDSet = srcArchetype->GetCmptTraits().GetTypes();
   auto dstTypeIDSet = srcTypeIDSet;
@@ -168,22 +173,29 @@ void EntityMngr::Attach(Entity e, std::span<const TypeID> types) {
   }
 
   // move src to dst
-  std::size_t dstIdxInArchetype = dstArchetype->RequestBuffer();
+  auto dstAddr = dstArchetype->RequestBuffer();
+  std::size_t dstChunkIdx = dstAddr.chunkIdx;
+  std::size_t dstidxInChunk = dstAddr.idxInChunk;
 
   const auto& srcCmptTraits = srcArchetype->GetCmptTraits();
   for (const auto& type : srcTypeIDSet) {
-    auto* srcCmpt = srcArchetype->ReadAt(type, srcIdxInArchetype).Ptr();
-    auto* dstCmpt = dstArchetype->WriteAt(type, dstIdxInArchetype).Ptr();
+    auto* srcCmpt =
+        srcArchetype->ReadAt(type, {srcChunkIdx, srcIdxInChunk}).Ptr();
+    auto* dstCmpt =
+        dstArchetype->WriteAt(type, {dstChunkIdx, dstidxInChunk}).Ptr();
     srcCmptTraits.GetTrait(type).MoveConstruct(dstCmpt, srcCmpt);
   }
 
   // erase
-  auto srcMovedEntityIndex = srcArchetype->Erase(srcIdxInArchetype);
-  if (srcMovedEntityIndex != static_cast<std::size_t>(-1))
-    entityTable[srcMovedEntityIndex].idxInArchetype = srcIdxInArchetype;
+  auto srcMovedEntityIndex = srcArchetype->Erase({srcChunkIdx, srcIdxInChunk});
+  if (srcMovedEntityIndex != static_cast<std::size_t>(-1)) {
+    entityTable[srcMovedEntityIndex].chunkIdx = srcChunkIdx;
+    entityTable[srcMovedEntityIndex].idxInChunk = srcIdxInChunk;
+  }
 
   info.archetype = dstArchetype;
-  info.idxInArchetype = dstIdxInArchetype;
+  info.chunkIdx = dstChunkIdx;
+  info.idxInChunk = dstidxInChunk;
 
   for (const auto& type : types) {
     auto target = dstArchetype->GetCmptTraits().GetTypes().find(type);
@@ -191,7 +203,8 @@ void EntityMngr::Attach(Entity e, std::span<const TypeID> types) {
     auto idx = static_cast<std::size_t>(std::distance(
         dstArchetype->GetCmptTraits().GetTypes().begin(), target));
     dstArchetype->GetCmptTraits().GetTraits()[idx].DefaultConstruct(
-        info.archetype->WriteAt(type, info.idxInArchetype).Ptr(), world_rsrc);
+        info.archetype->WriteAt(type, {info.chunkIdx, info.idxInChunk}).Ptr(),
+        world_rsrc);
   }
 }
 
@@ -225,24 +238,32 @@ void EntityMngr::Detach(Entity e, std::span<const TypeID> types) {
   }
 
   // move src to dst
-  std::size_t srcIdxInArchetype = info.idxInArchetype;
-  std::size_t dstIdxInArchetype = dstArchetype->RequestBuffer();
+  std::size_t srcChunkIdx = info.chunkIdx;
+  std::size_t srcIdxInChunk = info.idxInChunk;
+  auto dstAddr = dstArchetype->RequestBuffer();
+  std::size_t dstChunkIdx = dstAddr.chunkIdx;
+  std::size_t dstidxInChunk = dstAddr.idxInChunk;
 
   const auto& srcCmptTraits = srcArchetype->GetCmptTraits();
   for (const auto& type : dstTypeIDSet) {
-    auto* srcCmpt = srcArchetype->ReadAt(type, srcIdxInArchetype).Ptr();
-    auto* dstCmpt = dstArchetype->WriteAt(type, dstIdxInArchetype).Ptr();
+    auto* srcCmpt =
+        srcArchetype->ReadAt(type, {srcChunkIdx, srcIdxInChunk}).Ptr();
+    auto* dstCmpt =
+        dstArchetype->WriteAt(type, {dstChunkIdx, dstidxInChunk}).Ptr();
     srcCmptTraits.GetTrait(type).MoveConstruct(dstCmpt, srcCmpt);
   }
 
   // erase
   std::size_t srcMovedEntityIndex =
-      srcArchetype->Erase(srcIdxInArchetype);  // call destructor
-  if (srcMovedEntityIndex != static_cast<std::size_t>(-1))
-    entityTable[srcMovedEntityIndex].idxInArchetype = srcIdxInArchetype;
+      srcArchetype->Erase({srcChunkIdx, srcIdxInChunk});  // call destructor
+  if (srcMovedEntityIndex != static_cast<std::size_t>(-1)) {
+    entityTable[srcMovedEntityIndex].chunkIdx = srcChunkIdx;
+    entityTable[srcMovedEntityIndex].idxInChunk = srcIdxInChunk;
+  }
 
   info.archetype = dstArchetype;
-  info.idxInArchetype = dstIdxInArchetype;
+  info.chunkIdx = dstChunkIdx;
+  info.idxInChunk = dstidxInChunk;
 
   if (isNewArchetype)
     ts2a.emplace(std::move(dstTypeIDSet),
@@ -253,7 +274,7 @@ vector<CmptAccessPtr> EntityMngr::Components(Entity e, AccessMode mode) const {
   if (!Exist(e)) throw std::invalid_argument("Entity is invalid");
 
   const auto& info = entityTable[e.index];
-  return info.archetype->Components(info.idxInArchetype, mode);
+  return info.archetype->Components({info.chunkIdx, info.idxInChunk}, mode);
 }
 
 Entity EntityMngr::Instantiate(Entity srcEntity) {
@@ -263,10 +284,13 @@ Entity EntityMngr::Instantiate(Entity srcEntity) {
   const auto& srcInfo = entityTable[srcEntity.index];
   auto& dstInfo = entityTable[dstEntityIndex];
   Entity dstEntity{dstEntityIndex, dstInfo.version};
-  std::size_t dstIndexInArchetype =
-      srcInfo.archetype->Instantiate(dstEntity, srcInfo.idxInArchetype);
+  auto dstAddr = srcInfo.archetype->Instantiate(
+      dstEntity, {srcInfo.chunkIdx, srcInfo.idxInChunk});
+  std::size_t dstChunkIdx = dstAddr.chunkIdx;
+  std::size_t dstIdxInChunk = dstAddr.idxInChunk;
   dstInfo.archetype = srcInfo.archetype;
-  dstInfo.idxInArchetype = dstIndexInArchetype;
+  dstInfo.chunkIdx = dstChunkIdx;
+  dstInfo.idxInChunk = dstIdxInChunk;
   return dstEntity;
 }
 
@@ -306,12 +330,13 @@ void EntityMngr::Destroy(Entity e) {
 
   auto info = entityTable[e.index];
   auto* archetype = info.archetype;
-  auto idxInArchetype = info.idxInArchetype;
 
-  auto movedEntityIndex = archetype->Erase(idxInArchetype);
+  auto movedEntityIndex = archetype->Erase({info.chunkIdx, info.idxInChunk});
 
-  if (movedEntityIndex != static_cast<std::size_t>(-1))
-    entityTable[movedEntityIndex].idxInArchetype = idxInArchetype;
+  if (movedEntityIndex != static_cast<std::size_t>(-1)) {
+    entityTable[movedEntityIndex].chunkIdx = info.chunkIdx;
+    entityTable[movedEntityIndex].idxInChunk = info.idxInChunk;
+  }
 
   RecycleEntityEntry(e);
 }
@@ -344,41 +369,36 @@ bool EntityMngr::GenEntityJob(World* w, Job* job, SystemFunc* sys,
     assert(job);
     std::size_t indexOffsetInQuery = 0;
     for (Archetype* archetype : archetypes) {
-      auto [chunkEntity, chunkCmpts, sizes] =
-          archetype->Locate(sys->entityQuery.locator.AccessTypeIDs());
-
-      std::size_t num = archetype->EntityNum();
-      std::size_t chunkNum = archetype->ChunkNum();
-      std::size_t chunkCapacity = archetype->ChunkCapacity();
-
-      for (std::size_t i = 0; i < chunkNum; i++) {
+      std::size_t indexOffsetInArchetype = 0;
+      auto chunks = archetype->GetChunks();
+      for (std::size_t i = 0; i < chunks.size(); i++) {
+        chunks[i]->ApplyChanges(
+            {sys->entityQuery.locator.AccessTypeIDs().data(),
+             sys->entityQuery.locator.AccessTypeIDs().size()});
         if (!sys->changeFilter.types.empty() &&
-            !archetype->chunks[i]->HasAnyChange(sys->changeFilter.types,
-                                                version))
+            !chunks[i]->HasAnyChange(sys->changeFilter.types, version))
           continue;
-
-        job->emplace([=, sizes = sizes, entities = chunkEntity[i],
-                      cmpts = move(chunkCmpts[i]),
-                      singletons = singletons]() mutable {
-          std::size_t idxOffsetInChunk = i * chunkCapacity;
-          std::size_t indexOffsetInQueryChunk =
-              indexOffsetInQuery + idxOffsetInChunk;
-          CmptsView chunkView{std::span{cmpts.data(), cmpts.size()}};
+        job->emplace([=, chunk = chunks[i], singletons = singletons]() {
+          auto [entities, cmpts, sizes] =
+              chunk->Locate({sys->entityQuery.locator.AccessTypeIDs().data(),
+                             sys->entityQuery.locator.AccessTypeIDs().size()});
+          std::size_t indexOffsetInChunk =
+              indexOffsetInQuery + indexOffsetInArchetype;
+          CmptsView cmptsView{std::span{cmpts.data(), cmpts.size()}};
           SingletonsView singletonsView{
               std::span{singletons.data(), singletons.size()}};
           CommandBuffer cb;
-          std::size_t J = min(chunkCapacity, num - idxOffsetInChunk);
-          for (std::size_t j = 0; j < J; j++) {
-            (*sys)(w, singletonsView, entities[j], indexOffsetInQueryChunk + j,
-                   chunkView, &cb);
+          for (std::size_t j = 0; j < chunk->EntityNum(); j++) {
+            (*sys)(w, singletonsView, entities[j], indexOffsetInChunk + j,
+                   cmptsView, &cb);
             for (std::size_t k = 0; k < cmpts.size(); k++)
               reinterpret_cast<uint8_t*&>(cmpts[k].p) += sizes[k];
           }
           w->AddCommandBuffer(std::move(cb), layer);
         });
+        indexOffsetInArchetype += chunks[i]->EntityNum();
       }
-
-      indexOffsetInQuery += num;
+      indexOffsetInQuery += indexOffsetInArchetype;
     }
   } else {
     auto work = [this, singletons = std::move(singletons), sys, w, archetypes,
@@ -386,36 +406,37 @@ bool EntityMngr::GenEntityJob(World* w, Job* job, SystemFunc* sys,
       CommandBuffer cb;
       std::size_t indexOffsetInQuery = 0;
       for (Archetype* archetype : archetypes) {
-        auto [chunkEntity, chunkCmpts, sizes] =
-            archetype->Locate(sys->entityQuery.locator.AccessTypeIDs());
+        std::size_t indexOffsetInArchetype = 0;
+        auto chunks = archetype->GetChunks();
 
-        std::size_t num = archetype->EntityNum();
-        std::size_t chunkNum = archetype->ChunkNum();
-        std::size_t chunkCapacity = archetype->ChunkCapacity();
-
-        for (std::size_t i = 0; i < chunkNum; i++) {
+        for (std::size_t i = 0; i < chunks.size(); i++) {
+          chunks[i]->ApplyChanges(
+              {sys->entityQuery.locator.AccessTypeIDs().data(),
+               sys->entityQuery.locator.AccessTypeIDs().size()});
           if (!sys->changeFilter.types.empty() &&
               !archetype->chunks[i]->HasAnyChange(sys->changeFilter.types,
                                                   version))
             continue;
-          std::size_t idxOffsetInChunk = i * chunkCapacity;
-          std::size_t indexOffsetInQueryChunk =
-              indexOffsetInQuery + idxOffsetInChunk;
-          CmptsView chunkView{
-              std::span{chunkCmpts[i].data(), chunkCmpts[i].size()}};
+
+          auto [entities, cmpts, sizes] = chunks[i]->Locate(
+              {sys->entityQuery.locator.AccessTypeIDs().data(),
+               sys->entityQuery.locator.AccessTypeIDs().size()});
+          std::size_t indexOffsetInChunk =
+              indexOffsetInQuery + indexOffsetInArchetype;
+          CmptsView cmptsView{std::span{cmpts.data(), cmpts.size()}};
           SingletonsView singletonsView{
               std::span{singletons.data(), singletons.size()}};
 
-          std::size_t J = min(chunkCapacity, num - idxOffsetInChunk);
-          for (std::size_t j = 0; j < J; j++) {
-            (*sys)(w, singletonsView, chunkEntity[i][j],
-                   indexOffsetInQueryChunk + j, chunkView, &cb);
-            for (std::size_t k = 0; k < chunkCmpts[i].size(); k++)
-              reinterpret_cast<uint8_t*&>(chunkCmpts[i][k].p) += sizes[k];
+          for (std::size_t j = 0; j < chunks[i]->EntityNum(); j++) {
+            (*sys)(w, singletonsView, entities[j], indexOffsetInChunk + j,
+                   cmptsView, &cb);
+            for (std::size_t k = 0;
+                 k < sys->entityQuery.locator.AccessTypeIDs().size(); k++)
+              reinterpret_cast<uint8_t*&>(cmpts[k].p) += sizes[k];
           }
+          indexOffsetInArchetype += chunks[i]->EntityNum();
         }
-
-        indexOffsetInQuery += num;
+        indexOffsetInQuery += indexOffsetInArchetype;
       }
       w->AddCommandBuffer(std::move(cb), layer);
     };
@@ -443,30 +464,34 @@ bool EntityMngr::GenChunkJob(World* w, Job* job, SystemFunc* sys,
     if (archetypes.empty()) return false;
     std::size_t indexOffsetInQuery = 0;
     for (Archetype* archetype : archetypes) {
-      std::size_t num = archetype->EntityNum();
-      std::size_t chunkNum = archetype->ChunkNum();
-      std::size_t chunkCapacity = archetype->ChunkCapacity();
+      std::size_t indexOffsetInArchetype = 0;
+      auto chunks = archetype->GetChunks();
 
-      for (std::size_t i = 0; i < chunkNum; i++) {
+      for (std::size_t i = 0; i < chunks.size(); i++) {
+        chunks[i]->ApplyChanges({sys->entityQuery.filter.all.data(),
+                                 sys->entityQuery.filter.all.size()});
+        chunks[i]->ApplyChanges({sys->entityQuery.filter.any.data(),
+                                 sys->entityQuery.filter.any.size()});
+        assert(sys->entityQuery.locator.AccessTypeIDs().empty());
         if (!sys->changeFilter.types.empty() &&
-            !archetype->chunks[i]->HasAnyChange(sys->changeFilter.types,
-                                                version))
+            !chunks[i]->HasAnyChange(sys->changeFilter.types, version))
           continue;
 
-        std::size_t idxOffsetInChunk = i * chunkCapacity;
-        std::size_t indexOffsetInQueryChunk =
-            indexOffsetInQuery + idxOffsetInChunk;
+        std::size_t indexOffsetInChunk =
+            indexOffsetInQuery + indexOffsetInArchetype;
+
         job->emplace([=, singletons = singletons]() {
           CommandBuffer cb;
           (*sys)(
               w,
               SingletonsView{std::span{singletons.data(), singletons.size()}},
-              indexOffsetInQueryChunk, archetype->chunks[i], &cb);
+              indexOffsetInChunk, archetype->chunks[i], &cb);
           w->AddCommandBuffer(std::move(cb), layer);
         });
+        indexOffsetInArchetype += chunks[i]->EntityNum();
       }
 
-      indexOffsetInQuery += num;
+      indexOffsetInQuery += indexOffsetInArchetype;
     }
   } else {
     auto work = [this, w, sys, singletons = std::move(singletons), layer]() {
@@ -476,22 +501,27 @@ bool EntityMngr::GenChunkJob(World* w, Job* job, SystemFunc* sys,
       CommandBuffer cb;
       std::size_t indexOffsetInQuery = 0;
       for (Archetype* archetype : QueryArchetypes(sys->entityQuery)) {
-        std::size_t num = archetype->EntityNum();
-        std::size_t chunkNum = archetype->ChunkNum();
-        std::size_t chunkCapacity = archetype->ChunkCapacity();
+        std::size_t indexOffsetInArchetype = 0;
+        auto chunks = archetype->GetChunks();
 
-        for (std::size_t i = 0; i < chunkNum; i++) {
+        for (std::size_t i = 0; i < chunks.size(); i++) {
+          chunks[i]->ApplyChanges({sys->entityQuery.filter.all.data(),
+                                   sys->entityQuery.filter.all.size()});
+          chunks[i]->ApplyChanges({sys->entityQuery.filter.any.data(),
+                                   sys->entityQuery.filter.any.size()});
+          assert(sys->entityQuery.locator.AccessTypeIDs().empty());
           if (!sys->changeFilter.types.empty() &&
               !archetype->chunks[i]->HasAnyChange(sys->changeFilter.types,
                                                   version))
             continue;
 
-          std::size_t idxOffsetInChunk = i * chunkCapacity;
-          std::size_t indexOffsetInQueryChunk =
-              indexOffsetInQuery + idxOffsetInChunk;
-          (*sys)(w, singletonsView, indexOffsetInQueryChunk,
-                 archetype->chunks[i], &cb);
+          std::size_t indexOffsetInChunk =
+              indexOffsetInQuery + indexOffsetInArchetype;
+          (*sys)(w, singletonsView, indexOffsetInChunk, archetype->chunks[i],
+                 &cb);
+          indexOffsetInArchetype += chunks[i]->EntityNum();
         }
+        indexOffsetInQuery += indexOffsetInArchetype;
       }
       w->AddCommandBuffer(std::move(cb), layer);
     };
@@ -542,14 +572,16 @@ void EntityMngr::Accept(IListener* listener) const {
   // TODO : speed up
   listener->EnterEntityMngr(this);
   for (const auto& [ts, a] : ts2a) {
-    for (std::size_t i = 0; i < a->EntityNum(); i++) {
-      auto e = *a->ReadAt<Entity>(i);
-      listener->EnterEntity(e);
-      for (const auto& cmpt : a->Components(i, AccessMode::WRITE)) {
-        listener->EnterCmpt({cmpt.AccessType(), cmpt.Ptr()});
-        listener->ExistCmpt({cmpt.AccessType(), cmpt.Ptr()});
+    for (std::size_t i = 0; i < a->GetChunks().size(); i++) {
+      for (std::size_t j = 0; j < a->GetChunks()[i]->EntityNum(); j++) {
+        auto e = *a->ReadAt<Entity>({i, j});
+        listener->EnterEntity(e);
+        for (const auto& cmpt : a->Components({i, j}, AccessMode::WRITE)) {
+          listener->EnterCmpt({cmpt.AccessType(), cmpt.Ptr()});
+          listener->ExistCmpt({cmpt.AccessType(), cmpt.Ptr()});
+        }
+        listener->ExistEntity(e);
       }
-      listener->ExistEntity(e);
     }
   }
   listener->ExistEntityMngr(this);
@@ -572,7 +604,7 @@ Entity EntityMngr::GetSingletonEntity(TypeID t) const {
   EntityQuery query{move(filter)};
   const auto& archetypes = QueryArchetypes(query);
   auto* archetype = *archetypes.begin();
-  return *archetype->ReadAt<Entity>(0);
+  return *archetype->ReadAt<Entity>({0, 0});
 }
 
 CmptAccessPtr EntityMngr::GetSingleton(AccessTypeID access_type) const {
@@ -586,7 +618,7 @@ CmptAccessPtr EntityMngr::GetSingleton(AccessTypeID access_type) const {
   if (num != 1) return {TypeID{}, nullptr, AccessMode::WRITE};
 
   for (auto* archetype : archetypes) {
-    if (archetype->EntityNum() != 0) return archetype->At(access_type, 0);
+    if (archetype->EntityNum() != 0) return archetype->At(access_type, {0, 0});
   }
 
   return {TypeID{}, nullptr, AccessMode::WRITE};
