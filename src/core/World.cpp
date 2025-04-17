@@ -82,8 +82,8 @@ void World::Run(SystemFunc* sys) {
 }
 
 // after running Update
-UGraphviz::Graph World::GenUpdateFrameGraph() const {
-  UGraphviz::Graph graph("Update Frame Graph", true);
+MyGraphviz::Graph World::GenUpdateFrameGraph() const {
+  MyGraphviz::Graph graph("Update Frame Graph", true);
 
   graph.RegisterGraphNodeAttr("style", "filled")
       .RegisterGraphNodeAttr("fontcolor", "white")

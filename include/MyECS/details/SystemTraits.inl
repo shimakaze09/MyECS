@@ -1,6 +1,6 @@
 #pragma once
 
-#include <MyTemplate/Name.h>
+#include <MyTemplate/Name.hpp>
 
 namespace My::MyECS::details {
 template <typename System>

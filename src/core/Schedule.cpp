@@ -6,10 +6,6 @@ using namespace My;
 using namespace My::MyECS;
 using namespace std;
 
-std::pmr::polymorphic_allocator<SystemFunc> Schedule::GetSysFuncAllocator() {
-  return &sysfuncRsrc;
-}
-
 Schedule::~Schedule() { Clear(); }
 
 Schedule& Schedule::Order(string_view x, string_view y) {
@@ -34,7 +30,7 @@ Schedule& Schedule::EraseNone(string_view sys, TypeID type) {
 }
 
 void Schedule::Clear() {
-  auto alloc = GetSysFuncAllocator();
+  auto alloc = std::pmr::polymorphic_allocator<SystemFunc>{&frame_rsrc};
   for (const auto& [hash, sysFunc] : sysFuncs) {
     sysFunc->~SystemFunc();
     alloc.deallocate(sysFunc, 1);

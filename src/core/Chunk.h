@@ -1,7 +1,7 @@
 #pragma once
 
 #include <MyECS/config.h>
-#include <small_vector.h>
+#include <MySmallFlat/small_vector.hpp>
 
 #include <cstdint>
 #include <span>

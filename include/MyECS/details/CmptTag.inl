@@ -1,6 +1,6 @@
 #pragma once
 
-#include <MyTemplate/Util.h>
+#include <MyTemplate/Util.hpp>
 
 namespace My::MyECS {
 class Entity;

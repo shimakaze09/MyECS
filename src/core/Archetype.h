@@ -4,7 +4,7 @@
 #include <MyECS/CmptPtr.h>
 #include <MyECS/Entity.h>
 #include <MyECS/details/TypeIDSet.h>
-#include <MyTemplate/TypeList.h>
+#include <MyTemplate/TypeList.hpp>
 
 #include <memory_resource>
 

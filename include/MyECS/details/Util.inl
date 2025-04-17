@@ -1,6 +1,6 @@
 #pragma once
 
-#include <MyTemplate/Type.h>
+#include <MyTemplate/Type.hpp>
 
 namespace My::MyECS {
 constexpr std::size_t hash_combine(std::size_t x, std::size_t y) noexcept {

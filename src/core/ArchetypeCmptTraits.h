@@ -1,7 +1,7 @@
 #pragma once
 
-#include <MyTemplate/Type.h>
-#include <small_vector.h>
+#include <MyTemplate/Type.hpp>
+#include <MySmallFlat/small_vector.hpp>
 
 #include <functional>
 #include <tuple>

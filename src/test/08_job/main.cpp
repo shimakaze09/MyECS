@@ -43,7 +43,6 @@ int main() {
   for (std::size_t i = 1; i <= 100; i++) {
     auto e = w.entityMngr.Create(My::TypeIDs_of<Data>);
     w.entityMngr.Get<Data>(e)->value = i;
-    a > (e, i);
   }
 
   w.Update();

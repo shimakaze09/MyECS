@@ -1,6 +1,6 @@
 #pragma once
 
-#include <MyTemplate/Type.h>
+#include <MyTemplate/Type.hpp>
 
 #include <array>
 #include <functional>

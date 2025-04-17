@@ -1,6 +1,6 @@
 #pragma once
 
-#include <MyTemplate/Func.h>
+#include <MyTemplate/Func.hpp>
 
 namespace My::MyECS::details {
 template <typename... Cmpts>
