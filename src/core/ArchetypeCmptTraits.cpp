@@ -8,13 +8,15 @@
 
 using namespace My::MyECS;
 
-void ArchetypeCmptTraits::CmptTrait::DefaultConstruct(void* cmpt) const {
-  if (default_ctor) default_ctor(cmpt);
+void ArchetypeCmptTraits::CmptTrait::DefaultConstruct(
+    void* cmpt, std::pmr::memory_resource* world_rsrc) const {
+  if (default_ctor) default_ctor(cmpt, world_rsrc);
 }
 
-void ArchetypeCmptTraits::CmptTrait::CopyConstruct(void* dst, void* src) const {
+void ArchetypeCmptTraits::CmptTrait::CopyConstruct(
+    void* dst, const void* src, std::pmr::memory_resource* world_rsrc) const {
   if (copy_ctor)
-    copy_ctor(dst, src);
+    copy_ctor(dst, src, world_rsrc);
   else
     std::memcpy(dst, src, size);
 }
@@ -22,8 +24,6 @@ void ArchetypeCmptTraits::CmptTrait::CopyConstruct(void* dst, void* src) const {
 void ArchetypeCmptTraits::CmptTrait::MoveConstruct(void* dst, void* src) const {
   if (move_ctor)
     move_ctor(dst, src);
-  else if (copy_ctor)
-    copy_ctor(dst, src);
   else
     std::memcpy(dst, src, size);
 }

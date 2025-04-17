@@ -30,11 +30,6 @@ class Archetype;
 // - when free entries is empty, use new entity entry (version is 0)
 class EntityMngr {
  public:
-  EntityMngr();
-  EntityMngr(const EntityMngr& em);
-  EntityMngr(EntityMngr&&) noexcept;
-  ~EntityMngr();
-
   CmptTraits cmptTraits;
 
   Entity Create(std::span<const TypeID> types = {});
@@ -118,6 +113,11 @@ class EntityMngr {
   void Clear();
 
  private:
+  EntityMngr(std::pmr::memory_resource* world_rsrc);
+  EntityMngr(const EntityMngr& em, std::pmr::memory_resource* world_rsrc);
+  EntityMngr(EntityMngr&&) noexcept;
+  ~EntityMngr();
+
   friend class World;
   friend class Archetype;
 
@@ -141,6 +141,7 @@ class EntityMngr {
   bool AutoGen(World*, Job*, SystemFunc*, int layer) const;
 
   std::uint64_t version{0};
+  std::pmr::memory_resource* world_rsrc;
 
   struct EntityInfo {
     Archetype* archetype{nullptr};
