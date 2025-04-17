@@ -1,7 +1,6 @@
 #pragma once
 
 #include <MyGraphviz/MyGraphviz.hpp>
-
 #include <mutex>
 
 #include "Entity.hpp"
@@ -103,11 +102,14 @@ class World {
   template <typename T, typename... Args>
   T* SyncCreateFrameObject(Args&&... args);
 
+  std::uint64_t Version() const noexcept { return version; }
+
  private:
   bool inRunningJobGraph{false};
 
   mutable JobExecutor executor;
   Schedule schedule;
+  std::uint64_t version{0};
 
   Job jobGraph;
   std::vector<Job*> jobs;

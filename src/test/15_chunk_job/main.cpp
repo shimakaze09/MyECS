@@ -25,26 +25,26 @@ struct SAB_System {
 
     schedule.RegisterChunkJob(
         [](ChunkView chunk) {
-          auto arrayS = chunk.GetCmptArray<S>();
-          auto arrayA = chunk.GetCmptArray<A>();
-          auto arrayB = chunk.GetCmptArray<B>();
+          auto arrayS = chunk->GetCmptArray<S>();
+          auto arrayA = chunk->GetCmptArray<A>();
+          auto arrayB = chunk->GetCmptArray<B>();
           bool containsA = !arrayA.empty();
           bool containsB = !arrayB.empty();
           bool containsAB = containsA && containsB;
 
           if (containsAB) {
             cout << "[AB]" << endl;
-            for (std::size_t i = 0; i < chunk.EntityNum(); i++) {
+            for (std::size_t i = 0; i < chunk->EntityNum(); i++) {
               arrayS[i].value += arrayA[i].value * arrayB[i].value;
             }
           } else if (containsA) {
             cout << "[A]" << endl;
-            for (std::size_t i = 0; i < chunk.EntityNum(); i++) {
+            for (std::size_t i = 0; i < chunk->EntityNum(); i++) {
               arrayS[i].value += arrayA[i].value;
             }
           } else {  // containsB
             cout << "[B]" << endl;
-            for (std::size_t i = 0; i < chunk.EntityNum(); i++) {
+            for (std::size_t i = 0; i < chunk->EntityNum(); i++) {
               arrayS[i].value += arrayB[i].value;
             }
           }

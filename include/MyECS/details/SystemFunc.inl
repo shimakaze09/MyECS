@@ -13,11 +13,13 @@ template <typename Func>
 SystemFunc::SystemFunc(Func&& func, std::string_view name,
                        ArchetypeFilter archetypeFilter, CmptLocator cmptLocator,
                        SingletonLocator singletonLocator,
-                       RandomAccessor randomAccessor, bool isParallel)
+                       RandomAccessor randomAccessor, ChangeFilter changeFilter,
+                       bool isParallel)
     : entityQuery{std::move(archetypeFilter),
                   std::move(cmptLocator.Combine<decltype(func)>())},
       singletonLocator{std::move(singletonLocator.Combine<decltype(func)>())},
       randomAccessor{std::move(randomAccessor)},
+      changeFilter{std::move(changeFilter)},
       mode{Mode::Entity},
       name{name},
       hashCode{GetValue(this->name)},
@@ -42,10 +44,12 @@ template <typename Func>
 SystemFunc::SystemFunc(Func&& func, std::string_view name,
                        ArchetypeFilter archetypeFilter,
                        SingletonLocator singletonLocator,
-                       RandomAccessor randomAccessor, bool isParallel)
+                       RandomAccessor randomAccessor, ChangeFilter changeFilter,
+                       bool isParallel)
     : entityQuery{std::move(archetypeFilter)},
       singletonLocator{std::move(singletonLocator.Combine<decltype(func)>())},
       randomAccessor{std::move(randomAccessor)},
+      changeFilter{std::move(changeFilter)},
       mode{Mode::Chunk},
       name{name},
       hashCode{GetValue(this->name)},
@@ -61,7 +65,7 @@ SystemFunc::SystemFunc(Func&& func, std::string_view name,
 
   static_assert(!Contain_v<ArgList, Entity>,
                 "(Mode::Chunk) SystemFunc can't use Entity directly, use "
-                "ChunkView::GetEntityArray()");
+                "Chunk::GetEntityArray()");
 
   static_assert(
       !Contain_v<ArgList, CmptsView>,

@@ -33,9 +33,9 @@ void print1(const World& w) {
                 AccessTypeID_of<Latest<Position>>};
   w.RunChunkJob(
       [](const World* w, ChunkView chunk) {
-        auto velocities = chunk.GetCmptArray<Velocity>();
-        auto positions = chunk.GetCmptArray<Position>();
-        std::size_t N = chunk.EntityNum();
+        auto velocities = chunk->GetCmptArray<Velocity>();
+        auto positions = chunk->GetCmptArray<Position>();
+        std::size_t N = chunk->EntityNum();
         for (std::size_t i = 0; i < N; i++) {
           cout << velocities[i].val << ", " << positions[i].val << endl;
         }

@@ -2,7 +2,8 @@
 
 #include <functional>
 
-#include "ChunkView.hpp"
+#include "ChangeFilter.hpp"
+#include "Chunk.hpp"
 #include "CmptsView.hpp"
 #include "Entity.hpp"
 #include "EntityQuery.hpp"
@@ -40,16 +41,17 @@ class SystemFunc {
   EntityQuery entityQuery;
   SingletonLocator singletonLocator;
   RandomAccessor randomAccessor;
+  ChangeFilter changeFilter;
 
   // Mode::Entity
   template <typename Func>
   SystemFunc(Func&&, std::string_view name, ArchetypeFilter, CmptLocator,
-             SingletonLocator, RandomAccessor, bool isParallel);
+             SingletonLocator, RandomAccessor, ChangeFilter, bool isParallel);
 
   // Mode::Chunk
   template <typename Func>
   SystemFunc(Func&&, std::string_view name, ArchetypeFilter, SingletonLocator,
-             RandomAccessor, bool isParallel);
+             RandomAccessor, ChangeFilter, bool isParallel);
 
   // Mode::Job
   template <typename Func>

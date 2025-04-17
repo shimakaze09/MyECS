@@ -41,7 +41,7 @@ int main() {
 
   for (std::size_t i = 1; i <= 100; i++) {
     auto e = w.entityMngr.Create(My::TypeIDs_of<Data>);
-    w.entityMngr.Get<Data>(e)->value = i;
+    w.entityMngr.WriteComponent<Data>(e)->value = i;
   }
 
   w.Update();

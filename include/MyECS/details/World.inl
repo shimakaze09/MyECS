@@ -11,6 +11,7 @@ void World::RunEntityJob(Func&& func, bool isParallel, ArchetypeFilter filter,
                  std::move(cmptLocator),
                  std::move(singletonLocator),
                  {},
+                 {},
                  isParallel};
   Run(&sys);
 }
@@ -35,8 +36,13 @@ void World::RunEntityJob(Func&& func, bool isParallel, ArchetypeFilter filter,
 template <typename Func>
 void World::RunChunkJob(Func&& func, ArchetypeFilter filter, bool isParallel,
                         SingletonLocator singletonLocator) {
-  SystemFunc sys{std::forward<Func>(func),    "", std::move(filter),
-                 std::move(singletonLocator), {}, isParallel};
+  SystemFunc sys{std::forward<Func>(func),
+                 "",
+                 std::move(filter),
+                 std::move(singletonLocator),
+                 {},
+                 {},
+                 isParallel};
   Run(&sys);
 }
 

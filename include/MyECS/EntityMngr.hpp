@@ -48,13 +48,31 @@ class EntityMngr {
   bool Have(Entity, TypeID) const;
 
   // nullptr if not containts TypeID
-  CmptPtr Get(Entity, TypeID) const;
+  CmptAccessPtr GetComponent(Entity, AccessTypeID) const;
+  CmptAccessPtr WriteComponent(Entity e, TypeID t) const {
+    return GetComponent(e, {t, AccessMode::WRITE});
+  }
+  CmptAccessPtr ReadComponent(Entity e, TypeID t) const {
+    return GetComponent(e, {t, AccessMode::LATEST});
+  }
   template <typename Cmpt>
-  Cmpt* Get(Entity e) const {
-    return Get(e, TypeID_of<Cmpt>).template As<Cmpt>();
+  Cmpt* WriteComponent(Entity e) const {
+    return WriteComponent(e, TypeID_of<Cmpt>)
+        .template As<Cmpt, AccessMode::WRITE>();
+  }
+  template <typename Cmpt>
+  const Cmpt* ReadComponent(Entity e) const {
+    return ReadComponent(e, TypeID_of<Cmpt>)
+        .template As<Cmpt, AccessMode::LATEST>();
   }
 
-  std::vector<CmptPtr> Components(Entity) const;
+  std::vector<CmptAccessPtr> Components(Entity, AccessMode) const;
+  std::vector<CmptAccessPtr> WriteComponents(Entity e) const {
+    return Components(e, AccessMode::WRITE);
+  }
+  std::vector<CmptAccessPtr> ReadComponents(Entity e) const {
+    return Components(e, AccessMode::LATEST);
+  }
 
   bool Exist(Entity) const noexcept;
 
@@ -74,11 +92,22 @@ class EntityMngr {
 
   bool IsSingleton(TypeID) const;
   Entity GetSingletonEntity(TypeID) const;
-  // nullptr if not singleton
-  CmptPtr GetSingleton(TypeID) const;
+  CmptAccessPtr GetSingleton(AccessTypeID) const;
+  CmptAccessPtr WriteSingleton(TypeID type) const {
+    return GetSingleton({type, AccessMode::WRITE});
+  }
+  CmptAccessPtr ReadSingleton(TypeID type) const {
+    return GetSingleton({type, AccessMode::LATEST});
+  }
   template <typename Cmpt>
-  Cmpt* GetSingleton() const {
-    return GetSingleton(TypeID_of<Cmpt>).template As<Cmpt>();
+  Cmpt* WriteSingleton() const {
+    return WriteSingleton(TypeID_of<Cmpt>)
+        .template As<Cmpt, AccessMode::WRITE>();
+  }
+  template <typename Cmpt>
+  const Cmpt* ReadSingleton() const {
+    return ReadSingleton(TypeID_of<Cmpt>)
+        .template As<Cmpt, AccessMode::LATEST>();
   }
 
   void Accept(IListener* listener) const;
@@ -112,10 +141,12 @@ class EntityMngr {
   // if job is nullptr, direct run
   bool AutoGen(World*, Job*, SystemFunc*) const;
 
+  std::uint64_t version{0};
+
   struct EntityInfo {
     Archetype* archetype{nullptr};
     std::size_t idxInArchetype{static_cast<std::size_t>(-1)};
-    std::size_t version{0};  // version
+    std::uint64_t version{0};  // version
   };
   std::vector<EntityInfo> entityTable;
   std::vector<std::size_t> entityTableFreeEntry;
@@ -129,5 +160,6 @@ class EntityMngr {
   std::unordered_map<small_flat_set<TypeID>, std::unique_ptr<Archetype>,
                      TypeIDSetHash>
       ts2a;  // archetype's TypeIDSet to archetype
+  void UpdateVersion(std::uint64_t world_version) noexcept;
 };
 }  // namespace My::MyECS
