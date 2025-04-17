@@ -1,6 +1,6 @@
 #include <MyECS/EntityMngr.h>
 #include <MyECS/IListener.h>
-#include <MyECS/details/SystemFunc.h>
+#include <MyECS/SystemFunc.h>
 
 #include "Archetype.h"
 

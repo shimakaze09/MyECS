@@ -1,11 +1,12 @@
 #pragma once
 
+#include <MySmallFlat/pmr/small_vector.hpp>
 #include <map>
 #include <memory>
 #include <memory_resource>
 
+#include "SystemFunc.h"
 #include "details/Job.h"
-#include "details/SystemFunc.h"
 
 namespace My::MyECS::details {
 struct Compiler;
@@ -34,7 +35,7 @@ class Schedule {
   // <tagged-components>: {LastFrame|Write|Latest}<Cmpt>...
   // CmptsView
   template <typename Func>
-  const SystemFunc* RegisterEntityJob(Func&&, std::string name,
+  const SystemFunc* RegisterEntityJob(Func&&, std::string_view name,
                                       bool isParallel = true,
                                       ArchetypeFilter = {}, CmptLocator = {},
                                       SingletonLocator = {},
@@ -46,7 +47,7 @@ class Schedule {
   // SingletonsView
   // ChunkView (necessary)
   template <typename Func>
-  const SystemFunc* RegisterChunkJob(Func&&, std::string name,
+  const SystemFunc* RegisterChunkJob(Func&&, std::string_view name,
                                      ArchetypeFilter = {},
                                      bool isParallel = true,
                                      SingletonLocator = {},
@@ -57,8 +58,8 @@ class Schedule {
   // {LastFrame|Write|Latest}<Singleton<Cmpt>>
   // SingletonsView
   template <typename Func>
-  const SystemFunc* RegisterJob(Func&&, std::string name, SingletonLocator = {},
-                                RandomAccessor = {});
+  const SystemFunc* RegisterJob(Func&&, std::string_view name,
+                                SingletonLocator = {}, RandomAccessor = {});
 
   void RegisterCommand(std::function<void(World*)> command, int layer = 0) {
     commandBuffer[layer].push_back(std::move(command));
@@ -73,6 +74,8 @@ class Schedule {
   std::pmr::monotonic_buffer_resource* GetFrameMonotonicResource() {
     return &frame_rsrc;
   }
+  template <typename T, typename... Args>
+  T* CreateFrameObject(Args&&... args) const;
 
   ~Schedule();
 
@@ -83,14 +86,27 @@ class Schedule {
   void Clear();
 
   struct CmptSysFuncs {
-    std::vector<SystemFunc*> lastFrameSysFuncs;
-    std::vector<SystemFunc*> writeSysFuncs;
-    std::vector<SystemFunc*> latestSysFuncs;
+    CmptSysFuncs(std::pmr::memory_resource* rsrc)
+        : lastFrameSysFuncs{std::pmr::vector<SystemFunc*>(
+              std::pmr::polymorphic_allocator<SystemFunc*>{rsrc})},
+          writeSysFuncs{std::pmr::vector<SystemFunc*>(
+              std::pmr::polymorphic_allocator<SystemFunc*>{rsrc})},
+          latestSysFuncs{std::pmr::vector<SystemFunc*>(
+              std::pmr::polymorphic_allocator<SystemFunc*>{rsrc})} {}
+
+    pmr::small_vector<SystemFunc*> lastFrameSysFuncs;
+    pmr::small_vector<SystemFunc*> writeSysFuncs;
+    pmr::small_vector<SystemFunc*> latestSysFuncs;
   };
   friend struct details::Compiler;
-  std::unordered_map<TypeID, CmptSysFuncs> GenCmptSysFuncsMap() const;
 
-  SysFuncGraph GenSysFuncGraph() const;
+  using CmptSysFuncsMap = std::pmr::unordered_map<TypeID, CmptSysFuncs>;
+
+  // use frame_rsrc, so no need to delete
+  CmptSysFuncsMap* GenCmptSysFuncsMap() const;
+
+  // use frame_rsrc, so no need to delete
+  SysFuncGraph* GenSysFuncGraph() const;
 
   // SystemFunc's hashcode to pointer of SystemFunc
   std::unordered_map<std::size_t, SystemFunc*> sysFuncs;
@@ -107,7 +123,9 @@ class Schedule {
 
   std::map<int, std::vector<std::function<void(World*)>>> commandBuffer;
 
-  std::pmr::monotonic_buffer_resource frame_rsrc;  // release in every frame
+  mutable std::pmr::monotonic_buffer_resource
+      frame_rsrc;  // release in every frame
+  std::string_view RegisterFrameString(std::string_view str);
 
   friend class World;
 };

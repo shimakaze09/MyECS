@@ -1,34 +1,39 @@
 #pragma once
 
 namespace My::MyECS {
-template <typename Func>
-const SystemFunc* Schedule::RegisterEntityJob(Func&& func, std::string name,
-                                              bool isParallel,
-                                              ArchetypeFilter filter,
-                                              CmptLocator cmptLocator,
-                                              SingletonLocator singletonLocator,
-                                              RandomAccessor randomAccessor) {
-  return Request(std::forward<Func>(func), std::move(name), std::move(filter),
-                 std::move(cmptLocator), std::move(singletonLocator),
-                 std::move(randomAccessor), isParallel);
+template <typename T, typename... Args>
+T* Schedule::CreateFrameObject(Args&&... args) const {
+  void* buffer = frame_rsrc.allocate(sizeof(T), alignof(T));
+  return new (buffer) T(std::forward<Args>(args)...);
 }
 
 template <typename Func>
-const SystemFunc* Schedule::RegisterChunkJob(Func&& func, std::string name,
-                                             ArchetypeFilter filter,
-                                             bool isParallel,
-                                             SingletonLocator singletonLocator,
-                                             RandomAccessor randomAccessor) {
-  return Request(std::forward<Func>(func), std::move(name), std::move(filter),
+const SystemFunc* Schedule::RegisterEntityJob(
+    Func&& func, std::string_view name, bool isParallel, ArchetypeFilter filter,
+    CmptLocator cmptLocator, SingletonLocator singletonLocator,
+    RandomAccessor randomAccessor) {
+  return Request(std::forward<Func>(func), RegisterFrameString(name),
+                 std::move(filter), std::move(cmptLocator),
                  std::move(singletonLocator), std::move(randomAccessor),
                  isParallel);
 }
 
 template <typename Func>
-const SystemFunc* Schedule::RegisterJob(Func&& func, std::string name,
+const SystemFunc* Schedule::RegisterChunkJob(Func&& func, std::string_view name,
+                                             ArchetypeFilter filter,
+                                             bool isParallel,
+                                             SingletonLocator singletonLocator,
+                                             RandomAccessor randomAccessor) {
+  return Request(std::forward<Func>(func), RegisterFrameString(name),
+                 std::move(filter), std::move(singletonLocator),
+                 std::move(randomAccessor), isParallel);
+}
+
+template <typename Func>
+const SystemFunc* Schedule::RegisterJob(Func&& func, std::string_view name,
                                         SingletonLocator singletonLocator,
                                         RandomAccessor randomAccessor) {
-  return Request(std::forward<Func>(func), std::move(name),
+  return Request(std::forward<Func>(func), RegisterFrameString(name),
                  std::move(singletonLocator), std::move(randomAccessor));
 }
 

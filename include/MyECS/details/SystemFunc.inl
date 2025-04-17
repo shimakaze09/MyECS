@@ -10,7 +10,7 @@ auto Pack(Func&& func) noexcept;
 namespace My::MyECS {
 // Mode::Entity
 template <typename Func>
-SystemFunc::SystemFunc(Func&& func, std::string name,
+SystemFunc::SystemFunc(Func&& func, std::string_view name,
                        ArchetypeFilter archetypeFilter, CmptLocator cmptLocator,
                        SingletonLocator singletonLocator,
                        RandomAccessor randomAccessor, bool isParallel)
@@ -19,7 +19,7 @@ SystemFunc::SystemFunc(Func&& func, std::string name,
       singletonLocator{std::move(singletonLocator.Combine<decltype(func)>())},
       randomAccessor{std::move(randomAccessor)},
       mode{Mode::Entity},
-      name{std::move(name)},
+      name{name},
       hashCode{GetValue(this->name)},
       isParallel{isParallel},
       func{details::Pack(std::forward<Func>(func))} {
@@ -39,7 +39,7 @@ SystemFunc::SystemFunc(Func&& func, std::string name,
 
 // Mode::Chunk
 template <typename Func>
-SystemFunc::SystemFunc(Func&& func, std::string name,
+SystemFunc::SystemFunc(Func&& func, std::string_view name,
                        ArchetypeFilter archetypeFilter,
                        SingletonLocator singletonLocator,
                        RandomAccessor randomAccessor, bool isParallel)
@@ -47,7 +47,7 @@ SystemFunc::SystemFunc(Func&& func, std::string name,
       singletonLocator{std::move(singletonLocator.Combine<decltype(func)>())},
       randomAccessor{std::move(randomAccessor)},
       mode{Mode::Chunk},
-      name{std::move(name)},
+      name{name},
       hashCode{GetValue(this->name)},
       isParallel{isParallel},
       func{details::Pack(std::forward<Func>(func))} {
@@ -79,13 +79,13 @@ SystemFunc::SystemFunc(Func&& func, std::string name,
 
 // Mode::Job
 template <typename Func>
-SystemFunc::SystemFunc(Func&& func, std::string name,
+SystemFunc::SystemFunc(Func&& func, std::string_view name,
                        SingletonLocator singletonLocator,
                        RandomAccessor randomAccessor)
     : singletonLocator{std::move(singletonLocator.Combine<decltype(func)>())},
       randomAccessor{std::move(randomAccessor)},
       mode{Mode::Job},
-      name{std::move(name)},
+      name{name},
       hashCode{GetValue(this->name)},
       isParallel{false},
       func{details::Pack(std::forward<Func>(func))} {
@@ -113,7 +113,6 @@ struct Packer<TypeList<DecayedArgs...>, TypeList<Singletons...>,
               TypeList<NonSingletons...>> {
   using SingletonList = TypeList<Singletons...>;        // sorted
   using NonSingletonList = TypeList<NonSingletons...>;  // sorted
-
   template <typename Func>
   static auto run(Func&& func) noexcept {
     return [func = std::forward<Func>(func)](

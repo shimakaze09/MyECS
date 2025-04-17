@@ -1,23 +1,24 @@
 #pragma once
 
-#include "../ChunkView.h"
-#include "../CmptsView.h"
-#include "../Entity.h"
-#include "../EntityQuery.h"
-#include "../RandomAccessor.h"
-#include "../SingletonLocator.h"
-#include "../SingletonsView.h"
-
 #include <functional>
+
+#include "ChunkView.h"
+#include "CmptsView.h"
+#include "Entity.h"
+#include "EntityQuery.h"
+#include "RandomAccessor.h"
+#include "SingletonLocator.h"
+#include "SingletonsView.h"
 
 namespace My::MyECS {
 // [- description]
 // system function registered by Schedule in <System>::OnUpdate(Schedule&)
-// name + query(archetype filter + component locator) + singleton locator + function<...>
-// name('s hashcode) must be unique in global
-// query.filter.none can be change dynamically by other <System> with <Schedule>
+// name + query(archetype filter + component locator) + singleton locator +
+// function<...> name('s hashcode) must be unique in global query.filter.none
+// can be change dynamically by other <System> with <Schedule>
 // [- system function kind] (distinguish by argument list)
-// common arguments : [const] World*, SingletonsView, {LastFrame|Latest}<Singleton<Cmpt>>
+// common arguments : [const] World*, SingletonsView,
+// {LastFrame|Latest}<Singleton<Cmpt>>
 // 1. Mode::Entity: per entity function
 // * Entity
 // * std::size_t indexInQuery
@@ -42,19 +43,19 @@ class SystemFunc {
 
   // Mode::Entity
   template <typename Func>
-  SystemFunc(Func&&, std::string name, ArchetypeFilter, CmptLocator,
+  SystemFunc(Func&&, std::string_view name, ArchetypeFilter, CmptLocator,
              SingletonLocator, RandomAccessor, bool isParallel);
 
   // Mode::Chunk
   template <typename Func>
-  SystemFunc(Func&&, std::string name, ArchetypeFilter, SingletonLocator,
+  SystemFunc(Func&&, std::string_view name, ArchetypeFilter, SingletonLocator,
              RandomAccessor, bool isParallel);
 
   // Mode::Job
   template <typename Func>
-  SystemFunc(Func&&, std::string name, SingletonLocator, RandomAccessor);
+  SystemFunc(Func&&, std::string_view name, SingletonLocator, RandomAccessor);
 
-  const std::string& Name() const noexcept { return name; }
+  std::string_view Name() const noexcept { return name; }
 
   static constexpr std::size_t GetValue(std::string_view name) noexcept {
     return string_hash(name);
@@ -69,7 +70,6 @@ class SystemFunc {
   void operator()(World*, SingletonsView) const;
 
   Mode GetMode() const noexcept { return mode; }
-
   bool IsParallel() const noexcept { return isParallel; }
 
   bool operator==(const SystemFunc& sysFunc) const noexcept {
@@ -78,7 +78,7 @@ class SystemFunc {
 
  private:
   Mode mode;
-  std::string name;
+  std::string_view name;
   std::size_t hashCode;  // after name
   bool isParallel;
   std::function<void(World*, SingletonsView, Entity, std::size_t, CmptsView,
@@ -87,4 +87,4 @@ class SystemFunc {
 };
 }  // namespace My::MyECS
 
-#include "SystemFunc.inl"
+#include "details/SystemFunc.inl"

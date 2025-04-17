@@ -1,4 +1,4 @@
-#include <MyECS/details/SystemFunc.h>
+#include <MyECS/SystemFunc.h>
 
 using namespace My::MyECS;
 
