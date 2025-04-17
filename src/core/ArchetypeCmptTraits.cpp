@@ -2,8 +2,8 @@
 
 #include "ArchetypeCmptTraits.hpp"
 
+#include <MyECS/CmptTraits.hpp>
 #include <MyECS/EntityQuery.hpp>
-#include <MyECS/RTDCmptTraits.hpp>
 #include <stdexcept>
 
 using namespace My::MyECS;
@@ -48,7 +48,7 @@ ArchetypeCmptTraits::CmptTrait& ArchetypeCmptTraits::GetTrait(
   return cmpt_traits[GetTypeIndex(ID)];
 }
 
-void ArchetypeCmptTraits::Register(const RTDCmptTraits& rtdct, TypeID type) {
+void ArchetypeCmptTraits::Register(const CmptTraits& rtdct, TypeID type) {
   auto size_target = rtdct.GetSizeofs().find(type);
   if (size_target == rtdct.GetSizeofs().end())
     throw std::logic_error(

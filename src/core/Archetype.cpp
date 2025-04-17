@@ -130,7 +130,7 @@ void Archetype::SetLayout() {
   }
 }
 
-Archetype* Archetype::New(RTDCmptTraits& rtdCmptTraits,
+Archetype* Archetype::New(CmptTraits& rtdCmptTraits,
                           std::pmr::memory_resource* rsrc,
                           std::span<const TypeID> types,
                           std::uint64_t version) {
@@ -147,7 +147,7 @@ Archetype* Archetype::New(RTDCmptTraits& rtdCmptTraits,
   return rst;
 }
 
-Archetype* Archetype::Add(RTDCmptTraits& rtdCmptTraits, const Archetype* from,
+Archetype* Archetype::Add(CmptTraits& rtdCmptTraits, const Archetype* from,
                           std::span<const TypeID> types) {
   assert(std::find(types.begin(), types.end(), TypeID_of<Entity>) ==
          types.end());
@@ -278,9 +278,9 @@ std::size_t Archetype::Instantiate(Entity e, std::size_t srcIdx) {
   return dstIdx;
 }
 
-std::tuple<My::small_vector<Entity*, 16>,
-           My::small_vector<My::small_vector<CmptAccessPtr, 16>, 16>,
-           My::small_vector<std::size_t, 16> >
+std::tuple<My::small_vector<Entity*>,
+           My::small_vector<My::small_vector<CmptAccessPtr>>,
+           My::small_vector<std::size_t>>
 Archetype::Locate(std::span<const AccessTypeID> cmpts) const {
   assert(
       std::find_if_not(cmpts.begin(), cmpts.end(), [this](const TypeID& type) {
@@ -294,9 +294,8 @@ Archetype::Locate(std::span<const AccessTypeID> cmpts) const {
                     cmptTraits.GetTypes().find(TypeID_of<Entity>)));
   const std::size_t offsetEntity = offsets[entityIdx];
 
-  My::small_vector<My::small_vector<CmptAccessPtr, 16>, 16> chunkCmpts(
-      numChunk);
-  My::small_vector<Entity*, 16> chunkEntity(numChunk);
+  My::small_vector<My::small_vector<CmptAccessPtr>> chunkCmpts(numChunk);
+  My::small_vector<Entity*> chunkEntity(numChunk);
 
   for (std::size_t i = 0; i < numChunk; i++) {
     Chunk* chunk = chunks[i];
@@ -313,7 +312,7 @@ Archetype::Locate(std::span<const AccessTypeID> cmpts) const {
     chunkEntity[i] = reinterpret_cast<Entity*>(data + offsetEntity);
   }
 
-  My::small_vector<std::size_t, 16> sizes;
+  My::small_vector<std::size_t> sizes;
   sizes.reserve(numType);
   for (const auto& type : cmpts)
     sizes.push_back(cmptTraits.GetTrait(type).size);

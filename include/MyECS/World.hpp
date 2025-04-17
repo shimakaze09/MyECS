@@ -39,7 +39,7 @@ class World {
   std::string DumpUpdateJobGraph() const;
 
   // after running Update()
-  // use RTDCmptTraits' registered component name
+  // use CmptTraits' registered component name
   MyGraphviz::Graph GenUpdateFrameGraph() const;
 
   void Accept(IListener*) const;

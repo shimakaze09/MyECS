@@ -4,8 +4,8 @@
 #include <memory_resource>
 
 #include "CmptPtr.hpp"
+#include "CmptTraits.hpp"
 #include "EntityQuery.hpp"
-#include "RTDCmptTraits.hpp"
 #include "SingletonLocator.hpp"
 #include "details/Job.hpp"
 
@@ -23,7 +23,7 @@ class Archetype;
 // - Singleton: IsSingleton, GetSingletonEntity, GetSingleton
 // - other: EntityNum, AddCommand
 // [important]
-// - some API with TypeID need RTDCmptTraits to get {size|alignment|lifecycle
+// - some API with TypeID need CmptTraits to get {size|alignment|lifecycle
 // function} (throw std::logic_error)
 // - API with Entity require Entity exist  (throw std::invalid_argument)
 // [details]
@@ -35,7 +35,7 @@ class EntityMngr {
   EntityMngr(EntityMngr&&) noexcept;
   ~EntityMngr();
 
-  RTDCmptTraits cmptTraits;
+  CmptTraits cmptTraits;
 
   Entity Create(std::span<const TypeID> types = {});
 
@@ -126,8 +126,7 @@ class EntityMngr {
   // types not contain Entity
   Archetype* GetOrCreateArchetypeOf(std::span<const TypeID> types);
 
-  small_vector<CmptAccessPtr, 16> LocateSingletons(
-      const SingletonLocator&) const;
+  small_vector<CmptAccessPtr> LocateSingletons(const SingletonLocator&) const;
 
   const std::set<Archetype*>& QueryArchetypes(const EntityQuery&) const;
   mutable std::unordered_map<EntityQuery, std::set<Archetype*>> queryCache;

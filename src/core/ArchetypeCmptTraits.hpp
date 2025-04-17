@@ -6,7 +6,7 @@
 #include <span>
 
 namespace My::MyECS {
-class RTDCmptTraits;
+class CmptTraits;
 struct EntityQuery;
 
 // run-time static component traits
@@ -47,7 +47,7 @@ class ArchetypeCmptTraits {
     return const_cast<ArchetypeCmptTraits*>(this)->GetTrait(ID);
   }
 
-  void Register(const RTDCmptTraits&, TypeID);
+  void Register(const CmptTraits&, TypeID);
 
   void Deregister(TypeID) noexcept;
 

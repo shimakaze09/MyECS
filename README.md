@@ -39,7 +39,7 @@
 ## Example
 
 ```c++
-#include <MyECS/World.h>
+#include <MyECS/MyECS.hpp>
 
 using namespace My::MyECS;
 
@@ -59,8 +59,9 @@ struct MoverSystem {
 
 int main() {
   World w;
+  w.entityMngr.cmptTraits.Register<Position, Velocity>();
   w.systemMngr.RegisterAndActivate<MoverSystem>();
-  w.entityMngr.Create<Position, Velocity>();
+  w.entityMngr.Create(My::TypeIDs_of<Position, Velocity>);
   w.Update();
 }
 ```
@@ -83,4 +84,5 @@ int main() {
 - [world copy](src/test/18_copy/main.cpp)
 - [directly run execution](src/test/19_direct_run/main.cpp)
 - [system lifecycle](src/test/20_system_lifecycle/main.cpp)
-- [random access components](src/test/21_random/main.cpp) 
+- [random access components](src/test/21_random/main.cpp)
+- [change filter](src/test/22_change_filter/main.cpp)
