@@ -32,4 +32,4 @@ ADD_TARGET(
         ${l_options}
 )
 
-TARGET_PRECOMPILE_HEADERS(${tname} PRIVATE "${PROJECT_SOURCE_DIR}/include/MyECS/World.h")
+TARGET_PRECOMPILE_HEADERS(${tname} PRIVATE "${PROJECT_SOURCE_DIR}/include/MyECS/MyECS.hpp")
