@@ -1,6 +1,6 @@
 #pragma once
 
-#include <MyGraphviz/MyGraphviz.h>
+#include <MyGraphviz/MyGraphviz.hpp>
 
 #include <mutex>
 
