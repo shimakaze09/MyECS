@@ -4,10 +4,10 @@
 
 #include <mutex>
 
-#include "Entity.h"
-#include "EntityMngr.h"
-#include "Schedule.h"
-#include "SystemMngr.h"
+#include "Entity.hpp"
+#include "EntityMngr.hpp"
+#include "Schedule.hpp"
+#include "SystemMngr.hpp"
 
 namespace My::MyECS {
 class IListener;

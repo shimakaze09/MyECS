@@ -5,8 +5,8 @@
 #include <memory>
 #include <memory_resource>
 
-#include "SystemFunc.h"
-#include "details/Job.h"
+#include "SystemFunc.hpp"
+#include "details/Job.hpp"
 
 namespace My::MyECS::details {
 struct Compiler;

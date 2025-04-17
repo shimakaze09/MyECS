@@ -1,5 +1,4 @@
-#include <MyECS/SystemMngr.h>
-
+#include <MyECS/SystemMngr.hpp>
 #include <cassert>
 
 using namespace My::MyECS;

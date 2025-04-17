@@ -1,5 +1,4 @@
-#include <MyECS/World.h>
-
+#include <MyECS/MyECS.hpp>
 #include <iostream>
 
 using namespace My;
@@ -9,7 +8,6 @@ using namespace std;
 struct Position {
   float val;
 };
-
 struct Velocity {
   float val;
 };

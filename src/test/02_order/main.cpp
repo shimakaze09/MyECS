@@ -1,12 +1,10 @@
-#include <MyECS/World.h>
-
+#include <MyECS/MyECS.hpp>
 #include <iostream>
 
 using namespace My::MyECS;
 using namespace std;
 
 struct Data1 {};
-
 struct Data2 {};
 
 struct DataSystem {

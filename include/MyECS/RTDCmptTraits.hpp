@@ -4,8 +4,9 @@
 #include <memory_resource>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 
-#include "AccessTypeID.h"
+#include "AccessTypeID.hpp"
 
 namespace My::MyECS {
 // run-time dynamic component traits

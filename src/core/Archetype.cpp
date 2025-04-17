@@ -1,4 +1,4 @@
-#include "Archetype.h"
+#include "Archetype.hpp"
 
 using namespace My::MyECS;
 using namespace std;

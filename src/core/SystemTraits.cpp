@@ -1,5 +1,4 @@
-#include <MyECS/SystemTraits.h>
-
+#include <MyECS/SystemTraits.hpp>
 #include <cassert>
 
 using namespace My;

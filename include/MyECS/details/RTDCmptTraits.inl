@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../RTDCmptTraits.h"
+#include "../RTDCmptTraits.hpp"
 
 namespace My::MyECS {
 template <typename... Cmpts>

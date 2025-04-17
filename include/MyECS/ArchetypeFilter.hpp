@@ -1,7 +1,6 @@
 #pragma once
 
-#include "AccessTypeID.h"
-
+#include "AccessTypeID.hpp"
 
 namespace My::MyECS {
 // filter Archetype with all, any and none

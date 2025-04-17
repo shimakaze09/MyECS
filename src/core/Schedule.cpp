@@ -1,6 +1,6 @@
-#include <MyECS/Schedule.h>
+#include <MyECS/Schedule.hpp>
 
-#include "SysFuncGraph.h"
+#include "SysFuncGraph.hpp"
 
 using namespace My;
 using namespace My::MyECS;
@@ -39,6 +39,7 @@ void Schedule::Clear() {
     // no need to deallocate
     // alloc.deallocate(sysFunc, 1);
   }
+  disabledSysFuncs.clear();
   sysFuncs.clear();
   sysFuncOrder.clear();
   sysNones.clear();

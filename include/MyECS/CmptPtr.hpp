@@ -1,18 +1,16 @@
 #pragma once
 
-#include "AccessTypeID.h"
-
 #include <cassert>
+
+#include "AccessTypeID.hpp"
 
 namespace My::MyECS {
 // TypeID + void*
 class CmptPtr {
  public:
   constexpr CmptPtr(TypeID type, void* p) noexcept : type{type}, p{p} {}
-
   template <typename Cmpt>
   constexpr CmptPtr(Cmpt* p) noexcept : type{TypeID_of<Cmpt>}, p{p} {}
-
   constexpr CmptPtr() noexcept : CmptPtr{Invalid()} {}
 
   constexpr void* Ptr() const noexcept { return p; }
@@ -20,7 +18,6 @@ class CmptPtr {
   constexpr TypeID Type() const noexcept { return type; }
 
   static constexpr CmptPtr Invalid() noexcept { return {TypeID{}, nullptr}; };
-
   constexpr bool Valid() const noexcept { return p != nullptr && type.Valid(); }
 
   template <typename Cmpt>
@@ -38,20 +35,15 @@ class CmptAccessPtr {
  public:
   constexpr CmptAccessPtr(TypeID type, void* p, AccessMode mode) noexcept
       : accessType{type, mode}, p{p} {}
-
   constexpr CmptAccessPtr(AccessTypeID accessType, void* p) noexcept
       : accessType{accessType}, p{p} {}
-
   constexpr CmptAccessPtr(CmptPtr p, AccessMode mode) noexcept
       : accessType{p.Type(), mode}, p{p.Ptr()} {}
-
   template <typename TaggedCmpt>
   constexpr CmptAccessPtr(TaggedCmpt p) noexcept
       : accessType{AccessTypeID_of<TaggedCmpt>}, p{CastToVoidPointer(p)} {}
-
   explicit constexpr CmptAccessPtr(CmptPtr p) noexcept
       : CmptAccessPtr{p, AccessMode::LATEST} {}
-
   explicit constexpr CmptAccessPtr() noexcept : CmptAccessPtr{Invalid()} {}
 
   explicit constexpr operator CmptPtr() const noexcept {
@@ -65,7 +57,6 @@ class CmptAccessPtr {
   static constexpr CmptAccessPtr Invalid() noexcept {
     return {AccessTypeID{}, nullptr};
   };
-
   constexpr bool Valid() const noexcept {
     return p != nullptr && accessType.Valid();
   }

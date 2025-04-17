@@ -3,8 +3,8 @@
 #include <MySmallFlat/small_flat_set.hpp>
 #include <MyTemplate/Type.hpp>
 
-#include "CmptTag.h"
-#include "details/Util.h"
+#include "CmptTag.hpp"
+#include "details/Util.hpp"
 
 namespace My::MyECS {
 // TypeID with AccessMode
@@ -14,14 +14,11 @@ class AccessTypeID : public TypeID {
 
   constexpr AccessTypeID(std::size_t ID, AccessMode mode) noexcept
       : TypeID{ID}, mode{mode} {}
-
   constexpr AccessTypeID(std::string_view type_name, AccessMode mode) noexcept
       : TypeID{type_name}, mode{mode} {}
-
   constexpr AccessTypeID(TypeID ID,
                          AccessMode mode = AccessMode::WRITE) noexcept
       : TypeID{ID}, mode{mode} {}
-
   template <std::size_t N>
   constexpr AccessTypeID(const char (&str)[N], AccessMode mode) noexcept
       : TypeID{str}, mode{mode} {}

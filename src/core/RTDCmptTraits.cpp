@@ -1,4 +1,4 @@
-#include <MyECS/RTDCmptTraits.h>
+#include <MyECS/RTDCmptTraits.hpp>
 
 using namespace My;
 using namespace My::MyECS;

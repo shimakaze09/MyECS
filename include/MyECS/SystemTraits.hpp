@@ -1,7 +1,6 @@
 #pragma once
 
 #include <MyTemplate/Type.hpp>
-
 #include <array>
 #include <functional>
 #include <memory_resource>

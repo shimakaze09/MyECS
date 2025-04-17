@@ -1,4 +1,4 @@
-#include <MyECS/World.h>
+#include <MyECS/MyECS.hpp>
 
 using namespace My;
 using namespace My::MyECS;

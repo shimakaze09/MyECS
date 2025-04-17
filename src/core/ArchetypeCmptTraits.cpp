@@ -1,9 +1,8 @@
 #pragma once
 
-#include "ArchetypeCmptTraits.h"
+#include "ArchetypeCmptTraits.hpp"
 
-#include <MyECS/RTDCmptTraits.h>
-
+#include <MyECS/RTDCmptTraits.hpp>
 #include <stdexcept>
 
 using namespace My::MyECS;

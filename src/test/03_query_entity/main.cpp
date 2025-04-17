@@ -1,5 +1,4 @@
-#include <MyECS/World.h>
-
+#include <MyECS/MyECS.hpp>
 #include <iostream>
 
 using namespace My;
@@ -7,9 +6,7 @@ using namespace My::MyECS;
 using namespace std;
 
 struct A {};
-
 struct B {};
-
 struct C {};
 
 struct MySystem {
@@ -28,7 +25,7 @@ struct MySystem {
         [](World* w, Entity e, const A* a, const B* b, const C* c) {
           w->AddCommand([e, w]() {
             if (w->entityMngr.Have(e, TypeID_of<C>)) {
-              cout << "Detach C" << endl;
+              cout << "Dettach C" << endl;
               w->entityMngr.Detach(e, TypeIDs_of<C>);
             }
           });

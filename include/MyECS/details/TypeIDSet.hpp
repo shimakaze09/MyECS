@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../EntityQuery.h"
+#include "../EntityQuery.hpp"
 
 namespace My::MyECS {
 struct TypeIDSet {

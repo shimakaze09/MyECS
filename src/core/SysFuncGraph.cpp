@@ -1,4 +1,4 @@
-#include "SysFuncGraph.h"
+#include "SysFuncGraph.hpp"
 
 #include <cassert>
 #include <queue>

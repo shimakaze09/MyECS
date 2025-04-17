@@ -2,7 +2,7 @@
 
 #include <unordered_set>
 
-#include "SystemTraits.h"
+#include "SystemTraits.hpp"
 
 namespace My::MyECS {
 class Schedule;

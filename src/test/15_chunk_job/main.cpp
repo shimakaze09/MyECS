@@ -1,5 +1,4 @@
-#include <MyECS/World.h>
-
+#include <MyECS/MyECS.hpp>
 #include <iostream>
 
 using namespace My::MyECS;
@@ -9,11 +8,9 @@ using namespace std;
 struct S {
   float value;
 };
-
 struct A {
   float value;
 };
-
 struct B {
   float value;
 };

@@ -12,8 +12,7 @@ constexpr std::size_t hash_combine(
     const std::array<std::size_t, N>& arr) noexcept {
   static_assert(N >= 2);
   std::size_t rst = arr[0];
-  for (std::size_t i = 1; i < N; i++)
-    rst = hash_combine(rst, arr[i]);
+  for (std::size_t i = 1; i < N; i++) rst = hash_combine(rst, arr[i]);
   return rst;
 }
 

@@ -1,8 +1,7 @@
 #pragma once
 
-#include <MyTemplate/Type.hpp>
 #include <MySmallFlat/small_vector.hpp>
-
+#include <MyTemplate/Type.hpp>
 #include <functional>
 #include <tuple>
 #include <unordered_map>

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "AccessTypeID.h"
-#include "CmptTag.h"
-
 #include <span>
+
+#include "AccessTypeID.hpp"
+#include "CmptTag.hpp"
 
 namespace My::MyECS {
 // locate components in function's argument list for Archetype

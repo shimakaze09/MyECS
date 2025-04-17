@@ -1,6 +1,5 @@
-#include <MyECS/CmptLocator.h>
-
-#include <MyECS/details/Util.h>
+#include <MyECS/CmptLocator.hpp>
+#include <MyECS/details/Util.hpp>
 
 using namespace My::MyECS;
 
@@ -10,8 +9,7 @@ CmptLocator::CmptLocator(AccessTypeIDSet cmptTypes)
 }
 
 CmptLocator::CmptLocator(std::span<const AccessTypeID> types) {
-  for (const auto& type : types)
-    cmptTypes.insert(type);
+  for (const auto& type : types) cmptTypes.insert(type);
 
   UpdateGetValue();
 }
@@ -20,15 +18,13 @@ CmptLocator::CmptLocator() : hashCode{TypeID_of<CmptLocator>.GetValue()} {}
 
 void CmptLocator::UpdateGetValue() noexcept {
   std::size_t rst = TypeID_of<CmptLocator>.GetValue();
-  for (const auto& type : cmptTypes)
-    rst = hash_combine(rst, type.GetValue());
+  for (const auto& type : cmptTypes) rst = hash_combine(rst, type.GetValue());
   hashCode = rst;
 }
 
 bool CmptLocator::HasWriteTypeID() const noexcept {
   for (const auto& type : cmptTypes) {
-    if (type.GetAccessMode() == AccessMode::WRITE)
-      return true;
+    if (type.GetAccessMode() == AccessMode::WRITE) return true;
   }
   return false;
 }

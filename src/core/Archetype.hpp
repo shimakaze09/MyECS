@@ -1,15 +1,14 @@
 #pragma once
 
-#include <MyECS/CmptLocator.h>
-#include <MyECS/CmptPtr.h>
-#include <MyECS/Entity.h>
-#include <MyECS/details/TypeIDSet.h>
+#include <MyECS/CmptLocator.hpp>
+#include <MyECS/CmptPtr.hpp>
+#include <MyECS/Entity.hpp>
+#include <MyECS/details/TypeIDSet.hpp>
 #include <MyTemplate/TypeList.hpp>
-
 #include <memory_resource>
 
-#include "ArchetypeCmptTraits.h"
-#include "Chunk.h"
+#include "ArchetypeCmptTraits.hpp"
+#include "Chunk.hpp"
 
 namespace My::MyECS {
 class EntityMngr;

@@ -2,13 +2,13 @@
 
 #include <functional>
 
-#include "ChunkView.h"
-#include "CmptsView.h"
-#include "Entity.h"
-#include "EntityQuery.h"
-#include "RandomAccessor.h"
-#include "SingletonLocator.h"
-#include "SingletonsView.h"
+#include "ChunkView.hpp"
+#include "CmptsView.hpp"
+#include "Entity.hpp"
+#include "EntityQuery.hpp"
+#include "RandomAccessor.hpp"
+#include "SingletonLocator.hpp"
+#include "SingletonsView.hpp"
 
 namespace My::MyECS {
 // [- description]

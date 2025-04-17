@@ -1,16 +1,15 @@
 #pragma once
 
-#include "AccessTypeID.h"
-
 #include <set>
 #include <span>
+
+#include "AccessTypeID.hpp"
 
 namespace My::MyECS {
 class SingletonLocator {
  public:
   SingletonLocator(std::set<AccessTypeID> types)
       : singletonTypes{std::move(types)} {}
-
   SingletonLocator(std::span<const AccessTypeID> types);
   SingletonLocator() = default;
 

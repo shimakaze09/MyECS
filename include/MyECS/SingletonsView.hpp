@@ -1,8 +1,8 @@
 #pragma once
 
-#include "CmptPtr.h"
-
 #include <span>
+
+#include "CmptPtr.hpp"
 
 namespace My::MyECS {
 class SingletonsView {
@@ -11,7 +11,6 @@ class SingletonsView {
       : singletons{singletons} {}
 
   CmptAccessPtr GetSingleton(AccessTypeID) const noexcept;
-
   std::span<const CmptAccessPtr> Singletons() const noexcept {
     return singletons;
   }

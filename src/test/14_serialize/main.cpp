@@ -1,6 +1,5 @@
-#include <MyECS/IListener.h>
-#include <MyECS/World.h>
-
+#include <MyECS/IListener.hpp>
+#include <MyECS/MyECS.hpp>
 #include <iostream>
 
 using namespace My::MyECS;
@@ -9,7 +8,6 @@ using namespace std;
 struct Position {
   float val;
 };
-
 struct Velocity {
   float val;
 };

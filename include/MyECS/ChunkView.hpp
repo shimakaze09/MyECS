@@ -1,9 +1,9 @@
 #pragma once
 
-#include "AccessTypeID.h"
-#include "Entity.h"
-
 #include <span>
+
+#include "AccessTypeID.hpp"
+#include "Entity.hpp"
 
 namespace My::MyECS {
 class Archetype;
@@ -14,7 +14,6 @@ class ChunkView {
   ChunkView() noexcept = default;
 
   bool Contains(TypeID) const;
-
   std::size_t EntityNum() const noexcept { return entityNum; }
 
   // nullptr if not contain

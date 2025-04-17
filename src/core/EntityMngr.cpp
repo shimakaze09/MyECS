@@ -1,8 +1,8 @@
-#include <MyECS/EntityMngr.h>
-#include <MyECS/IListener.h>
-#include <MyECS/SystemFunc.h>
+#include <MyECS/EntityMngr.hpp>
+#include <MyECS/IListener.hpp>
+#include <MyECS/SystemFunc.hpp>
 
-#include "Archetype.h"
+#include "Archetype.hpp"
 
 using namespace My::MyECS;
 using namespace std;

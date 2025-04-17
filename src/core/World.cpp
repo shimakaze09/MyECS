@@ -1,7 +1,7 @@
-#include <MyECS/IListener.h>
-#include <MyECS/World.h>
+#include <MyECS/IListener.hpp>
+#include <MyECS/World.hpp>
 
-#include "SysFuncGraph.h"
+#include "SysFuncGraph.hpp"
 
 using namespace My::MyECS;
 using namespace My;

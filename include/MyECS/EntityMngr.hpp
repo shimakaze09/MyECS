@@ -3,12 +3,12 @@
 #include <MySmallFlat/small_vector.hpp>
 #include <memory_resource>
 
-#include "CmptPtr.h"
-#include "EntityQuery.h"
-#include "RTDCmptTraits.h"
-#include "SingletonLocator.h"
-#include "details/Job.h"
-#include "details/TypeIDSet.h"
+#include "CmptPtr.hpp"
+#include "EntityQuery.hpp"
+#include "RTDCmptTraits.hpp"
+#include "SingletonLocator.hpp"
+#include "details/Job.hpp"
+#include "details/TypeIDSet.hpp"
 
 namespace My::MyECS {
 class World;

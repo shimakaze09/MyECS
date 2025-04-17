@@ -24,8 +24,7 @@ CmptLocator CmptLocator::Generate() {
 template <typename Func>
 CmptLocator& CmptLocator::Combine() {
   CmptLocator funcLocator = Generate<Func>();
-  for (const auto& type : funcLocator.cmptTypes)
-    cmptTypes.insert(type);
+  for (const auto& type : funcLocator.cmptTypes) cmptTypes.insert(type);
   UpdateGetValue();
   return *this;
 }
