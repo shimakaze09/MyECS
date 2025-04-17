@@ -3,7 +3,7 @@
 namespace My::MyECS {
 class World;
 class EntityMngr;
-class Entity;
+struct Entity;
 class CmptPtr;
 
 class IListener {

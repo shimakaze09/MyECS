@@ -27,7 +27,11 @@ struct EntityQuery {
            std::find_if(filter.none.begin(), filter.none.end(),
                         [&](const auto& type) {
                           return types.contains(type);
-                        }) == filter.none.end();
+                        }) == filter.none.end() &&
+           std::find_if_not(
+               locator.AccessTypeIDs().begin(), locator.AccessTypeIDs().end(),
+               [&](const auto& type) { return types.contains(type); }) ==
+               locator.AccessTypeIDs().end();
   }
 
   friend bool operator==(const EntityQuery& lhs,

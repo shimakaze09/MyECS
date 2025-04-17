@@ -3,7 +3,7 @@
 #include <MyTemplate/Util.hpp>
 
 namespace My::MyECS {
-class Entity;
+struct Entity;
 class CmptLocator;
 class World;
 }  // namespace My::MyECS

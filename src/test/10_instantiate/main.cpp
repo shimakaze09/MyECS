@@ -11,7 +11,7 @@ struct A {
 struct MySystem {
   static void OnUpdate(Schedule& schedule) {
     schedule.RegisterEntityJob(
-        [](Entity e, const A* a) { cout << e.Idx() << ": " << a->val << endl; },
+        [](Entity e, const A* a) { cout << e.index << ": " << a->val << endl; },
         "MySystem", false);
   }
 };

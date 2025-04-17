@@ -36,7 +36,7 @@ int main() {
 
   for (std::size_t i = 0; i < 100; i++) w.entityMngr.Create();
 
-  w.RunEntityJob([](Entity e) { std::cout << e.Idx() << std::endl; }, false);
+  w.RunEntityJob([](Entity e) { std::cout << e.index << std::endl; }, false);
 
   std::cout << w.DumpUpdateJobGraph() << std::endl;
   std::cout << w.GenUpdateFrameGraph().Dump() << std::endl;

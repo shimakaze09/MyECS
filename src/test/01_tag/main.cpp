@@ -29,10 +29,10 @@ struct DataSystem {
 
 int main() {
   World w;
-  w.entityMngr.cmptTraits.Register<DataSystem>();
+  w.entityMngr.cmptTraits.Register<Data>();
   w.systemMngr.RegisterAndActivate<DataSystem>();
 
-  w.entityMngr.Create(My::TypeIDs_of<DataSystem>);
+  w.entityMngr.Create(My::TypeIDs_of<Data>);
 
   w.Update();
 
