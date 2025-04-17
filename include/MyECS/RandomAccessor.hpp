@@ -1,7 +1,5 @@
 #pragma once
 
-#include <set>
-
 #include "AccessTypeID.hpp"
 
 namespace My::MyECS {

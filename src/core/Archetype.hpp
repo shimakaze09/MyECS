@@ -3,12 +3,9 @@
 #include <MyECS/CmptLocator.hpp>
 #include <MyECS/CmptPtr.hpp>
 #include <MyECS/Entity.hpp>
-#include <MyECS/details/TypeIDSet.hpp>
-#include <MyTemplate/TypeList.hpp>
 #include <memory_resource>
 
 #include "ArchetypeCmptTraits.hpp"
-#include "Chunk.hpp"
 
 namespace My::MyECS {
 class EntityMngr;
@@ -17,19 +14,16 @@ class EntityMngr;
 // type of Entity + Components is Archetype's type
 class Archetype {
  public:
-  Archetype(std::pmr::polymorphic_allocator<Chunk> chunkAllocator) noexcept
-      : chunkAllocator{chunkAllocator} {}
+  Archetype(std::pmr::memory_resource* rsrc) noexcept : chunkAllocator{rsrc} {}
 
   // copy
-  Archetype(std::pmr::polymorphic_allocator<Chunk> chunkAllocator,
-            const Archetype&);
+  Archetype(std::pmr::memory_resource* rsrc, const Archetype&);
   Archetype(const Archetype&) = delete;
 
   ~Archetype();
 
   // auto add Entity
-  static Archetype* New(RTDCmptTraits&,
-                        std::pmr::polymorphic_allocator<Chunk> chunkAllocator,
+  static Archetype* New(RTDCmptTraits&, std::pmr::memory_resource* rsrc,
                         std::span<const TypeID> types);
 
   static Archetype* Add(RTDCmptTraits&, const Archetype* from,
@@ -43,12 +37,10 @@ class Archetype {
   std::tuple<small_vector<Entity*, 16>,
              small_vector<small_vector<CmptAccessPtr, 16>, 16>,
              small_vector<std::size_t, 16> >
-  Locate(const CmptLocator& locator) const;
+  Locate(std::span<const AccessTypeID> cmpts) const;
 
   // nullptr if not contains
   void* Locate(std::size_t chunkIdx, TypeID) const;
-
-  Chunk* GetChunk(std::size_t chunkIdx) const { return chunks[chunkIdx]; }
 
   // nullptr if not contains
   void* At(TypeID, std::size_t idx) const;
@@ -65,7 +57,7 @@ class Archetype {
   // no init
   std::size_t RequestBuffer();
 
-  std::size_t Create(RTDCmptTraits&, Entity);
+  std::size_t Create(Entity);
 
   // return index in archetype
   std::size_t Instantiate(Entity, std::size_t srcIdx);
@@ -77,8 +69,7 @@ class Archetype {
   std::size_t Erase(std::size_t idx);
 
   // Components + Entity
-  const TypeIDSet& GetTypeIDSet() const noexcept { return types; }
-  const ArchetypeCmptTraits& GetArchetypeCmptTraits() const noexcept {
+  const ArchetypeCmptTraits& GetCmptTraits() const noexcept {
     return cmptTraits;
   }
 
@@ -88,23 +79,26 @@ class Archetype {
   std::size_t ChunkCapacity() const noexcept { return chunkCapacity; }
 
   // add Entity
-  static TypeIDSet GenTypeIDSet(std::span<const TypeID> types);
+  static small_flat_set<TypeID> GenTypeIDSet(std::span<const TypeID> types);
 
  private:
   // set type2alignment
   // call after setting type2size and type2offset
   void SetLayout();
 
-  static bool NotContainEntity(std::span<const TypeID> types) noexcept;
-
   friend class EntityMngr;
 
-  TypeIDSet types;  // Entity + Components
-  ArchetypeCmptTraits cmptTraits;
+  ArchetypeCmptTraits cmptTraits;  // Entity + Components
 
   std::size_t chunkCapacity{static_cast<std::size_t>(-1)};
+
+  // std::aligned_storage_t<ChunkSize, ChunkAlignment>
+  struct alignas(ChunkAlignment) Chunk {
+    std::byte data[ChunkSize];
+  };
   std::pmr::polymorphic_allocator<Chunk> chunkAllocator;
-  std::vector<Chunk*> chunks;
+  small_vector<Chunk*> chunks;
+  small_vector<std::size_t> offsets;
 
   std::size_t entityNum{0};  // number of entities
 };

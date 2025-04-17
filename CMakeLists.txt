@@ -10,7 +10,7 @@ INIT_PROJECT()
 
 ADD_DEP(MyTemplate 0.7.2)
 ADD_DEP(MyGraphviz 0.2.1)
-ADD_DEP(MySmallFlat 0.2.0)
+ADD_DEP(MySmallFlat 0.2.2)
 
 ADD_SUB_DIRS_REC(include)
 ADD_SUB_DIRS_REC(src)
