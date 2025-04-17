@@ -2,14 +2,13 @@
 
 #include "AccessTypeID.h"
 
-#include <set>
 
 namespace My::MyECS {
 // filter Archetype with all, any and none
 struct ArchetypeFilter {
   AccessTypeIDSet all;
   AccessTypeIDSet any;
-  std::set<TypeID> none;
+  small_flat_set<TypeID> none;
 
   std::size_t GetValue() const noexcept;
 

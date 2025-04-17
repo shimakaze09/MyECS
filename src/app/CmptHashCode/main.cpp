@@ -1,4 +1,4 @@
-#include <MyTemplate/Type.h>
+#include <MyTemplate/Type.hpp>
 
 #include <iostream>
 

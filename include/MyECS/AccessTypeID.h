@@ -1,12 +1,10 @@
 #pragma once
 
-#include "CmptTag.h"
-
-#include "details/Util.h"
-
+#include <MySmallFlat/small_flat_set.hpp>
 #include <MyTemplate/Type.hpp>
 
-#include <set>
+#include "CmptTag.h"
+#include "details/Util.h"
 
 namespace My::MyECS {
 // TypeID with AccessMode
@@ -38,7 +36,7 @@ template <typename Cmpt>
 static constexpr AccessTypeID AccessTypeID_of = {TypeID_of<RemoveTag_t<Cmpt>>,
                                                  AccessMode_of<Cmpt>};
 
-using AccessTypeIDSet = std::set<AccessTypeID, std::less<>>;
+using AccessTypeIDSet = small_flat_set<AccessTypeID, 16, std::less<>>;
 }  // namespace My::MyECS
 
 template <>
