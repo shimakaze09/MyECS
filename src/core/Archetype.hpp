@@ -10,6 +10,7 @@
 
 namespace My::MyECS {
 class EntityMngr;
+class World;
 
 // Entity is a special Component
 // type of Entity + Components is Archetype's type
@@ -20,26 +21,18 @@ class Archetype {
     std::size_t idxInChunk;
   };
 
-  Archetype(std::pmr::memory_resource* rsrc,
-            std::pmr::synchronized_pool_resource* sync_rsrc,
-            synchronized_monotonic_buffer_resource* sync_frame_rsrc,
-            std::uint64_t version) noexcept;
+  Archetype(World*);
 
   // copy
-  Archetype(std::pmr::memory_resource* rsrc,
-            std::pmr::synchronized_pool_resource* sync_rsrc,
-            synchronized_monotonic_buffer_resource* sync_frame_rsrc,
-            const Archetype&);
+  Archetype(const Archetype&, World*);
 
   Archetype(const Archetype&) = delete;
 
   ~Archetype();
 
   // auto add Entity
-  static Archetype* New(CmptTraits&, std::pmr::memory_resource* rsrc,
-                        std::pmr::synchronized_pool_resource* sync_rsrc,
-                        synchronized_monotonic_buffer_resource* sync_frame_rsrc,
-                        std::span<const TypeID> types, std::uint64_t version);
+  static Archetype* New(CmptTraits&, World* world,
+                        std::span<const TypeID> types);
 
   static Archetype* Add(CmptTraits&, const Archetype* from,
                         std::span<const TypeID> types);
@@ -103,8 +96,6 @@ class Archetype {
   // add Entity
   static small_flat_set<TypeID> GenTypeIDSet(std::span<const TypeID> types);
 
-  std::size_t Version() const noexcept { return version; }
-
   std::size_t EntityNum() const noexcept { return entityNum; }
 
   std::span<Chunk*> GetChunks() noexcept {
@@ -115,7 +106,8 @@ class Archetype {
   }
 
   void NewFrame();
-  void UpdateVersion(std::uint64_t version);
+
+  std::uint64_t Version() const noexcept;
 
  private:
   // set type2alignment
@@ -124,14 +116,11 @@ class Archetype {
 
   friend class EntityMngr;
 
+  World* world;
+
   ArchetypeCmptTraits cmptTraits;  // Entity + Components
 
-  std::uint64_t version;
-  std::pmr::synchronized_pool_resource* sync_rsrc;
-  synchronized_monotonic_buffer_resource* sync_frame_rsrc;
-
   // chunk infomations
-  std::pmr::polymorphic_allocator<Chunk> chunkAllocator;
   small_vector<Chunk*> chunks;
   std::size_t chunkCapacity{static_cast<std::size_t>(-1)};
   small_vector<std::size_t> offsets;  // component

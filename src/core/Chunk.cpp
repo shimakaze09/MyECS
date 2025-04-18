@@ -70,7 +70,8 @@ std::size_t Chunk::Erase(std::size_t idx) {
         std::distance(cmptTraits.GetTypes().begin(),
                       cmptTraits.GetTypes().find(TypeID_of<Entity>)));
     movedEntityIdx =
-        reinterpret_cast<Entity*>(head->GetCmptInfos()[entityTypeIdx].offset +
+        reinterpret_cast<Entity*>(dstBuffer +
+                                  head->GetCmptInfos()[entityTypeIdx].offset +
                                   sizeof(Entity) * srcIdxInChunk)
             ->index;
 

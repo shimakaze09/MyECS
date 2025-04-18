@@ -38,12 +38,6 @@ class SystemTraits {
   using OnDeactivate = void(World*);
   using OnDestroy = void(World*);
 
-  SystemTraits() = default;
-  SystemTraits(const SystemTraits&);
-  SystemTraits(SystemTraits&&) noexcept = default;
-  SystemTraits& operator=(const SystemTraits&);
-  SystemTraits& operator=(SystemTraits&&) noexcept = default;
-
   // register system's name and get an ID
   // if it is already registered, return it's ID directly
   Name Register(std::string_view name);
@@ -58,7 +52,8 @@ class SystemTraits {
 
   std::string_view Nameof(NameID ID) const noexcept;
   bool IsRegistered(NameID ID) const noexcept;
-  const auto& GetNames() const noexcept { return names; }
+  const std::pmr::unordered_map<NameID, std::string_view>& GetNames()
+      const noexcept;
 
   // [ Template ] functions
   ///////////////////////////
@@ -79,20 +74,20 @@ class SystemTraits {
  private:
   friend class SystemMngr;
 
+  SystemTraits(std::pmr::unsynchronized_pool_resource*);
+  SystemTraits(const SystemTraits&, std::pmr::unsynchronized_pool_resource*);
+  SystemTraits(SystemTraits&&) noexcept;
+  ~SystemTraits();
+  SystemTraits& operator=(SystemTraits&&) noexcept = delete;
+
   void Create(NameID, World*) const;
   void Activate(NameID, World*) const;
   void Update(NameID, Schedule&) const;
   void Deactivate(NameID, World*) const;
   void Destroy(NameID, World*) const;
 
-  std::pmr::synchronized_pool_resource rsrc;
-  std::unordered_map<NameID, std::string_view> names;
-
-  std::unordered_map<NameID, std::function<OnCreate>> createMap;
-  std::unordered_map<NameID, std::function<OnActivate>> activateMap;
-  std::unordered_map<NameID, std::function<OnUpdate>> updateMap;
-  std::unordered_map<NameID, std::function<OnDeactivate>> deactivateMap;
-  std::unordered_map<NameID, std::function<OnDestroy>> destroyMap;
+  struct Impl;
+  std::unique_ptr<Impl> impl;
 };
 }  // namespace My::MyECS
 

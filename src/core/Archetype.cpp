@@ -1,16 +1,11 @@
 #include "Archetype.hpp"
 
+#include <MyECS/World.hpp>
+
 using namespace My::MyECS;
 using namespace std;
 
-Archetype::Archetype(std::pmr::memory_resource* rsrc,
-                     std::pmr::synchronized_pool_resource* sync_rsrc,
-                     synchronized_monotonic_buffer_resource* sync_frame_rsrc,
-                     std::uint64_t version) noexcept
-    : chunkAllocator{rsrc},
-      version{version},
-      sync_rsrc{sync_rsrc},
-      sync_frame_rsrc{sync_frame_rsrc} {}
+Archetype::Archetype(World* world) : world{world} {}
 
 Archetype::~Archetype() {
   if (cmptTraits.IsTrivial()) return;
@@ -33,72 +28,42 @@ Archetype::~Archetype() {
   //	entityMngr->sharedChunkPool.Recycle(chunk);
 }
 
-Archetype::Archetype(std::pmr::memory_resource* rsrc,
-                     std::pmr::synchronized_pool_resource* sync_rsrc,
-                     synchronized_monotonic_buffer_resource* sync_frame_rsrc,
-                     const Archetype& src)
-    : chunkAllocator{rsrc},
-      sync_rsrc{sync_rsrc},
-      sync_frame_rsrc{sync_frame_rsrc} {
+Archetype::Archetype(const Archetype& src, World* world) : world{world} {
   cmptTraits = src.cmptTraits;
   chunkCapacity = src.chunkCapacity;
   offsets = src.offsets;
-  version = src.version;
   entityNum = src.entityNum;
   nonFullChunks = src.nonFullChunks;
 
   chunks.resize(src.chunks.size(), nullptr);
 
-  if (cmptTraits.IsTrivial()) {
-    for (std::size_t i = 0; i < src.chunks.size(); i++) {
-      chunks[i] = chunkAllocator.allocate(1);
-      auto* srcChunk = src.chunks[i];
-      auto* dstChunk = chunks[i];
-      std::memcpy(dstChunk, srcChunk,
-                  sizeof(Chunk::Head) + sizeof(Chunk::Head::CmptInfo) *
-                                            cmptTraits.GetTypes().size());
-      new (&dstChunk->GetHead()->chunk_unsync_rsrc)
-          std::pmr::unsynchronized_pool_resource(sync_rsrc);
-      new (&dstChunk->GetHead()->chunk_unsync_frame_rsrc)
-          std::pmr::monotonic_buffer_resource(sync_frame_rsrc);
-      dstChunk->GetHead()->ForceUpdateVersion(version);
-      dstChunk->GetHead()->archetype = this;
-      std::size_t num = srcChunk->EntityNum();
-      for (std::size_t j = 0; j < cmptTraits.GetTraits().size(); j++) {
-        const auto& trait = cmptTraits.GetTraits()[j];
-        auto* srcBegin = srcChunk->data + offsets[j];
-        auto* dstBegin = dstChunk->data + offsets[j];
-        memcpy(dstBegin, srcBegin, num * trait.size);
-      }
-    }
-  } else {
-    for (std::size_t i = 0; i < src.chunks.size(); i++) {
-      auto* srcChunk = src.chunks[i];
-      auto* dstChunk = chunks[i] = chunkAllocator.allocate(1);
-      std::memcpy(dstChunk, srcChunk,
-                  sizeof(Chunk::Head) + sizeof(Chunk::Head::CmptInfo) *
-                                            cmptTraits.GetTypes().size());
-      new (&dstChunk->GetHead()->chunk_unsync_rsrc)
-          std::pmr::unsynchronized_pool_resource(sync_rsrc);
-      new (&dstChunk->GetHead()->chunk_unsync_frame_rsrc)
-          std::pmr::monotonic_buffer_resource(sync_frame_rsrc);
-      dstChunk->GetHead()->ForceUpdateVersion(version);
-      dstChunk->GetHead()->archetype = this;
-      std::size_t num = srcChunk->EntityNum();
-      for (std::size_t j = 0; j < cmptTraits.GetTraits().size(); j++) {
-        const auto& trait = cmptTraits.GetTraits()[j];
-        auto* cursor_src = srcChunk->data + offsets[j];
-        auto* cursor_dst = dstChunk->data + offsets[j];
-        if (trait.copy_ctor) {
-          for (std::size_t k = 0; k < num; k++) {
-            trait.copy_ctor(cursor_dst, cursor_src,
-                            dstChunk->GetChunkUnsyncResource());
-            cursor_src += trait.size;
-            cursor_dst += trait.size;
-          }
-        } else
-          memcpy(cursor_dst, cursor_src, num * trait.size);
-      }
+  for (std::size_t i = 0; i < src.chunks.size(); i++) {
+    auto* srcChunk = src.chunks[i];
+    auto* dstChunk = chunks[i] = (Chunk*)world->GetUnsyncResource()->allocate(
+        sizeof(Chunk), alignof(Chunk));
+    std::memcpy(dstChunk, srcChunk,
+                sizeof(Chunk::Head) + sizeof(Chunk::Head::CmptInfo) *
+                                          cmptTraits.GetTypes().size());
+    new (&dstChunk->GetHead()->chunk_unsync_rsrc)
+        std::pmr::unsynchronized_pool_resource(world->GetSyncResource());
+    new (&dstChunk->GetHead()->chunk_unsync_frame_rsrc)
+        std::pmr::monotonic_buffer_resource(world->GetSyncFrameResource());
+    dstChunk->GetHead()->ForceUpdateVersion(world->Version());
+    dstChunk->GetHead()->archetype = this;
+    std::size_t num = srcChunk->EntityNum();
+    for (std::size_t j = 0; j < cmptTraits.GetTraits().size(); j++) {
+      const auto& trait = cmptTraits.GetTraits()[j];
+      auto* cursor_src = srcChunk->data + offsets[j];
+      auto* cursor_dst = dstChunk->data + offsets[j];
+      if (trait.copy_ctor) {
+        for (std::size_t k = 0; k < num; k++) {
+          trait.copy_ctor(cursor_dst, cursor_src,
+                          dstChunk->GetChunkUnsyncResource());
+          cursor_src += trait.size;
+          cursor_dst += trait.size;
+        }
+      } else
+        memcpy(cursor_dst, cursor_src, num * trait.size);
     }
   }
 }
@@ -140,15 +105,12 @@ void Archetype::SetLayout() {
   }
 }
 
-Archetype* Archetype::New(
-    CmptTraits& rtdCmptTraits, std::pmr::memory_resource* rsrc,
-    std::pmr::synchronized_pool_resource* sync_rsrc,
-    synchronized_monotonic_buffer_resource* sync_frame_rsrc,
-    std::span<const TypeID> types, std::uint64_t version) {
+Archetype* Archetype::New(CmptTraits& rtdCmptTraits, World* world,
+                          std::span<const TypeID> types) {
   assert(std::find(types.begin(), types.end(), TypeID_of<Entity>) ==
          types.end());
 
-  auto* rst = new Archetype{rsrc, sync_rsrc, sync_frame_rsrc, version};
+  auto* rst = new Archetype{world};
 
   rst->cmptTraits.Register(rtdCmptTraits, TypeID_of<Entity>);
   for (const auto& type : types) rst->cmptTraits.Register(rtdCmptTraits, type);
@@ -166,8 +128,7 @@ Archetype* Archetype::Add(CmptTraits& rtdCmptTraits, const Archetype* from,
            return from->cmptTraits.GetTypes().contains(type);
          }) != types.end());
 
-  auto* rst = new Archetype{from->chunkAllocator.resource(), from->sync_rsrc,
-                            from->sync_frame_rsrc, from->version};
+  auto* rst = new Archetype{from->world};
 
   rst->cmptTraits = from->cmptTraits;
   for (const auto& type : types) rst->cmptTraits.Register(rtdCmptTraits, type);
@@ -185,8 +146,7 @@ Archetype* Archetype::Remove(const Archetype* from,
            return from->cmptTraits.GetTypes().contains(type);
          }) != types.end());
 
-  auto* rst = new Archetype{from->chunkAllocator.resource(), from->sync_rsrc,
-                            from->sync_frame_rsrc, from->version};
+  auto* rst = new Archetype{from->world};
 
   rst->cmptTraits = from->cmptTraits;
 
@@ -215,7 +175,7 @@ Archetype::EntityAddress Archetype::Create(Entity e) {
       trait.DefaultConstruct(dst, chunk->GetChunkUnsyncResource());
     }
   }
-  chunk->GetHead()->ForceUpdateVersion(version);
+  chunk->GetHead()->ForceUpdateVersion(world->Version());
 
   entityNum++;
 
@@ -224,7 +184,8 @@ Archetype::EntityAddress Archetype::Create(Entity e) {
 
 Archetype::EntityAddress Archetype::RequestBuffer() {
   if (nonFullChunks.empty()) {
-    auto* chunk = chunkAllocator.allocate(1);
+    auto* chunk = (Chunk*)world->GetUnsyncResource()->allocate(sizeof(Chunk),
+                                                               alignof(Chunk));
 
     // init chunk
     chunk->GetHead()->archetype = this;
@@ -236,11 +197,11 @@ Archetype::EntityAddress Archetype::RequestBuffer() {
       info.ID = cmptTraits.GetTypes().data()[i];
       info.offset = offsets[i];
     }
-    chunk->GetHead()->ForceUpdateVersion(version);
+    chunk->GetHead()->ForceUpdateVersion(world->Version());
     new (&chunk->GetHead()->chunk_unsync_rsrc)
-        std::pmr::unsynchronized_pool_resource(sync_rsrc);
+        std::pmr::unsynchronized_pool_resource(world->GetSyncResource());
     new (&chunk->GetHead()->chunk_unsync_frame_rsrc)
-        std::pmr::monotonic_buffer_resource(sync_frame_rsrc);
+        std::pmr::monotonic_buffer_resource(world->GetSyncFrameResource());
 
     chunks.push_back(chunk);
 
@@ -270,7 +231,7 @@ CmptAccessPtr Archetype::At(AccessTypeID type, EntityAddress addr) const {
   Chunk* chunk = chunks[addr.chunkIdx];
   std::uint8_t* buffer = chunk->data;
   if (type.GetAccessMode() == AccessMode::WRITE)
-    chunk->GetHead()->GetCmptInfos()[typeIdx].version = version;
+    chunk->GetHead()->GetCmptInfos()[typeIdx].version = world->Version();
 
   return {type, buffer + offset + idxInChunk * size};
 }
@@ -303,7 +264,7 @@ Archetype::EntityAddress Archetype::Instantiate(Entity e, EntityAddress src) {
     trait.CopyConstruct(dst, src, dstChunk->GetChunkUnsyncResource());
   }
 
-  dstChunk->GetHead()->ForceUpdateVersion(version);
+  dstChunk->GetHead()->ForceUpdateVersion(world->Version());
 
   entityNum++;
 
@@ -339,7 +300,7 @@ Archetype::Locate(std::span<const AccessTypeID> cmpts) const {
       const std::size_t offset = offsets[idx];
       chunkCmpts[i].emplace_back(type, data + offset);
       if (type.GetAccessMode() == AccessMode::WRITE)
-        chunk->GetHead()->GetCmptInfos()[idx].version = version;
+        chunk->GetHead()->GetCmptInfos()[idx].version = world->Version();
     }
     chunkEntity[i] = reinterpret_cast<Entity*>(data + offsetEntity);
   }
@@ -360,7 +321,8 @@ std::size_t Archetype::Erase(EntityAddress addr) {
   if (chunk->Empty()) {
     nonFullChunks.erase(addr.chunkIdx);
     chunk->~Chunk();
-    chunkAllocator.deallocate(chunk, 1);
+    world->GetUnsyncResource()->deallocate(chunk, sizeof(Chunk),
+                                           alignof(Chunk));
   }
 
   entityNum--;
@@ -390,9 +352,7 @@ My::small_flat_set<My::TypeID> Archetype::GenTypeIDSet(
 void Archetype::NewFrame() {
   for (Chunk* chunk : chunks)
     new (&chunk->GetHead()->chunk_unsync_frame_rsrc)
-        std::pmr::monotonic_buffer_resource(sync_frame_rsrc);
+        std::pmr::monotonic_buffer_resource(world->GetSyncFrameResource());
 }
 
-void Archetype::UpdateVersion(std::uint64_t version) {
-  this->version = version;
-}
+std::uint64_t Archetype::Version() const noexcept { return world->Version(); }

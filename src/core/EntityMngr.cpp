@@ -8,41 +8,14 @@
 using namespace My::MyECS;
 using namespace std;
 
-EntityMngr::EntityMngr(std::pmr::synchronized_pool_resource* sync_rsrc,
-                       synchronized_monotonic_buffer_resource* sync_frame_rsrc)
-    : rsrc{std::make_unique<std::pmr::unsynchronized_pool_resource>()},
-      sync_rsrc{sync_rsrc},
-      sync_frame_rsrc{sync_frame_rsrc} {}
+EntityMngr::EntityMngr(World* world)
+    : world{world}, cmptTraits{world->GetUnsyncResource()} {}
 
-EntityMngr::EntityMngr(
-    EntityMngr&& other, std::pmr::synchronized_pool_resource* sync_rsrc,
-    synchronized_monotonic_buffer_resource* sync_frame_rsrc) noexcept
-    : cmptTraits{std::move(other.cmptTraits)},
-      queryCache{std::move(other.queryCache)},
-      version{other.version},
-      sync_rsrc{sync_rsrc},
-      sync_frame_rsrc{sync_frame_rsrc},
-      entityTable{std::move(other.entityTable)},
-      entityTableFreeEntry{std::move(other.entityTableFreeEntry)},
-      rsrc{std::move(other.rsrc)},
-      ts2a{std::move(other.ts2a)} {
-  other.version = 0;
-  other.sync_rsrc = nullptr;
-  other.sync_frame_rsrc = nullptr;
-}
-
-EntityMngr::EntityMngr(const EntityMngr& em,
-                       std::pmr::synchronized_pool_resource* sync_rsrc,
-                       synchronized_monotonic_buffer_resource* sync_frame_rsrc)
-    : cmptTraits{em.cmptTraits},
-      rsrc{std::make_unique<std::pmr::unsynchronized_pool_resource>()},
-      version{em.version},
-      sync_rsrc{sync_rsrc},
-      sync_frame_rsrc{sync_frame_rsrc} {
+EntityMngr::EntityMngr(const EntityMngr& em, World* world)
+    : cmptTraits{em.cmptTraits, world->GetUnsyncResource()}, world{world} {
   ts2a.reserve(em.ts2a.size());
   for (const auto& [ts, a] : em.ts2a)
-    ts2a.try_emplace(ts, std::make_unique<Archetype>(rsrc.get(), sync_rsrc,
-                                                     sync_frame_rsrc, *a));
+    ts2a.try_emplace(ts, std::make_unique<Archetype>(*a, world));
   entityTableFreeEntry = em.entityTableFreeEntry;
   entityTable.resize(em.entityTable.size());
   for (std::size_t i = 0; i < em.entityTable.size(); i++) {
@@ -62,6 +35,14 @@ EntityMngr::EntityMngr(const EntityMngr& em,
           ts2a.at(archetype->GetCmptTraits().GetTypes()).get());
   }
 }
+
+EntityMngr::EntityMngr(EntityMngr&& em, World* world) noexcept
+    : cmptTraits{std::move(em.cmptTraits)},
+      queryCache{std::move(em.queryCache)},
+      entityTable{std::move(em.entityTable)},
+      ts2a{std::move(em.ts2a)},
+      entityTableFreeEntry{std::move(em.entityTableFreeEntry)},
+      world{world} {}
 
 EntityMngr::~EntityMngr() { ts2a.clear(); }
 
@@ -127,8 +108,7 @@ Archetype* EntityMngr::GetOrCreateArchetypeOf(std::span<const TypeID> types) {
   auto target = ts2a.find(typeset);
   if (target != ts2a.end()) return target->second.get();
 
-  auto* archetype = Archetype::New(cmptTraits, rsrc.get(), sync_rsrc,
-                                   sync_frame_rsrc, types, version);
+  auto* archetype = Archetype::New(cmptTraits, world, types);
 
   ts2a.emplace(std::move(typeset), std::unique_ptr<Archetype>{archetype});
   for (auto& [query, archetypes] : queryCache) {
@@ -388,7 +368,7 @@ bool EntityMngr::GenEntityJob(World* w, Job* job, SystemFunc* sys,
             {sys->entityQuery.locator.AccessTypeIDs().data(),
              sys->entityQuery.locator.AccessTypeIDs().size()});
         if (!sys->changeFilter.types.empty() &&
-            !chunks[i]->HasAnyChange(sys->changeFilter.types, version))
+            !chunks[i]->HasAnyChange(sys->changeFilter.types, world->Version()))
           continue;
         job->emplace([=, chunk = chunks[i], singletons = singletons]() {
           auto [entities, cmpts, sizes] =
@@ -427,7 +407,7 @@ bool EntityMngr::GenEntityJob(World* w, Job* job, SystemFunc* sys,
                sys->entityQuery.locator.AccessTypeIDs().size()});
           if (!sys->changeFilter.types.empty() &&
               !archetype->chunks[i]->HasAnyChange(sys->changeFilter.types,
-                                                  version))
+                                                  world->Version()))
             continue;
 
           auto [entities, cmpts, sizes] = chunks[i]->Locate(
@@ -486,7 +466,7 @@ bool EntityMngr::GenChunkJob(World* w, Job* job, SystemFunc* sys,
                                  sys->entityQuery.filter.any.size()});
         assert(sys->entityQuery.locator.AccessTypeIDs().empty());
         if (!sys->changeFilter.types.empty() &&
-            !chunks[i]->HasAnyChange(sys->changeFilter.types, version))
+            !chunks[i]->HasAnyChange(sys->changeFilter.types, world->Version()))
           continue;
 
         std::size_t indexOffsetInChunk =
@@ -524,7 +504,7 @@ bool EntityMngr::GenChunkJob(World* w, Job* job, SystemFunc* sys,
           assert(sys->entityQuery.locator.AccessTypeIDs().empty());
           if (!sys->changeFilter.types.empty() &&
               !archetype->chunks[i]->HasAnyChange(sys->changeFilter.types,
-                                                  version))
+                                                  world->Version()))
             continue;
 
           std::size_t indexOffsetInChunk =
@@ -638,9 +618,4 @@ CmptAccessPtr EntityMngr::GetSingleton(AccessTypeID access_type) const {
 
 void EntityMngr::NewFrame() noexcept {
   for (auto& [ts, a] : ts2a) a->NewFrame();
-}
-
-void EntityMngr::UpdateVersion(std::uint64_t version) noexcept {
-  this->version = version;
-  for (auto& [ts, a] : ts2a) a->UpdateVersion(version);
 }
