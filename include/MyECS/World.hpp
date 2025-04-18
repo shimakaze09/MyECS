@@ -9,7 +9,7 @@
 #include "Schedule.hpp"
 #include "SystemMngr.hpp"
 
-namespace My::MyECS {
+namespace Smkz::MyECS {
 class IListener;
 
 class synchronized_monotonic_buffer_resource
@@ -170,6 +170,6 @@ class World {
 
   CommandBuffer Run(SystemFunc*);
 };
-}  // namespace My::MyECS
+}  // namespace Smkz::MyECS
 
 #include "details/World.inl"

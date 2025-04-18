@@ -6,7 +6,7 @@
 #include <MyECS/EntityQuery.hpp>
 #include <stdexcept>
 
-using namespace My::MyECS;
+using namespace Smkz::MyECS;
 
 void ArchetypeCmptTraits::CmptTrait::DefaultConstruct(
     void* cmpt, std::pmr::memory_resource* rsrc) const {

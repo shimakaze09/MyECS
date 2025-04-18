@@ -2,7 +2,7 @@
 
 #include <MyTemplate/Type.hpp>
 
-namespace My::MyECS {
+namespace Smkz::MyECS {
 constexpr std::size_t hash_combine(std::size_t x, std::size_t y) noexcept {
   return x ^ (y + 0x9e3779b9 + (x << 6) + (x >> 2));
 }
@@ -29,4 +29,4 @@ std::size_t hash_combine(const Container& container) noexcept {
   }
   return rst;
 }
-}  // namespace My::MyECS
+}  // namespace Smkz::MyECS

@@ -3,8 +3,8 @@
 
 #include "SysFuncGraph.hpp"
 
-using namespace My::MyECS;
-using namespace My;
+using namespace Smkz::MyECS;
+using namespace Smkz;
 using namespace std;
 
 World::World()

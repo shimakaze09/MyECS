@@ -4,7 +4,7 @@
 
 #include "CmptPtr.hpp"
 
-namespace My::MyECS {
+namespace Smkz::MyECS {
 class CmptsView {
  public:
   CmptsView() noexcept = default;
@@ -16,4 +16,4 @@ class CmptsView {
  private:
   std::span<const CmptAccessPtr> cmpts;
 };
-}  // namespace My::MyECS
+}  // namespace Smkz::MyECS

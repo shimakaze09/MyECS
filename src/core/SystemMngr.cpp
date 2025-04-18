@@ -2,7 +2,7 @@
 #include <MyECS/World.hpp>
 #include <cassert>
 
-using namespace My::MyECS;
+using namespace Smkz::MyECS;
 
 struct SystemMngr::Impl {
   Impl(World* w)
@@ -33,11 +33,11 @@ SystemMngr::SystemMngr(SystemMngr&& mngr, World* w) noexcept
 
 SystemMngr::~SystemMngr() { Clear(); }
 
-const std::pmr::unordered_set<My::NameID>& SystemMngr::GetAliveSystemIDs()
+const std::pmr::unordered_set<Smkz::NameID>& SystemMngr::GetAliveSystemIDs()
     const noexcept {
   return impl->aliveSystemIDs;
 }
-const std::pmr::unordered_set<My::NameID>& SystemMngr::GetActiveSystemIDs()
+const std::pmr::unordered_set<Smkz::NameID>& SystemMngr::GetActiveSystemIDs()
     const noexcept {
   return impl->activeSystemIDs;
 }

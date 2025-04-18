@@ -1,8 +1,8 @@
 #include <MyECS/SystemTraits.hpp>
 #include <cassert>
 
-using namespace My;
-using namespace My::MyECS;
+using namespace Smkz;
+using namespace Smkz::MyECS;
 
 struct SystemTraits::Impl {
   Impl(std::pmr::unsynchronized_pool_resource* r)

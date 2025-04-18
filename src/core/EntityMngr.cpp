@@ -5,7 +5,7 @@
 
 #include "Archetype.hpp"
 
-using namespace My::MyECS;
+using namespace Smkz::MyECS;
 using namespace std;
 
 EntityMngr::EntityMngr(World* world)
@@ -333,7 +333,7 @@ void EntityMngr::Destroy(Entity e) {
   RecycleEntityEntry(e);
 }
 
-My::small_vector<CmptAccessPtr> EntityMngr::LocateSingletons(
+Smkz::small_vector<CmptAccessPtr> EntityMngr::LocateSingletons(
     const SingletonLocator& locator) const {
   std::size_t numSingletons = 0;
   small_vector<CmptAccessPtr> rst;

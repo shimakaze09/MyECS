@@ -2,7 +2,7 @@
 
 #include <MyTemplate/Func.hpp>
 
-namespace My::MyECS::details {
+namespace Smkz::MyECS::details {
 template <typename... Cmpts>
 CmptLocator GenerateCmptLocator(TypeList<Cmpts...>) {
   if constexpr (sizeof...(Cmpts) > 0) {
@@ -11,9 +11,9 @@ CmptLocator GenerateCmptLocator(TypeList<Cmpts...>) {
   } else
     return {};
 }
-}  // namespace My::MyECS::details
+}  // namespace Smkz::MyECS::details
 
-namespace My::MyECS {
+namespace Smkz::MyECS {
 template <typename Func>
 CmptLocator CmptLocator::Generate() {
   using ArgList = FuncTraits_ArgList<std::decay_t<Func>>;
@@ -28,4 +28,4 @@ CmptLocator& CmptLocator::Combine() {
   UpdateGetValue();
   return *this;
 }
-}  // namespace My::MyECS
+}  // namespace Smkz::MyECS

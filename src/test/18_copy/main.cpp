@@ -1,7 +1,7 @@
 #include <MyECS/MyECS.hpp>
 #include <iostream>
 
-using namespace My::MyECS;
+using namespace Smkz::MyECS;
 
 struct Position {
   float val{0.f};
@@ -27,11 +27,11 @@ int main() {
   World w;
   w.entityMngr.cmptTraits.Register<Position, Velocity>();
   w.systemMngr.RegisterAndActivate<MoverSystem>();
-  w.entityMngr.Create(My::TypeIDs_of<Position, Velocity>);
+  w.entityMngr.Create(Smkz::TypeIDs_of<Position, Velocity>);
 
   World cpW = w;
 
   cpW.Update();
-  w.entityMngr.Create(My::TypeIDs_of<Position, Velocity>);
+  w.entityMngr.Create(Smkz::TypeIDs_of<Position, Velocity>);
   cpW.Update();
 }

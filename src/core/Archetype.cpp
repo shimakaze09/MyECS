@@ -2,7 +2,7 @@
 
 #include <MyECS/World.hpp>
 
-using namespace My::MyECS;
+using namespace Smkz::MyECS;
 using namespace std;
 
 Archetype::Archetype(World* world) : world{world} {}
@@ -271,9 +271,9 @@ Archetype::EntityAddress Archetype::Instantiate(Entity e, EntityAddress src) {
   return dst;
 }
 
-std::tuple<My::small_vector<Entity*>,
-           My::small_vector<My::small_vector<CmptAccessPtr>>,
-           My::small_vector<std::size_t>>
+std::tuple<Smkz::small_vector<Entity*>,
+           Smkz::small_vector<Smkz::small_vector<CmptAccessPtr>>,
+           Smkz::small_vector<std::size_t>>
 Archetype::Locate(std::span<const AccessTypeID> cmpts) const {
   assert(
       std::find_if_not(cmpts.begin(), cmpts.end(), [this](const TypeID& type) {
@@ -287,8 +287,8 @@ Archetype::Locate(std::span<const AccessTypeID> cmpts) const {
                     cmptTraits.GetTypes().find(TypeID_of<Entity>)));
   const std::size_t offsetEntity = offsets[entityIdx];
 
-  My::small_vector<My::small_vector<CmptAccessPtr>> chunkCmpts(numChunk);
-  My::small_vector<Entity*> chunkEntity(numChunk);
+  Smkz::small_vector<Smkz::small_vector<CmptAccessPtr>> chunkCmpts(numChunk);
+  Smkz::small_vector<Entity*> chunkEntity(numChunk);
 
   for (std::size_t i = 0; i < numChunk; i++) {
     Chunk* chunk = chunks[i];
@@ -305,7 +305,7 @@ Archetype::Locate(std::span<const AccessTypeID> cmpts) const {
     chunkEntity[i] = reinterpret_cast<Entity*>(data + offsetEntity);
   }
 
-  My::small_vector<std::size_t> sizes;
+  Smkz::small_vector<std::size_t> sizes;
   sizes.reserve(numType);
   for (const auto& type : cmpts)
     sizes.push_back(cmptTraits.GetTrait(type).size);
@@ -342,7 +342,7 @@ vector<CmptAccessPtr> Archetype::Components(EntityAddress addr,
   return rst;
 }
 
-My::small_flat_set<My::TypeID> Archetype::GenTypeIDSet(
+Smkz::small_flat_set<Smkz::TypeID> Archetype::GenTypeIDSet(
     std::span<const TypeID> types) {
   small_flat_set<TypeID> sorted_types(types.begin(), types.end());
   sorted_types.insert(TypeID_of<Entity>);

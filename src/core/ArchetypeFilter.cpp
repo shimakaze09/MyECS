@@ -1,7 +1,7 @@
 #include <MyECS/ArchetypeFilter.hpp>
 #include <MyECS/details/Util.hpp>
 
-using namespace My::MyECS;
+using namespace Smkz::MyECS;
 
 std::size_t ArchetypeFilter::GetValue() const noexcept {
   std::size_t rst = TypeID_of<ArchetypeFilter>.GetValue();

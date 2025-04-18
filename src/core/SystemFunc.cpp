@@ -1,6 +1,6 @@
 #include <MyECS/SystemFunc.hpp>
 
-using namespace My::MyECS;
+using namespace Smkz::MyECS;
 
 void SystemFunc::operator()(World* w, SingletonsView singletonsView, Entity e,
                             std::size_t entityIndexInQuery, CmptsView cmptsView,

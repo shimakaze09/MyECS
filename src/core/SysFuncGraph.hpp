@@ -5,7 +5,7 @@
 #include <unordered_set>
 #include <vector>
 
-namespace My::MyECS {
+namespace Smkz::MyECS {
 class SystemFunc;
 class SysFuncGraph {
  public:
@@ -36,4 +36,4 @@ class SysFuncGraph {
   std::pmr::unordered_map<SystemFunc*, std::pmr::unordered_set<SystemFunc*>>
       adjList;
 };
-}  // namespace My::MyECS
+}  // namespace Smkz::MyECS

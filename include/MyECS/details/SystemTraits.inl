@@ -2,7 +2,7 @@
 
 #include <MyTemplate/Name.hpp>
 
-namespace My::MyECS::details {
+namespace Smkz::MyECS::details {
 template <typename System>
 concept HaveOnCreate = requires(World* w) {
   { System::OnCreate(w) };
@@ -44,9 +44,9 @@ Name Register(SystemTraits& traits) {
         name, static_cast<SystemTraits::OnDestroy*>(&System::OnDestroy));
   return name;
 }
-}  // namespace My::MyECS::details
+}  // namespace Smkz::MyECS::details
 
-namespace My::MyECS {
+namespace Smkz::MyECS {
 template <typename Sys>
 constexpr Name SystemTraits::Nameof() noexcept {
   static_assert(std::is_same_v<std::remove_cvref_t<Sys>, Sys>);
@@ -64,4 +64,4 @@ template <typename System>
 bool SystemTraits::IsRegistered() const {
   return type_name<System>().View();
 }
-}  // namespace My::MyECS
+}  // namespace Smkz::MyECS

@@ -6,7 +6,7 @@
 #include <memory_resource>
 #include <span>
 
-namespace My::MyECS {
+namespace Smkz::MyECS {
 class CmptTraits;
 struct EntityQuery;
 
@@ -60,4 +60,4 @@ class ArchetypeCmptTraits {
   small_flat_set<TypeID> types;
   small_vector<CmptTrait> cmpt_traits;
 };
-}  // namespace My::MyECS
+}  // namespace Smkz::MyECS

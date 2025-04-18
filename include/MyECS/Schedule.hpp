@@ -8,11 +8,11 @@
 #include "SystemFunc.hpp"
 #include "details/Job.hpp"
 
-namespace My::MyECS::details {
+namespace Smkz::MyECS::details {
 struct Compiler;
 }
 
-namespace My::MyECS {
+namespace Smkz::MyECS {
 class EntityMngr;
 class SystemMngr;
 class SysFuncGraph;
@@ -158,6 +158,6 @@ class Schedule {
 
   friend class World;
 };
-}  // namespace My::MyECS
+}  // namespace Smkz::MyECS
 
 #include "details/Schedule.inl"

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace My::MyECS {
+namespace Smkz::MyECS {
 template <typename... Systems>
 void SystemMngr::Create() {
   (Create(SystemTraits::Nameof<Systems>()), ...);
@@ -46,4 +46,4 @@ std::array<Name, sizeof...(Systems)> SystemMngr::RegisterAndActivate() {
   std::apply([this](auto... names) { (Activate(names), ...); }, names);
   return names;
 }
-}  // namespace My::MyECS
+}  // namespace Smkz::MyECS

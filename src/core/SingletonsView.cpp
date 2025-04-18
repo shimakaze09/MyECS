@@ -1,6 +1,6 @@
 #include <MyECS/SingletonsView.hpp>
 
-using namespace My::MyECS;
+using namespace Smkz::MyECS;
 
 CmptAccessPtr SingletonsView::GetSingleton(AccessTypeID t) const noexcept {
   for (const auto& singleton : singletons) {

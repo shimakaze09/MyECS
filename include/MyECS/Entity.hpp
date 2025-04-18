@@ -5,7 +5,7 @@
 
 #include "details/Util.hpp"
 
-namespace My::MyECS {
+namespace Smkz::MyECS {
 // index + version
 struct Entity {
   std::uint64_t index;
@@ -21,4 +21,4 @@ struct Entity {
   constexpr auto operator<=>(const Entity&) const = default;
 };
 static_assert(std::is_trivial_v<Entity>);
-}  // namespace My::MyECS
+}  // namespace Smkz::MyECS

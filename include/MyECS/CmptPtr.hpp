@@ -4,7 +4,7 @@
 
 #include "AccessTypeID.hpp"
 
-namespace My::MyECS {
+namespace Smkz::MyECS {
 // TypeID + void*
 class CmptPtr {
  public:
@@ -80,4 +80,4 @@ class CmptAccessPtr {
   AccessTypeID accessType;
   void* p;
 };
-}  // namespace My::MyECS
+}  // namespace Smkz::MyECS

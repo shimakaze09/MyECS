@@ -5,7 +5,7 @@
 #include "AccessTypeID.hpp"
 #include "CmptTag.hpp"
 
-namespace My::MyECS {
+namespace Smkz::MyECS {
 // locate components in function's argument list for Archetype
 // immutable
 class CmptLocator {
@@ -36,6 +36,6 @@ class CmptLocator {
 
   std::size_t hashCode;
 };
-}  // namespace My::MyECS
+}  // namespace Smkz::MyECS
 
 #include "details/CmptsLocator.inl"

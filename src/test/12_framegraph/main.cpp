@@ -1,8 +1,8 @@
 #include <MyECS/MyECS.hpp>
 #include <iostream>
 
-using namespace My::MyECS;
-using namespace My;
+using namespace Smkz::MyECS;
+using namespace Smkz;
 using namespace std;
 
 struct A {};
@@ -29,7 +29,7 @@ int main() {
   w.entityMngr.cmptTraits.Register<A, B, C, D, E, F, G>();
   w.systemMngr.RegisterAndActivate<MySystem>();
 
-  w.entityMngr.Create(My::TypeIDs_of<A, B, C, D, E>);
+  w.entityMngr.Create(Smkz::TypeIDs_of<A, B, C, D, E>);
   w.Update();
 
   cout << w.DumpUpdateJobGraph() << endl;

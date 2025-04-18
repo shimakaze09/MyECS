@@ -1,7 +1,7 @@
 #include <MyECS/CmptLocator.hpp>
 #include <MyECS/details/Util.hpp>
 
-using namespace My::MyECS;
+using namespace Smkz::MyECS;
 
 CmptLocator::CmptLocator(AccessTypeIDSet cmptTypes)
     : cmptTypes{std::move(cmptTypes)} {

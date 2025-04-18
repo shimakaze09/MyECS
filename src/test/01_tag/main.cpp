@@ -1,7 +1,7 @@
 #include <MyECS/MyECS.hpp>
 #include <iostream>
 
-using namespace My::MyECS;
+using namespace Smkz::MyECS;
 using namespace std;
 
 struct Data {};
@@ -32,7 +32,7 @@ int main() {
   w.entityMngr.cmptTraits.Register<Data>();
   w.systemMngr.RegisterAndActivate<DataSystem>();
 
-  w.entityMngr.Create(My::TypeIDs_of<Data>);
+  w.entityMngr.Create(Smkz::TypeIDs_of<Data>);
 
   w.Update();
 

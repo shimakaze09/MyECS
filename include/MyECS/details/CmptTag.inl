@@ -2,13 +2,13 @@
 
 #include <MyTemplate/Util.hpp>
 
-namespace My::MyECS {
+namespace Smkz::MyECS {
 struct Entity;
 class CmptLocator;
 class World;
-}  // namespace My::MyECS
+}  // namespace Smkz::MyECS
 
-namespace My::MyECS {
+namespace Smkz::MyECS {
 template <typename TaggedCmpt>
 void* CastToVoidPointer(TaggedCmpt p) noexcept {
   return const_cast<void*>(reinterpret_cast<const void*>(p));
@@ -259,4 +259,4 @@ template <typename T>
 struct IsLatestSingleton : std::false_type {};
 template <typename Cmpt>
 struct IsLatestSingleton<Latest<Singleton<Cmpt>>> : std::true_type {};
-}  // namespace My::MyECS
+}  // namespace Smkz::MyECS

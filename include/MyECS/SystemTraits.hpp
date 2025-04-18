@@ -8,7 +8,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace My::MyECS {
+namespace Smkz::MyECS {
 class World;
 class Schedule;
 
@@ -89,6 +89,6 @@ class SystemTraits {
   struct Impl;
   std::unique_ptr<Impl> impl;
 };
-}  // namespace My::MyECS
+}  // namespace Smkz::MyECS
 
 #include "details/SystemTraits.inl"

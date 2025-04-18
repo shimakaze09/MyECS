@@ -5,7 +5,7 @@
 #include <stack>
 #include <unordered_set>
 
-using namespace My::MyECS;
+using namespace Smkz::MyECS;
 using namespace std;
 
 bool SysFuncGraph::HaveVertex(SystemFunc* x) const {

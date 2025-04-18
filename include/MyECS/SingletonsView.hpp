@@ -4,7 +4,7 @@
 
 #include "CmptPtr.hpp"
 
-namespace My::MyECS {
+namespace Smkz::MyECS {
 class SingletonsView {
  public:
   SingletonsView(std::span<const CmptAccessPtr> singletons) noexcept
@@ -18,4 +18,4 @@ class SingletonsView {
  private:
   std::span<const CmptAccessPtr> singletons;
 };
-}  // namespace My::MyECS
+}  // namespace Smkz::MyECS

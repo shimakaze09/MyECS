@@ -1,7 +1,7 @@
 #include <MyECS/MyECS.hpp>
 #include <iostream>
 
-using namespace My::MyECS;
+using namespace Smkz::MyECS;
 using namespace std;
 
 struct alignas(1) A {
@@ -36,6 +36,6 @@ struct alignas(256) G {
 int main() {
   World w;
   w.entityMngr.cmptTraits.Register<A, B, C, D, E, F, G>();
-  w.entityMngr.Create(My::TypeIDs_of<A, B, C, D, E, F, G>);
+  w.entityMngr.Create(Smkz::TypeIDs_of<A, B, C, D, E, F, G>);
   return 0;
 }

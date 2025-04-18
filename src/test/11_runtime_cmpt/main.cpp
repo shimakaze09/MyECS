@@ -1,8 +1,8 @@
 #include <MyECS/MyECS.hpp>
 #include <iostream>
 
-using namespace My;
-using namespace My::MyECS;
+using namespace Smkz;
+using namespace Smkz::MyECS;
 using namespace std;
 
 struct RTDSystem {
@@ -47,7 +47,7 @@ int main() {
                                   })
       .RegisterDestructor(type, [](void*) { cout << "destruct" << endl; });
 
-  auto e = w.entityMngr.Create(My::TempTypeIDs{type});
+  auto e = w.entityMngr.Create(Smkz::TempTypeIDs{type});
   w.Update();
 
   cout << w.DumpUpdateJobGraph() << endl;
