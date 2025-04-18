@@ -76,7 +76,12 @@ World::~World() {
   entityMngr.Clear();
 }
 
-void World::Update() {
+void World::Update() {  // 1. clear
+  schedule.Clear();
+
+  sync_frame_rsrc->release();
+  unsync_frame_rsrc->release();
+
   entityMngr.NewFrame();
 
   // 2. update schedule
@@ -118,11 +123,6 @@ void World::Update() {
 
   // 4. update version
   version++;
-
-  schedule.Clear();
-
-  sync_frame_rsrc->release();
-  unsync_frame_rsrc->release();
 }
 
 string World::DumpUpdateJobGraph() const { return jobGraph.dump(); }
