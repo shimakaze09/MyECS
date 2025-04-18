@@ -70,6 +70,9 @@ class EntityMngr {
     return Components(e, AccessMode::LATEST);
   }
 
+  // chunk + index in chunk
+  std::tuple<Chunk*, std::size_t> GetChunk(Entity e) const;
+
   bool Exist(Entity) const noexcept;
 
   void Destroy(Entity);

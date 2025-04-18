@@ -619,3 +619,9 @@ CmptAccessPtr EntityMngr::GetSingleton(AccessTypeID access_type) const {
 void EntityMngr::NewFrame() noexcept {
   for (auto& [ts, a] : ts2a) a->NewFrame();
 }
+
+std::tuple<Chunk*, std::size_t> EntityMngr::GetChunk(Entity e) const {
+  if (!Exist(e)) throw std::invalid_argument("Entity is invalid");
+  const auto& info = entityTable[e.index];
+  return {info.archetype->GetChunks()[info.chunkIdx], info.idxInChunk};
+}
