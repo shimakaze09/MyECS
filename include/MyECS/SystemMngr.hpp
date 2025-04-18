@@ -11,11 +11,6 @@ class SystemMngr {
  public:
   SystemTraits systemTraits;
 
-  SystemMngr(World* w) : w{w} {}
-  SystemMngr(const SystemMngr& mngr, World* w);
-  SystemMngr(SystemMngr&& mngr, World* w) noexcept;
-  ~SystemMngr();
-
   const auto& GetAliveSystemIDs() const noexcept { return aliveSystemIDs; }
   const auto& GetActiveSystemIDs() const noexcept { return activeSystemIDs; }
 
@@ -66,6 +61,12 @@ class SystemMngr {
 
  private:
   friend class World;
+
+  SystemMngr(World* w) : w{w} {}
+  SystemMngr(const SystemMngr& mngr, World* w);
+  SystemMngr(SystemMngr&& mngr, World* w) noexcept;
+  ~SystemMngr();
+
   World* w;
   void Update(NameID, Schedule&) const;
   void Clear();

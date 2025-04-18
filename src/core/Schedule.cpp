@@ -6,25 +6,30 @@ using namespace My;
 using namespace My::MyECS;
 using namespace std;
 
-Schedule::Schedule()
-    : frame_rsrc{std::make_unique<std::pmr::monotonic_buffer_resource>()} {}
+Schedule::Schedule(World* w) : world{w} {}
 
 Schedule::~Schedule() { Clear(); }
 
-Schedule::Schedule(const Schedule& other)
-    : frame_rsrc{std::make_unique<std::pmr::monotonic_buffer_resource>()},
-      layerInfos{other.layerInfos} {
+Schedule::Schedule(const Schedule& other, World* w)
+    : world{w}, layerInfos{other.layerInfos} {
   for (auto& [layer, info] : layerInfos) {
     for (auto& [id, sys] : info.sysFuncs) {
-      sys = CreateFrameObject<SystemFunc>(*sys);
+      sys = world->UnsyncNewFrameObject<SystemFunc>(*sys);
       sys->name = RegisterFrameString(sys->Name());
     }
   }
 }
 
+Schedule::Schedule(Schedule&& other, World* w) noexcept
+    : world{w}, layerInfos{std::move(other.layerInfos)} {}
+
+std::pmr::memory_resource* Schedule::GetUnsyncFrameResource() const noexcept {
+  return world->GetUnsyncFrameResource();
+}
+
 std::string_view Schedule::RegisterFrameString(std::string_view str) {
-  auto* buffer = (char*)frame_rsrc->allocate((str.size() + 1) * sizeof(char),
-                                             alignof(char));
+  auto* buffer = (char*)world->GetUnsyncFrameResource()->allocate(
+      (str.size() + 1) * sizeof(char), alignof(char));
   std::memcpy(buffer, str.data(), str.size() * sizeof(char));
   buffer[str.size()] = 0;
   return str;
@@ -65,7 +70,6 @@ void Schedule::Clear() {
     layerinfo.sysNones.clear();
   }
   layerInfos.clear();
-  frame_rsrc->release();
 }
 
 Schedule::CmptSysFuncsMap* Schedule::GenCmptSysFuncsMap(int layer) const {
@@ -74,14 +78,13 @@ Schedule::CmptSysFuncsMap* Schedule::GenCmptSysFuncsMap(int layer) const {
   const auto& sysFuncs = layerinfo.sysFuncs;
   const auto& disabledSysFuncs = layerinfo.disabledSysFuncs;
 
-  CmptSysFuncsMap* rst = CreateFrameObject<CmptSysFuncsMap>(
-      CmptSysFuncsMap::allocator_type{frame_rsrc.get()});
+  CmptSysFuncsMap* rst = world->UnsyncNewFrameObject<CmptSysFuncsMap>();
   for (const auto& [hashcode, sysFunc] : sysFuncs) {
     if (disabledSysFuncs.contains(hashcode)) continue;
 
     for (const auto& type : sysFunc->entityQuery.locator.AccessTypeIDs()) {
       auto& cmptSysFuncs =
-          rst->try_emplace(type, frame_rsrc.get()).first->second;
+          rst->try_emplace(type, world->GetUnsyncFrameResource()).first->second;
       switch (type.GetAccessMode()) {
         case AccessMode::LAST_FRAME:
           cmptSysFuncs.lastFrameSysFuncs.push_back(sysFunc);
@@ -99,7 +102,7 @@ Schedule::CmptSysFuncsMap* Schedule::GenCmptSysFuncsMap(int layer) const {
     }
     for (const auto& type : sysFunc->singletonLocator.SingletonTypes()) {
       auto& cmptSysFuncs =
-          rst->try_emplace(type, frame_rsrc.get()).first->second;
+          rst->try_emplace(type, world->GetUnsyncFrameResource()).first->second;
       switch (type.GetAccessMode()) {
         case AccessMode::LAST_FRAME:
           cmptSysFuncs.lastFrameSysFuncs.push_back(sysFunc);
@@ -117,7 +120,7 @@ Schedule::CmptSysFuncsMap* Schedule::GenCmptSysFuncsMap(int layer) const {
     }
     for (const auto& type : sysFunc->randomAccessor.types) {
       auto& cmptSysFuncs =
-          rst->try_emplace(type, frame_rsrc.get()).first->second;
+          rst->try_emplace(type, world->GetUnsyncFrameResource()).first->second;
       switch (type.GetAccessMode()) {
         case AccessMode::LAST_FRAME:
           cmptSysFuncs.lastFrameSysFuncs.push_back(sysFunc);
@@ -138,7 +141,8 @@ Schedule::CmptSysFuncsMap* Schedule::GenCmptSysFuncsMap(int layer) const {
       const auto& filter = sysFunc->entityQuery.filter;
       for (const auto& type : filter.all) {
         auto& cmptSysFuncs =
-            rst->try_emplace(type, frame_rsrc.get()).first->second;
+            rst->try_emplace(type, world->GetUnsyncFrameResource())
+                .first->second;
         switch (type.GetAccessMode()) {
           case AccessMode::LAST_FRAME:
             cmptSysFuncs.lastFrameSysFuncs.push_back(sysFunc);
@@ -157,7 +161,8 @@ Schedule::CmptSysFuncsMap* Schedule::GenCmptSysFuncsMap(int layer) const {
 
       for (const auto& type : filter.any) {
         auto& cmptSysFuncs =
-            rst->try_emplace(type, frame_rsrc.get()).first->second;
+            rst->try_emplace(type, world->GetUnsyncFrameResource())
+                .first->second;
         switch (type.GetAccessMode()) {
           case AccessMode::LAST_FRAME:
             cmptSysFuncs.lastFrameSysFuncs.push_back(sysFunc);
@@ -201,7 +206,7 @@ SysFuncGraph* Schedule::GenSysFuncGraph(int layer) const {
       GenCmptSysFuncsMap(layer);  // use frame rsrc, no need to release
 
   // [gen graph]
-  SysFuncGraph* graph = CreateFrameObject<SysFuncGraph>(frame_rsrc.get());
+  SysFuncGraph* graph = world->UnsyncNewFrameObject<SysFuncGraph>();
 
   // [gen graph] - vertex
   for (const auto& [hashcode, sysFunc] : sysFuncs) {
@@ -239,7 +244,7 @@ SysFuncGraph* Schedule::GenSysFuncGraph(int layer) const {
   for (const auto& [type, cmptSysFuncs] : *cmptSysFuncsMap) {
     if (cmptSysFuncs.writeSysFuncs.empty()) continue;
 
-    SysFuncGraph* subgraph = CreateFrameObject<SysFuncGraph>(frame_rsrc.get());
+    SysFuncGraph* subgraph = world->UnsyncNewFrameObject<SysFuncGraph>();
     graph->SubGraph(*subgraph, std::span{cmptSysFuncs.writeSysFuncs.data(),
                                          cmptSysFuncs.writeSysFuncs.size()});
     auto [success, sorted_wirtes] = subgraph->Toposort();

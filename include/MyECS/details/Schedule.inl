@@ -1,12 +1,6 @@
 #pragma once
 
 namespace My::MyECS {
-template <typename T, typename... Args>
-T* Schedule::CreateFrameObject(Args&&... args) const {
-  void* buffer = frame_rsrc->allocate(sizeof(T), alignof(T));
-  return new (buffer) T(std::forward<Args>(args)...);
-}
-
 template <typename Func>
 const SystemFunc* Schedule::RegisterEntityJob(
     Func&& func, std::string_view name, bool isParallel, ArchetypeFilter filter,
@@ -62,9 +56,9 @@ const SystemFunc* Schedule::RegisterChunkJob(Func&& func, std::string_view name,
 template <typename... Args>
 const SystemFunc* Schedule::Request(int layer, Args&&... args) {
   assert(layer != SpecialLayer);
-  SystemFunc* sysFunc = (SystemFunc*)frame_rsrc->allocate(sizeof(SystemFunc),
-                                                          alignof(SystemFunc));
-  new (sysFunc) SystemFunc(std::forward<Args>(args)...);
+  void* buffer = GetUnsyncFrameResource()->allocate(sizeof(SystemFunc),
+                                                    alignof(SystemFunc));
+  SystemFunc* sysFunc = new (buffer) SystemFunc(std::forward<Args>(args)...);
   layerInfos[layer].sysFuncs.emplace(sysFunc->GetValue(), sysFunc);
   return sysFunc;
 }

@@ -19,6 +19,11 @@ template<typename T>
 	concept CopyCtorWithAlloc = ContainPmrAlloc<T> &&
 		(requires(const T & other, const typename T::allocator_type & alloc) { new T(other, alloc); }
 	|| requires(const T & other, const typename T::allocator_type & alloc) { new T(std::allocator_arg_t{}, alloc, other); });
+
+template<typename T>
+	concept MoveCtorWithAlloc = ContainPmrAlloc<T> &&
+		(requires(T other, const typename T::allocator_type & alloc) { new T(std::move(other), alloc); }
+	|| requires(T other, const typename T::allocator_type & alloc) { new T(std::allocator_arg_t{}, alloc, std::move(other)); });
 }  // namespace My::MyECS::details
 
 namespace My::MyECS {
@@ -61,11 +66,22 @@ void CmptTraits::UnsafeRegisterOne() {
                         [](void* cmpt) { static_cast<Cmpt*>(cmpt)->~Cmpt(); });
   }
 
-  if constexpr (std::is_move_constructible_v<Cmpt> &&
-                !std::is_trivially_move_constructible_v<Cmpt>) {
-    move_constructors.emplace(type.GetID(), [](void* dst, void* src) {
-      new (dst) Cmpt(std::move(*static_cast<Cmpt*>(src)));
-    });
+  if constexpr (details::MoveCtorWithAlloc<Cmpt>) {
+    move_constructors.emplace(
+        type.GetID(),
+        [](void* dst, void* src, std::pmr::memory_resource* world_rsrc) {
+          using Alloc = typename Cmpt::allocator_type;
+          Alloc alloc(world_rsrc);
+          std::allocator_traits<Alloc>::template construct(
+              alloc, reinterpret_cast<Cmpt*>(dst),
+              std::move(*static_cast<const Cmpt*>(src)));
+        });
+  } else if constexpr (std::is_move_constructible_v<Cmpt> &&
+                       !std::is_trivially_move_constructible_v<Cmpt>) {
+    move_constructors.emplace(
+        type.GetID(), [](void* dst, void* src, std::pmr::memory_resource*) {
+          new (dst) Cmpt(std::move(*static_cast<Cmpt*>(src)));
+        });
   }
 
   if constexpr (std::is_move_assignable_v<Cmpt> &&
@@ -103,8 +119,9 @@ void CmptTraits::RegisterOne() {
   static_assert(
       std::is_copy_constructible_v<Cmpt> || details::CopyCtorWithAlloc<Cmpt>,
       "<Cmpt> must be copy-constructible or with alloc");
-  static_assert(std::is_move_constructible_v<Cmpt>,
-                "<Cmpt> must be move-constructible");
+  static_assert(
+      std::is_move_constructible_v<Cmpt> || details::MoveCtorWithAlloc<Cmpt>,
+      "<Cmpt> must be move-constructible or with alloc");
   static_assert(std::is_move_assignable_v<Cmpt>,
                 "<Cmpt> must be move-assignable");
   static_assert(std::is_destructible_v<Cmpt>, "<Cmpt> must be destructible");

@@ -98,7 +98,7 @@ std::size_t Chunk::Erase(std::size_t idx) {
     }
   }
 
-  head->UpdateVersion(head->archetype->Version());
+  head->ForceUpdateVersion(head->archetype->Version());
 
   entityNum--;
 
@@ -147,7 +147,7 @@ Chunk::Locate(std::span<const AccessTypeID> types) {
   return {(Entity*)GetCmptArray(TypeID_of<Entity>), cmpts, sizes};
 }
 
-void Chunk::Head::UpdateVersion(std::uint64_t version) {
+void Chunk::Head::ForceUpdateVersion(std::uint64_t version) {
   order_version = version;
   for (auto& info : GetCmptInfos()) info.version = version;
 }

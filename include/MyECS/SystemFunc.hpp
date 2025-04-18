@@ -28,6 +28,7 @@ class Schedule;
 // * std::size_t indexInQuery
 // * <tagged-components>: {LastFrame|Write|Latest}<Cmpt>...
 // * CmptsView
+// * ChunkView
 // * CommandBufferView
 // 2. Mode::Chunk
 // * std::size_t entityBeginIndexInQuery
@@ -37,6 +38,8 @@ class Schedule;
 // * Write<Singleton<Cmpt>> (only job can write singletons)
 class SystemFunc {
  public:
+  SystemFunc(const SystemFunc&) = default;
+
   enum class Mode {
     Entity,
     Chunk,
@@ -86,7 +89,6 @@ class SystemFunc {
 
  private:
   friend class Schedule;
-  SystemFunc(const SystemFunc&) = default;
   Mode mode;
   std::string_view name;
   std::size_t hashCode;  // after name

@@ -31,7 +31,7 @@ SystemFunc::SystemFunc(Func&& func, std::string_view name,
                 "(Mode::Entity) SystemFunc can't write singletons, use "
                 "{Latest|LastFrame}Singleton<Cmpt> instead");
 
-  static_assert(!Contain_v<ArgList, ChunkView>);
+  // static_assert(!Contain_v<ArgList, ChunkView>);
 
   assert(
       "(Mode::Entity) SystemFunc can't write singletons, use "

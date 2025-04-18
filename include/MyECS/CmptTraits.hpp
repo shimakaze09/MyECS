@@ -36,8 +36,8 @@ class CmptTraits {
   CmptTraits& RegisterCopyConstructor(
       TypeID,
       std::function<void(void*, const void*, std::pmr::memory_resource*)>);
-  CmptTraits& RegisterMoveConstructor(TypeID,
-                                      std::function<void(void*, void*)>);
+  CmptTraits& RegisterMoveConstructor(
+      TypeID, std::function<void(void*, void*, std::pmr::memory_resource*)>);
   CmptTraits& RegisterMoveAssignment(TypeID, std::function<void(void*, void*)>);
   CmptTraits& RegisterDestructor(TypeID, std::function<void(void*)>);
 
@@ -55,11 +55,6 @@ class CmptTraits {
   bool IsTrivial(TypeID) const;
   std::size_t Sizeof(TypeID) const;
   std::size_t Alignof(TypeID) const;
-  void DefaultConstruct(TypeID, void* cmpt) const;
-  void CopyConstruct(TypeID, void* dst, const void* src) const;
-  void MoveConstruct(TypeID, void* dst, void* src) const;
-  void MoveAssign(TypeID, void* dst, void* src) const;
-  void Destruct(TypeID, void* cmpt) const;
   std::string_view Nameof(TypeID) const;
 
   CmptTraits& Deregister(TypeID) noexcept;
@@ -75,9 +70,9 @@ class CmptTraits {
 
  private:
   friend class EntityMngr;
-  CmptTraits(std::pmr::memory_resource* world_rsrc);
-  CmptTraits(const CmptTraits& other, std::pmr::memory_resource* world_rsrc);
-  CmptTraits(CmptTraits&& other) noexcept;
+  CmptTraits();
+  CmptTraits(const CmptTraits& other);
+  CmptTraits(CmptTraits&& other) noexcept = default;
 
   // register all for Cmpt
   // static_assert
@@ -103,13 +98,12 @@ class CmptTraits {
   std::unordered_map<TypeID, std::function<void(void*, const void*,
                                                 std::pmr::memory_resource*)>>
       copy_constructors;  // dst <- src
-  std::unordered_map<TypeID, std::function<void(void*, void*)>>
+  std::unordered_map<
+      TypeID, std::function<void(void*, void*, std::pmr::memory_resource*)>>
       move_constructors;  // dst <- src
   std::unordered_map<TypeID, std::function<void(void*, void*)>>
       move_assignments;  // dst <- src
   std::unordered_map<TypeID, std::function<void(void*)>> destructors;
-
-  std::pmr::memory_resource* world_rsrc;
 };
 }  // namespace My::MyECS
 
