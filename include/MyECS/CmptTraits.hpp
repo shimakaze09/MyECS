@@ -8,7 +8,7 @@
 
 #include "AccessTypeID.hpp"
 
-namespace Smkz::MyECS {
+namespace My::MyECS {
 class EntityMngr;
 
 // run-time dynamic component traits
@@ -103,6 +103,6 @@ class CmptTraits {
   struct Impl;
   std::unique_ptr<Impl> impl;
 };
-}  // namespace Smkz::MyECS
+}  // namespace My::MyECS
 
 #include "details/CmptTraits.inl"

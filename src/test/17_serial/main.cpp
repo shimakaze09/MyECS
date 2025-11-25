@@ -1,7 +1,7 @@
 #include <MyECS/MyECS.hpp>
 #include <iostream>
 
-using namespace Smkz::MyECS;
+using namespace My::MyECS;
 
 struct A {};
 struct B {};
@@ -24,10 +24,10 @@ int main() {
   World w;
   w.entityMngr.cmptTraits.Register<A, B, C>();
   w.systemMngr.RegisterAndActivate<PrintASystem>();
-  w.entityMngr.Create(Smkz::TypeIDs_of<A>);
-  w.entityMngr.Create(Smkz::TypeIDs_of<A, B>);
-  w.entityMngr.Create(Smkz::TypeIDs_of<A, C>);
-  w.entityMngr.Create(Smkz::TypeIDs_of<A, B, C>);
+  w.entityMngr.Create(My::TypeIDs_of<A>);
+  w.entityMngr.Create(My::TypeIDs_of<A, B>);
+  w.entityMngr.Create(My::TypeIDs_of<A, C>);
+  w.entityMngr.Create(My::TypeIDs_of<A, B, C>);
 
   for (std::size_t i = 0; i < 5; i++) {
     w.Update();

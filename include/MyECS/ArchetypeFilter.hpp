@@ -2,7 +2,7 @@
 
 #include "AccessTypeID.hpp"
 
-namespace Smkz::MyECS {
+namespace My::MyECS {
 // filter Archetype with all, any and none
 struct ArchetypeFilter {
   AccessTypeIDSet all;
@@ -15,4 +15,4 @@ struct ArchetypeFilter {
 
   bool operator==(const ArchetypeFilter& rhs) const noexcept;
 };
-}  // namespace Smkz::MyECS
+}  // namespace My::MyECS

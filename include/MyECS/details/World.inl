@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Smkz::MyECS {
+namespace My::MyECS {
 template <typename Func>
 CommandBuffer World::RunEntityJob(Func&& func, bool isParallel,
                                   ArchetypeFilter filter,
@@ -80,4 +80,4 @@ T* World::UnsyncNewFrameObject(Args&&... args) {
       obj, std::forward<Args>(args)...);
   return obj;
 }
-}  // namespace Smkz::MyECS
+}  // namespace My::MyECS

@@ -2,7 +2,7 @@
 
 #include <MyTemplate/Func.hpp>
 
-namespace Smkz::MyECS::details {
+namespace My::MyECS::details {
 template <typename... Singletons>
 SingletonLocator GenerateSingletonLocator(TypeList<Singletons...>) {
   if constexpr (sizeof...(Singletons) > 0) {
@@ -11,9 +11,9 @@ SingletonLocator GenerateSingletonLocator(TypeList<Singletons...>) {
   } else
     return {};
 }
-}  // namespace Smkz::MyECS::details
+}  // namespace My::MyECS::details
 
-namespace Smkz::MyECS {
+namespace My::MyECS {
 template <typename Func>
 SingletonLocator SingletonLocator::Generate() {
   using ArgList = FuncTraits_ArgList<std::decay_t<Func>>;
@@ -28,4 +28,4 @@ SingletonLocator& SingletonLocator::Combine() {
     singletonTypes.insert(type);
   return *this;
 }
-}  // namespace Smkz::MyECS
+}  // namespace My::MyECS

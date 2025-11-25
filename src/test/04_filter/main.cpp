@@ -1,8 +1,8 @@
 #include <MyECS/MyECS.hpp>
 #include <iostream>
 
-using namespace Smkz::MyECS;
-using namespace Smkz;
+using namespace My::MyECS;
+using namespace My;
 using namespace std;
 
 struct A {};
@@ -30,10 +30,10 @@ int main() {
   w.entityMngr.cmptTraits.Register<A, B, C, D, E>();
   w.systemMngr.RegisterAndActivate<MySystem>();
 
-  auto e0 = w.entityMngr.Create(Smkz::TypeIDs_of<B, E>);        // x
-  auto e1 = w.entityMngr.Create(Smkz::TypeIDs_of<A, E>);        // x
-  auto e2 = w.entityMngr.Create(Smkz::TypeIDs_of<A, C, D, E>);  // x
-  auto e3 = w.entityMngr.Create(Smkz::TypeIDs_of<A, B, E>);     // bingo
+  auto e0 = w.entityMngr.Create(My::TypeIDs_of<B, E>);        // x
+  auto e1 = w.entityMngr.Create(My::TypeIDs_of<A, E>);        // x
+  auto e2 = w.entityMngr.Create(My::TypeIDs_of<A, C, D, E>);  // x
+  auto e3 = w.entityMngr.Create(My::TypeIDs_of<A, B, E>);     // bingo
 
   w.entityMngr.WriteComponent<E>(e0)->val = 0.f;
   w.entityMngr.WriteComponent<E>(e1)->val = 1.f;

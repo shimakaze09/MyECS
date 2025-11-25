@@ -4,7 +4,7 @@
 #include "CmptLocator.hpp"
 #include "details/Util.hpp"
 
-namespace Smkz::MyECS {
+namespace My::MyECS {
 // ArchetypeFilter + CmptLocator
 struct EntityQuery {
   ArchetypeFilter filter;
@@ -39,11 +39,11 @@ struct EntityQuery {
     return lhs.filter == rhs.filter && lhs.locator == rhs.locator;
   }
 };
-}  // namespace Smkz::MyECS
+}  // namespace My::MyECS
 
 template <>
-struct std::hash<Smkz::MyECS::EntityQuery> {
-  std::size_t operator()(const Smkz::MyECS::EntityQuery& query) const noexcept {
+struct std::hash<My::MyECS::EntityQuery> {
+  std::size_t operator()(const My::MyECS::EntityQuery& query) const noexcept {
     return query.GetValue();
   }
 };

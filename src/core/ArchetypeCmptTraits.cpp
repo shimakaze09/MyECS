@@ -1,4 +1,3 @@
-#pragma once
 
 #include "ArchetypeCmptTraits.hpp"
 
@@ -6,11 +5,12 @@
 #include <MyECS/EntityQuery.hpp>
 #include <stdexcept>
 
-using namespace Smkz::MyECS;
+using namespace My::MyECS;
 
 void ArchetypeCmptTraits::CmptTrait::DefaultConstruct(
     void* cmpt, std::pmr::memory_resource* rsrc) const {
-  if (default_ctor) default_ctor(cmpt, rsrc);
+  if (default_ctor)
+    default_ctor(cmpt, rsrc);
 }
 
 void ArchetypeCmptTraits::CmptTrait::CopyConstruct(
@@ -37,7 +37,8 @@ void ArchetypeCmptTraits::CmptTrait::MoveAssign(void* dst, void* src) const {
 }
 
 void ArchetypeCmptTraits::CmptTrait::Destruct(void* cmpt) const {
-  if (dtor) dtor(cmpt);
+  if (dtor)
+    dtor(cmpt);
 }
 
 std::size_t ArchetypeCmptTraits::GetTypeIndex(TypeID ID) const noexcept {
@@ -76,7 +77,8 @@ void ArchetypeCmptTraits::Register(const CmptTraits& rtdct, TypeID type) {
   if (destructor_target != rtdct.GetDestructors().end())
     trait.dtor = destructor_target->second;
 
-  if (!trait.trivial) trivial = false;
+  if (!trait.trivial)
+    trivial = false;
 
   auto [iter, success] = types.insert(type);
   std::size_t idx =
@@ -89,7 +91,8 @@ void ArchetypeCmptTraits::Register(const CmptTraits& rtdct, TypeID type) {
 
 void ArchetypeCmptTraits::Deregister(TypeID type) noexcept {
   auto ttarget = types.find(type);
-  if (ttarget == types.end()) return;
+  if (ttarget == types.end())
+    return;
 
   std::size_t idx =
       static_cast<std::size_t>(std::distance(types.begin(), ttarget));
@@ -97,7 +100,8 @@ void ArchetypeCmptTraits::Deregister(TypeID type) noexcept {
   if (!target->trivial) {
     cmpt_traits.erase(target);
     for (const auto& trait : cmpt_traits) {
-      if (!trait.trivial) return;
+      if (!trait.trivial)
+        return;
     }
     // all cmpt is trivial
     trivial = true;

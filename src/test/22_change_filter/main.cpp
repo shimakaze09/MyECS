@@ -1,8 +1,8 @@
 #include <MyECS/MyECS.hpp>
 #include <iostream>
 
-using namespace Smkz;
-using namespace Smkz::MyECS;
+using namespace My;
+using namespace My::MyECS;
 
 struct Data {
   float value;

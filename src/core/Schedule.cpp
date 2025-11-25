@@ -2,8 +2,8 @@
 
 #include "SysFuncGraph.hpp"
 
-using namespace Smkz;
-using namespace Smkz::MyECS;
+using namespace My;
+using namespace My::MyECS;
 using namespace std;
 
 Schedule::Schedule(World* w) : world{w} {}

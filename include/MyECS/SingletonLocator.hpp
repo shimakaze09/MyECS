@@ -5,7 +5,7 @@
 
 #include "AccessTypeID.hpp"
 
-namespace Smkz::MyECS {
+namespace My::MyECS {
 class SingletonLocator {
  public:
   SingletonLocator(std::set<AccessTypeID> types)
@@ -28,6 +28,6 @@ class SingletonLocator {
  private:
   std::set<AccessTypeID> singletonTypes;
 };
-}  // namespace Smkz::MyECS
+}  // namespace My::MyECS
 
 #include "details/SingletonLocator.inl"

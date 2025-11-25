@@ -7,7 +7,7 @@
 #include "Entity.hpp"
 #include "config.hpp"
 
-namespace Smkz::MyECS {
+namespace My::MyECS {
 class Archetype;
 
 class alignas(ChunkAlignment) Chunk {
@@ -136,4 +136,4 @@ class ChunkView {
  private:
   const Chunk* chunk;
 };
-}  // namespace Smkz::MyECS
+}  // namespace My::MyECS

@@ -2,17 +2,19 @@
 
 #include <MyECS/World.hpp>
 
-using namespace Smkz::MyECS;
+using namespace My::MyECS;
 using namespace std;
 
 Archetype::Archetype(World* world) : world{world} {}
 
 Archetype::~Archetype() {
-  if (cmptTraits.IsTrivial()) return;
+  if (cmptTraits.IsTrivial())
+    return;
 
   for (std::size_t i = 0; i < cmptTraits.GetTraits().size(); i++) {
     const auto& trait = cmptTraits.GetTraits()[i];
-    if (!trait.dtor) continue;
+    if (!trait.dtor)
+      continue;
     for (std::size_t k = 0; k < chunks.size(); k++) {
       std::size_t num = chunks[k]->EntityNum();
       std::uint8_t* buffer = chunks[k]->data;
@@ -41,7 +43,8 @@ Archetype::Archetype(const Archetype& src, World* world) : world{world} {
     auto* srcChunk = src.chunks[i];
     auto* dstChunk = chunks[i] = (Chunk*)world->GetUnsyncResource()->allocate(
         sizeof(Chunk), alignof(Chunk));
-    std::memcpy(dstChunk, srcChunk,
+    std::memcpy(reinterpret_cast<void*>(dstChunk),
+                reinterpret_cast<void*>(srcChunk),
                 sizeof(Chunk::Head) + sizeof(Chunk::Head::CmptInfo) *
                                           cmptTraits.GetTypes().size());
     new (&dstChunk->GetHead()->chunk_unsync_rsrc)
@@ -113,7 +116,8 @@ Archetype* Archetype::New(CmptTraits& rtdCmptTraits, World* world,
   auto* rst = new Archetype{world};
 
   rst->cmptTraits.Register(rtdCmptTraits, TypeID_of<Entity>);
-  for (const auto& type : types) rst->cmptTraits.Register(rtdCmptTraits, type);
+  for (const auto& type : types)
+    rst->cmptTraits.Register(rtdCmptTraits, type);
 
   rst->SetLayout();
 
@@ -131,7 +135,8 @@ Archetype* Archetype::Add(CmptTraits& rtdCmptTraits, const Archetype* from,
   auto* rst = new Archetype{from->world};
 
   rst->cmptTraits = from->cmptTraits;
-  for (const auto& type : types) rst->cmptTraits.Register(rtdCmptTraits, type);
+  for (const auto& type : types)
+    rst->cmptTraits.Register(rtdCmptTraits, type);
 
   rst->SetLayout();
 
@@ -150,7 +155,8 @@ Archetype* Archetype::Remove(const Archetype* from,
 
   rst->cmptTraits = from->cmptTraits;
 
-  for (const auto& type : types) rst->cmptTraits.Deregister(type);
+  for (const auto& type : types)
+    rst->cmptTraits.Deregister(type);
 
   rst->SetLayout();
 
@@ -220,7 +226,8 @@ Archetype::EntityAddress Archetype::RequestBuffer() {
 
 CmptAccessPtr Archetype::At(AccessTypeID type, EntityAddress addr) const {
   auto target = cmptTraits.GetTypes().find(type);
-  if (target == cmptTraits.GetTypes().end()) return nullptr;
+  if (target == cmptTraits.GetTypes().end())
+    return nullptr;
   auto typeIdx = static_cast<std::size_t>(
       std::distance(cmptTraits.GetTypes().begin(), target));
 
@@ -236,14 +243,16 @@ CmptAccessPtr Archetype::At(AccessTypeID type, EntityAddress addr) const {
   return {type, buffer + offset + idxInChunk * size};
 }
 
-Archetype::EntityAddress Archetype::Instantiate(Entity e, EntityAddress src) {
+Archetype::EntityAddress Archetype::Instantiate(Entity /*e*/,
+                                                EntityAddress src) {
   EntityAddress dst;
 
   Chunk* srcChunk = chunks[src.chunkIdx];
   if (!srcChunk->Full()) {
     dst = {.chunkIdx = src.chunkIdx,
            .idxInChunk = srcChunk->GetHead()->num_entity++};
-    if (srcChunk->Full()) nonFullChunks.erase(src.chunkIdx);
+    if (srcChunk->Full())
+      nonFullChunks.erase(src.chunkIdx);
   } else
     dst = RequestBuffer();
 
@@ -271,9 +280,9 @@ Archetype::EntityAddress Archetype::Instantiate(Entity e, EntityAddress src) {
   return dst;
 }
 
-std::tuple<Smkz::small_vector<Entity*>,
-           Smkz::small_vector<Smkz::small_vector<CmptAccessPtr>>,
-           Smkz::small_vector<std::size_t>>
+std::tuple<My::small_vector<Entity*>,
+           My::small_vector<My::small_vector<CmptAccessPtr>>,
+           My::small_vector<std::size_t>>
 Archetype::Locate(std::span<const AccessTypeID> cmpts) const {
   assert(
       std::find_if_not(cmpts.begin(), cmpts.end(), [this](const TypeID& type) {
@@ -287,8 +296,8 @@ Archetype::Locate(std::span<const AccessTypeID> cmpts) const {
                     cmptTraits.GetTypes().find(TypeID_of<Entity>)));
   const std::size_t offsetEntity = offsets[entityIdx];
 
-  Smkz::small_vector<Smkz::small_vector<CmptAccessPtr>> chunkCmpts(numChunk);
-  Smkz::small_vector<Entity*> chunkEntity(numChunk);
+  My::small_vector<My::small_vector<CmptAccessPtr>> chunkCmpts(numChunk);
+  My::small_vector<Entity*> chunkEntity(numChunk);
 
   for (std::size_t i = 0; i < numChunk; i++) {
     Chunk* chunk = chunks[i];
@@ -305,7 +314,7 @@ Archetype::Locate(std::span<const AccessTypeID> cmpts) const {
     chunkEntity[i] = reinterpret_cast<Entity*>(data + offsetEntity);
   }
 
-  Smkz::small_vector<std::size_t> sizes;
+  My::small_vector<std::size_t> sizes;
   sizes.reserve(numType);
   for (const auto& type : cmpts)
     sizes.push_back(cmptTraits.GetTrait(type).size);
@@ -335,14 +344,15 @@ vector<CmptAccessPtr> Archetype::Components(EntityAddress addr,
   vector<CmptAccessPtr> rst;
 
   for (const auto& type : cmptTraits.GetTypes()) {
-    if (type.Is<Entity>()) continue;
+    if (type.Is<Entity>())
+      continue;
     rst.push_back(At({type, mode}, addr));
   }
 
   return rst;
 }
 
-Smkz::small_flat_set<Smkz::TypeID> Archetype::GenTypeIDSet(
+My::small_flat_set<My::TypeID> Archetype::GenTypeIDSet(
     std::span<const TypeID> types) {
   small_flat_set<TypeID> sorted_types(types.begin(), types.end());
   sorted_types.insert(TypeID_of<Entity>);
@@ -355,4 +365,6 @@ void Archetype::NewFrame() {
         std::pmr::monotonic_buffer_resource(world->GetSyncFrameResource());
 }
 
-std::uint64_t Archetype::Version() const noexcept { return world->Version(); }
+std::uint64_t Archetype::Version() const noexcept {
+  return world->Version();
+}

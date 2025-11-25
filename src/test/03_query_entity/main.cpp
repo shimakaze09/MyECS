@@ -1,8 +1,8 @@
 #include <MyECS/MyECS.hpp>
 #include <iostream>
 
-using namespace Smkz;
-using namespace Smkz::MyECS;
+using namespace My;
+using namespace My::MyECS;
 using namespace std;
 
 struct A {};
@@ -40,7 +40,7 @@ int main() {
   w.entityMngr.cmptTraits.Register<A, B, C>();
   w.systemMngr.RegisterAndActivate<MySystem>();
 
-  w.entityMngr.Create(Smkz::TypeIDs_of<A, B>);
+  w.entityMngr.Create(My::TypeIDs_of<A, B>);
 
   w.Update();
   w.Update();

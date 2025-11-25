@@ -3,7 +3,7 @@
 
 #include "Archetype.hpp"
 
-using namespace Smkz::MyECS;
+using namespace My::MyECS;
 
 bool Chunk::Contains(TypeID type) const noexcept {
   const auto infos = GetHead()->GetCmptInfos();
@@ -120,8 +120,8 @@ void Chunk::ApplyChanges(std::span<const AccessTypeID> types) {
   }
 }
 
-std::tuple<Entity*, Smkz::small_vector<CmptAccessPtr>,
-           Smkz::small_vector<std::size_t>>
+std::tuple<Entity*, My::small_vector<CmptAccessPtr>,
+           My::small_vector<std::size_t>>
 Chunk::Locate(std::span<const AccessTypeID> types) {
   const auto& cmptTraits = GetHead()->archetype->GetCmptTraits();
   const auto infos = GetHead()->GetCmptInfos();

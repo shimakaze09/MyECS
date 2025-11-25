@@ -1,6 +1,6 @@
 #include <MyECS/SingletonLocator.hpp>
 
-using namespace Smkz::MyECS;
+using namespace My::MyECS;
 using namespace std;
 
 SingletonLocator::SingletonLocator(std::span<const AccessTypeID> types) {

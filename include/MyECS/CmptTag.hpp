@@ -2,7 +2,7 @@
 
 #include <cstddef>
 
-namespace Smkz::MyECS {
+namespace My::MyECS {
 // read/write tag : LastFrame -> Write -> Latest
 // singleton tag  : Singleton
 // ====
@@ -102,6 +102,6 @@ class Latest<Singleton<Cmpt>> {
  private:
   const Cmpt* cmpt;
 };
-}  // namespace Smkz::MyECS
+}  // namespace My::MyECS
 
 #include "details/CmptTag.inl"

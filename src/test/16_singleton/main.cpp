@@ -1,7 +1,7 @@
 #include <MyECS/MyECS.hpp>
 #include <iostream>
 
-using namespace Smkz::MyECS;
+using namespace My::MyECS;
 
 struct Timer {
   float dt{0.f};
@@ -33,8 +33,8 @@ int main() {
   w.entityMngr.cmptTraits.Register<Timer, Position, Velocity>();
   w.systemMngr.RegisterAndActivate<MoverSystem>();
 
-  w.entityMngr.Create(Smkz::TypeIDs_of<Position, Velocity>);
-  w.entityMngr.Create(Smkz::TypeIDs_of<Timer>);
+  w.entityMngr.Create(My::TypeIDs_of<Position, Velocity>);
+  w.entityMngr.Create(My::TypeIDs_of<Timer>);
 
   w.Update();
   std::cout << w.DumpUpdateJobGraph() << std::endl;

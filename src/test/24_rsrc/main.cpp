@@ -4,8 +4,8 @@
 
 #include "MyResource.hpp"
 
-using namespace Smkz;
-using namespace Smkz::MyECS;
+using namespace My;
+using namespace My::MyECS;
 
 struct Buffer {
   using allocator_type = std::pmr::vector<std::size_t>::allocator_type;

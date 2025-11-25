@@ -1,7 +1,7 @@
 #include <MyECS/MyECS.hpp>
 
-using namespace Smkz;
-using namespace Smkz::MyECS;
+using namespace My;
+using namespace My::MyECS;
 
 struct Position {
   float val;

@@ -41,7 +41,7 @@
 ```c++
 #include <MyECS/MyECS.hpp>
 
-using namespace Smkz::MyECS;
+using namespace My::MyECS;
 
 struct Position { float val; };
 struct Velocity { float val; };
@@ -61,7 +61,7 @@ int main() {
   World w;
   w.entityMngr.cmptTraits.Register<Position, Velocity>();
   w.systemMngr.RegisterAndActivate<MoverSystem>();
-  w.entityMngr.Create(Smkz::TypeIDs_of<Position, Velocity>);
+  w.entityMngr.Create(My::TypeIDs_of<Position, Velocity>);
   w.Update();
 }
 ```

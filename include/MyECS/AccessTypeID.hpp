@@ -6,7 +6,7 @@
 #include "CmptTag.hpp"
 #include "details/Util.hpp"
 
-namespace Smkz::MyECS {
+namespace My::MyECS {
 // TypeID with AccessMode
 class AccessTypeID : public TypeID {
  public:
@@ -34,12 +34,12 @@ static constexpr AccessTypeID AccessTypeID_of = {TypeID_of<RemoveTag_t<Cmpt>>,
                                                  AccessMode_of<Cmpt>};
 
 using AccessTypeIDSet = small_flat_set<AccessTypeID, 16, std::less<>>;
-}  // namespace Smkz::MyECS
+}  // namespace My::MyECS
 
 template <>
-struct std::hash<Smkz::MyECS::AccessTypeID> {
+struct std::hash<My::MyECS::AccessTypeID> {
   constexpr std::size_t operator()(
-      const Smkz::MyECS::AccessTypeID& id) const noexcept {
+      const My::MyECS::AccessTypeID& id) const noexcept {
     return id.GetValue();
   }
 };

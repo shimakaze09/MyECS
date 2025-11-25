@@ -1,6 +1,6 @@
 #include <MyECS/MyECS.hpp>
 
-using namespace Smkz::MyECS;
+using namespace My::MyECS;
 
 #include <chrono>
 #include <iostream>
@@ -35,7 +35,7 @@ int main() {
   {  // ECS
     auto t0 = std::chrono::high_resolution_clock::now();
     for (std::size_t i = 0; i < numEntities; i++)
-      w.entityMngr.Create(Smkz::TypeIDs_of<A, B>);
+      w.entityMngr.Create(My::TypeIDs_of<A, B>);
     auto t1 = std::chrono::high_resolution_clock::now();
     for (std::size_t i = 0; i < numUpdate; i++) w.Update();
     auto t2 = std::chrono::high_resolution_clock::now();

@@ -1,7 +1,7 @@
 #include <MyECS/MyECS.hpp>
 
-using namespace Smkz;
-using namespace Smkz::MyECS;
+using namespace My;
+using namespace My::MyECS;
 
 struct Translation {
   float value{0.f};
@@ -83,11 +83,11 @@ int main() {
   w.systemMngr.RegisterAndActivate<TranslationSystem>();
 
   auto e1 = w.entityMngr.Create(
-      Smkz::TypeIDs_of<Children, Translation, LocalToWorld>);
+      My::TypeIDs_of<Children, Translation, LocalToWorld>);
   auto e2 = w.entityMngr.Create(
-      Smkz::TypeIDs_of<Parent, Translation, LocalToParent, LocalToWorld>);
+      My::TypeIDs_of<Parent, Translation, LocalToParent, LocalToWorld>);
   auto e3 = w.entityMngr.Create(
-      Smkz::TypeIDs_of<Parent, Translation, LocalToParent, LocalToWorld>);
+      My::TypeIDs_of<Parent, Translation, LocalToParent, LocalToWorld>);
 
   w.entityMngr.WriteComponent<Children>(e1)->value = {e2, e3};
   w.entityMngr.WriteComponent<Parent>(e2)->value = e1;

@@ -9,7 +9,7 @@
 #include "SingletonLocator.hpp"
 #include "details/Job.hpp"
 
-namespace Smkz::MyECS {
+namespace My::MyECS {
 class World;
 class SystemFunc;
 class IListener;
@@ -164,4 +164,4 @@ class EntityMngr {
       ts2a;  // archetype's TypeIDSet to archetype
   void NewFrame() noexcept;
 };
-}  // namespace Smkz::MyECS
+}  // namespace My::MyECS

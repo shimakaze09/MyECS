@@ -8,7 +8,7 @@
 
 #include "ArchetypeCmptTraits.hpp"
 
-namespace Smkz::MyECS {
+namespace My::MyECS {
 class EntityMngr;
 class World;
 
@@ -129,4 +129,4 @@ class Archetype {
 
   std::size_t entityNum{0};
 };
-}  // namespace Smkz::MyECS
+}  // namespace My::MyECS

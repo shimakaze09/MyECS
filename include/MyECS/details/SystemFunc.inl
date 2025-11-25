@@ -2,12 +2,12 @@
 
 #include <MyTemplate/Func.hpp>
 
-namespace Smkz::MyECS::details {
+namespace My::MyECS::details {
 template <typename Func>
 auto Pack(Func&& func) noexcept;
 }
 
-namespace Smkz::MyECS {
+namespace My::MyECS {
 // Mode::Entity
 template <typename Func>
 SystemFunc::SystemFunc(Func&& func, std::string_view name,
@@ -105,9 +105,9 @@ SystemFunc::SystemFunc(Func&& func, std::string_view name,
       "(Mode::Job) SystemFunc's argument list cann't have Entity, indexInQuery "
       "CmptsView, ChunkView or CommandBufferView");
 }
-}  // namespace Smkz::MyECS
+}  // namespace My::MyECS
 
-namespace Smkz::MyECS::details {
+namespace My::MyECS::details {
 template <typename DecayedArgList, typename SortedSingletonList,
           typename SortedNonSingletonList>
 struct Packer;
@@ -166,4 +166,4 @@ auto Pack(Func&& func) noexcept {
   return Packer<DecayedArgList, SortedSingletonList,
                 SortedNonSingletonList>::run(std::forward<Func>(func));
 }
-}  // namespace Smkz::MyECS::details
+}  // namespace My::MyECS::details

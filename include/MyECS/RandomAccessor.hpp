@@ -2,9 +2,9 @@
 
 #include "AccessTypeID.hpp"
 
-namespace Smkz::MyECS {
+namespace My::MyECS {
 class RandomAccessor {
  public:
   AccessTypeIDSet types;
 };
-}  // namespace Smkz::MyECS
+}  // namespace My::MyECS

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Smkz::MyECS {
+namespace My::MyECS {
 template <typename Func>
 const SystemFunc* Schedule::RegisterEntityJob(
     Func&& func, std::string_view name, bool isParallel, ArchetypeFilter filter,
@@ -62,4 +62,4 @@ const SystemFunc* Schedule::Request(int layer, Args&&... args) {
   layerInfos[layer].sysFuncs.emplace(sysFunc->GetValue(), sysFunc);
   return sysFunc;
 }
-}  // namespace Smkz::MyECS
+}  // namespace My::MyECS

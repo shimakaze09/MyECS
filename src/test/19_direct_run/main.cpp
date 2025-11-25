@@ -1,8 +1,8 @@
 #include <MyECS/MyECS.hpp>
 #include <iostream>
 
-using namespace Smkz;
-using namespace Smkz::MyECS;
+using namespace My;
+using namespace My::MyECS;
 using namespace std;
 
 struct Position {
@@ -47,7 +47,7 @@ int main() {
   World w;
   w.entityMngr.cmptTraits.Register<Position, Velocity>();
   w.systemMngr.RegisterAndActivate<MoverSystem>();
-  w.entityMngr.Create(Smkz::TypeIDs_of<Position, Velocity>);
+  w.entityMngr.Create(My::TypeIDs_of<Position, Velocity>);
   w.Update();
   print0(w);
   print1(w);

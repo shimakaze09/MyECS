@@ -4,16 +4,16 @@
 
 #include "SystemTraits.hpp"
 
-namespace Smkz::MyECS {
+namespace My::MyECS {
 class Schedule;
 
 class SystemMngr {
  public:
   SystemTraits systemTraits;
 
-  const std::pmr::unordered_set<Smkz::NameID>& GetAliveSystemIDs()
+  const std::pmr::unordered_set<My::NameID>& GetAliveSystemIDs()
       const noexcept;
-  const std::pmr::unordered_set<Smkz::NameID>& GetActiveSystemIDs()
+  const std::pmr::unordered_set<My::NameID>& GetActiveSystemIDs()
       const noexcept;
 
   // not alive -> create
@@ -76,6 +76,6 @@ class SystemMngr {
   struct Impl;
   std::unique_ptr<Impl> impl;
 };
-}  // namespace Smkz::MyECS
+}  // namespace My::MyECS
 
 #include "details/SystemMngr.inl"

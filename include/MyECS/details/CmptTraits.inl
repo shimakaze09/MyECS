@@ -2,7 +2,7 @@
 
 #include "../CmptTraits.hpp"
 
-namespace Smkz::MyECS::details {
+namespace My::MyECS::details {
 template <typename T>
 concept ContainPmrAlloc = requires() {
   typename T::allocator_type;
@@ -24,9 +24,9 @@ template<typename T>
 	concept MoveCtorWithAlloc = ContainPmrAlloc<T> &&
 		(requires(T other, const typename T::allocator_type & alloc) { new T(std::move(other), alloc); }
 	|| requires(T other, const typename T::allocator_type & alloc) { new T(std::allocator_arg_t{}, alloc, std::move(other)); });
-}  // namespace Smkz::MyECS::details
+}  // namespace My::MyECS::details
 
-namespace Smkz::MyECS {
+namespace My::MyECS {
 template <typename... Cmpts>
 void CmptTraits::Register() {
   (RegisterOne<Cmpts>(), ...);
@@ -141,4 +141,4 @@ void CmptTraits::Deregister() {
   constexpr TypeID type = TypeID_of<Cmpt>;
   Deregister(type);
 }
-}  // namespace Smkz::MyECS
+}  // namespace My::MyECS

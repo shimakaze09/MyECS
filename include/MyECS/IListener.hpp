@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Smkz::MyECS {
+namespace My::MyECS {
 class World;
 class EntityMngr;
 struct Entity;
@@ -20,4 +20,4 @@ class IListener {
   virtual void EnterCmpt(CmptPtr) = 0;
   virtual void ExistCmpt(CmptPtr) = 0;
 };
-}  // namespace Smkz::MyECS
+}  // namespace My::MyECS

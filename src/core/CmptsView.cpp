@@ -1,6 +1,6 @@
 #include <MyECS/CmptsView.hpp>
 
-using namespace Smkz::MyECS;
+using namespace My::MyECS;
 
 CmptAccessPtr CmptsView::GetCmpt(AccessTypeID t) const noexcept {
   for (const auto& cmpt : cmpts) {

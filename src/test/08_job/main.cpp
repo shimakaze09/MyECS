@@ -1,7 +1,7 @@
 #include <MyECS/MyECS.hpp>
 #include <iostream>
 
-using namespace Smkz::MyECS;
+using namespace My::MyECS;
 using namespace std;
 
 struct Data {
@@ -40,7 +40,7 @@ int main() {
   w.systemMngr.RegisterAndActivate<MySystem>();
 
   for (std::size_t i = 1; i <= 100; i++) {
-    auto e = w.entityMngr.Create(Smkz::TypeIDs_of<Data>);
+    auto e = w.entityMngr.Create(My::TypeIDs_of<Data>);
     w.entityMngr.WriteComponent<Data>(e)->value = i;
   }
 

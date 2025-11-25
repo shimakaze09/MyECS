@@ -12,7 +12,7 @@
 #include "SingletonLocator.hpp"
 #include "SingletonsView.hpp"
 
-namespace Smkz::MyECS {
+namespace My::MyECS {
 class Schedule;
 
 // [- description]
@@ -97,6 +97,6 @@ class SystemFunc {
                      ChunkView, CommandBufferView)>
       func;
 };
-}  // namespace Smkz::MyECS
+}  // namespace My::MyECS
 
 #include "details/SystemFunc.inl"

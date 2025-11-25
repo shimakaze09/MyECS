@@ -9,7 +9,7 @@
 #include "Schedule.hpp"
 #include "SystemMngr.hpp"
 
-namespace Smkz::MyECS {
+namespace My::MyECS {
 class IListener;
 
 class synchronized_monotonic_buffer_resource
@@ -17,6 +17,9 @@ class synchronized_monotonic_buffer_resource
  public:
   using std::pmr::monotonic_buffer_resource::monotonic_buffer_resource;
 
+  // WARNING: This method shadows std::pmr::monotonic_buffer_resource::release.
+  // It is not virtual and will not be called if accessed through a base pointer.
+  // Ensure this is called on the derived type synchronized_monotonic_buffer_resource.
   void release() noexcept /* strengthened */ {
     std::lock_guard<std::mutex> guard{mtx};
     this->monotonic_buffer_resource::release();
@@ -136,12 +139,15 @@ class World {
   synchronized_monotonic_buffer_resource* GetSyncFrameResource() {
     return sync_frame_rsrc.get();
   }
+
   std::pmr::monotonic_buffer_resource* GetUnsyncFrameResource() {
     return unsync_frame_rsrc.get();
   }
+
   std::pmr::synchronized_pool_resource* GetSyncResource() {
     return sync_rsrc.get();
   }
+
   std::pmr::unsynchronized_pool_resource* GetUnsyncResource() {
     return unsync_rsrc.get();
   }
@@ -170,6 +176,6 @@ class World {
 
   CommandBuffer Run(SystemFunc*);
 };
-}  // namespace Smkz::MyECS
+}  // namespace My::MyECS
 
 #include "details/World.inl"

@@ -3,7 +3,7 @@
 #include <functional>
 #include <vector>
 
-namespace Smkz::MyECS {
+namespace My::MyECS {
 class CommandBuffer {
  public:
   void AddCommand(std::function<void()> command) {
@@ -37,4 +37,4 @@ class CommandBufferView {
  private:
   CommandBuffer* commandBuffer;
 };
-}  // namespace Smkz::MyECS
+}  // namespace My::MyECS

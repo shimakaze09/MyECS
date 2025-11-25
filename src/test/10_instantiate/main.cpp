@@ -1,7 +1,7 @@
 #include <MyECS/MyECS.hpp>
 #include <iostream>
 
-using namespace Smkz::MyECS;
+using namespace My::MyECS;
 using namespace std;
 
 struct A {
@@ -21,7 +21,7 @@ int main() {
   w.entityMngr.cmptTraits.Register<A>();
   w.systemMngr.RegisterAndActivate<MySystem>();
 
-  auto e = w.entityMngr.Create(Smkz::TypeIDs_of<A>);
+  auto e = w.entityMngr.Create(My::TypeIDs_of<A>);
   w.entityMngr.WriteComponent<A>(e)->val = 1.f;
   w.entityMngr.Instantiate(e);
   w.Update();

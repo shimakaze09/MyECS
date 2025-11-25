@@ -3,9 +3,9 @@
 #include <MySmallFlat/small_flat_set.hpp>
 #include <MyTemplate/Type.hpp>
 
-namespace Smkz::MyECS {
+namespace My::MyECS {
 class ChangeFilter {
  public:
   small_flat_set<TypeID> types;
 };
-}  // namespace Smkz::MyECS
+}  // namespace My::MyECS

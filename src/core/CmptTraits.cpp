@@ -1,7 +1,7 @@
 #include <MyECS/CmptTraits.hpp>
 
-using namespace Smkz;
-using namespace Smkz::MyECS;
+using namespace My;
+using namespace My::MyECS;
 
 struct CmptTraits::Impl {
   Impl(std::pmr::unsynchronized_pool_resource* rsrc)
